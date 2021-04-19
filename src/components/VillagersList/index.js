@@ -11,8 +11,7 @@ const useStyles = makeStyles(() => ({
     flexFlow: 'row wrap',
     justifyContent: 'space-around',
     width: 'auto',
-    maxWidth: '100%',
-    background: 'lightskyblue'
+    maxWidth: '100%'
   },
 }));
 

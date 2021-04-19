@@ -6,10 +6,10 @@ import VillagerIcon from '../VillagerIcon'
 const useStyles = makeStyles(() => ({
   root: {
     flex: '1 0 initial',
+    width: '100%',
     display: 'flex',
-    margin: 24,
     textAlign: 'left',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
     boxSizing: 'border-box'
   },
   details: {
@@ -50,7 +50,7 @@ export default function GiftListItem(props) {
           <Typography component="h5" variant="h5" className={classes.gift}>
             {props.gift}
           </Typography>
-          {props.villagers.map(villager => <VillagerIcon name={villager} />)}
+          {props.villagers.map(villager => <VillagerIcon key={villager} name={villager} />)}
         </CardContent>
       </div>
       

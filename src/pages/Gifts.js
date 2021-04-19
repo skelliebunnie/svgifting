@@ -1,23 +1,33 @@
 import { useState, useEffect } from 'react'
 import { makeStyles } from '@material-ui/core/styles'
-import { Box, Container, FormHelperText, Typography } from '@material-ui/core'
+import { Box, AppBar, Tabs, Tab, Container } from '@material-ui/core'
 
+import Navbar from '../components/Navbar'
+
+import TabPanel from '../components/TabPanel'
 import GiftListItem from '../components/GiftListItem'
 
 const data = require('../utils/data')
 
 const useStyles = makeStyles(() => ({
+  root: {
+    flexGrow: 1,
+  },
   giftsList: {
-    display: 'flex',
-    flexFlow: 'row wrap',
-    maxWidth: '90%'
-  }
-}))
+    maxWidth: '80%',
+    display: 'grid',
+    gridTemplateColumns: 'repeat(4, 1fr)',
+    gridGap: '1rem',
+    margin: '2rem auto 1rem'
+  },
+}));
 
 export default function Gifts() {
   const classes = useStyles();
 
+  const [tabValue, setTabValue] = useState(0);
   const [lovedGifts, setLovedGifts] = useState([]);
+  // eslint-disable-next-line
   const [includeUniversalLoves, setIncludeULoves] = useState(false);
 
   useEffect(() => {
@@ -65,6 +75,8 @@ export default function Gifts() {
     }
 
     setLovedGifts(minimum_list);
+
+  // eslint-disable-next-line
   }, []);
 
   const toTitleCase = (str) => {
@@ -82,19 +94,30 @@ export default function Gifts() {
     return '24px-' + str.replace('\'', '').split(' ').join('_') + '.png'
   }
 
+  const handleTabChange = (event, newValue) => {
+    setTabValue(newValue);
+  }
+
   return (
-    <>
-    <Typography component="h3" variant="h3">
-      Minimum Gifts
-    </Typography>
     <Box>
-      <Typography component="h5" variant="h5">
-        Loved Gifts ({[...lovedGifts.keys()].length})
-      </Typography>
-      <Container className={classes.giftsList}>
-        {[...lovedGifts.keys()].map(gift => <GiftListItem key={gift} gift={gift} icon={lovedGifts.get(gift).filename} villagers={lovedGifts.get(gift).villagers} />)}
-      </Container>
+      <Navbar />
+      <div className={classes.root}>
+        <AppBar position="static">
+          <Tabs value={tabValue} onChange={handleTabChange} aria-label="villagers grouped by gifts, grouped by preference" indicatorColor="secondary">
+            <Tab label={`Loved Gifts (${lovedGifts.size})`} {...{id: 'tab-loved', 'aria-controls': 'loved-gifts-tab'}} />
+            <Tab label="Liked Gifts" {...{id: 'tab-liked', 'aria-controls': 'liked-gifts-tab'}} />
+            <Tab label="Neutral Gifts" {...{id: 'tab-neutral', 'aria-controls': 'neutral-gifts-tab'}} />
+            <Tab label="Disliked Gifts" {...{id: 'tab-disliked', 'aria-controls': 'disliked-gifts-tab'}} />
+            <Tab label="Hated Gifts" {...{id: 'tab-hated', 'aria-controls': 'hated-gifts-tab'}} />
+          </Tabs>
+        </AppBar>
+        <TabPanel value={tabValue} index={0}>
+          <Container className={classes.giftsList}>
+            {[...lovedGifts.keys()].map(gift => <GiftListItem key={gift} gift={gift} icon={lovedGifts.get(gift).filename} villagers={lovedGifts.get(gift).villagers} />)}
+          </Container>
+        </TabPanel>
+        
+      </div>
     </Box>
-    </>
   )
 }
