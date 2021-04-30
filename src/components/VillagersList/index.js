@@ -1,9 +1,9 @@
+import { useState, useEffect } from 'react'
 import { makeStyles } from '@material-ui/core/styles'
 import { Box, Container } from '@material-ui/core'
+import API from '../../utils/API'
 
 import VillagerCard from '../VillagerCard'
-
-const data = require('../../utils/data')
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -18,10 +18,19 @@ const useStyles = makeStyles(() => ({
 export default function VillagersList() {
   const classes = useStyles();
 
+  const [villagers, setVillagers] = useState([]);
+
+  useEffect(() => {
+    API.getVillagers().then(list => {
+      console.log(list.data);
+      setVillagers(list.data);
+    }).catch(err => console.error(err));
+  }, []);
+
   return (
     <Box className="App">
       <Container className={classes.root}>
-        {data.villagers.map((villager, idx) => <VillagerCard key={villager} name={villager} status={data.marriageable.includes(villager)} portrait={data.portraits[idx]} icon={data.icons[idx]} />)}
+        {villagers.map(villager => <VillagerCard key={villager.name} name={villager.name} status={villager.available} gifts={villager.Items} />)}
       </Container>
     </Box>
   );

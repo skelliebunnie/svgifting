@@ -35,14 +35,14 @@ const useStyles = makeStyles(() => ({
 
 export default function GiftListItem(props) {
   const classes = useStyles();
-
-  const icon = require(`../../../public/assets/item_icons/${props.icon}`);
+  // const fileName = '24px-' + props.name.replace('\'', '').split(' ').join('_') + '.png'
+  // const icon = require(`../../assets/item_icons/${fileName}`);
 
   return (
     <Card className={classes.root}>
       <CardMedia
         className={classes.giftIcon}
-        image={icon.default}
+        // image={icon.default}
         title={props.gift}
       />
       <div className={classes.details}>
@@ -50,7 +50,7 @@ export default function GiftListItem(props) {
           <Typography component="h5" variant="h5" className={classes.gift}>
             {props.gift}
           </Typography>
-          {props.villagers.map(villager => <VillagerIcon key={villager} name={villager} />)}
+          {props.villagers.map(villager => <VillagerIcon key={villager.name} name={villager.name} />)}
         </CardContent>
       </div>
       

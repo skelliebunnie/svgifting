@@ -28,6 +28,24 @@ const mainTheme = createMuiTheme({
       '"Segoe UI Emoji"',
       '"Segoe UI Symbol"',
     ].join(','),
+    h1: {
+      fontFamily: ['Dosis', 'sans-serif'].join(',')
+    },
+    h2: {
+      fontFamily: ['Dosis', 'sans-serif'].join(',')
+    },
+    h3: {
+      fontFamily: ['Dosis', 'sans-serif'].join(',')
+    },
+    h4: {
+      fontFamily: ['Dosis', 'sans-serif'].join(',')
+    },
+    h5: {
+      fontFamily: ['Dosis', 'sans-serif'].join(',')
+    },
+    h6: {
+      fontFamily: ['Dosis', 'sans-serif'].join(',')
+    },
   },
   overrides: {
     MuiToolbar: {
