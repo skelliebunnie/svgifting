@@ -3,17 +3,10 @@ import createBreakpoints from '@material-ui/core/styles/createBreakpoints'
 
 const breakpoints = createBreakpoints({})
 
-const colors = {
-  dayblue: '#59C9F1',
-  nightblue: '#151152',
-  red: '#B52121',
-  brown: '#6B3710',
-  sand: '#DDA059',
-  yellow: '#FFD921',
-  green: '#58AC14'
-};
+const palette = require('../utils/palette')
 
 const mainTheme = createMuiTheme({
+  palette: { ...palette },
   typography: {
     fontFamily: [
       'Noto Sans',
@@ -50,20 +43,20 @@ const mainTheme = createMuiTheme({
   overrides: {
     MuiToolbar: {
       root: {
-        background: colors.nightblue,
+        background: palette.nightblue,
         '& a:hover': {
-          color: colors.yellow
+          color: palette.yellow
         }
       },
     },
     MuiTabs: {
       root: {
-        backgroundColor: colors.dayblue,
+        backgroundColor: palette.dayblue[200],
         color: 'black',
         width: '100%',
         flex: '1 0 100%',
         '&:hover .MuiTabs-indicator': {
-          backgroundColor: colors.sand
+          backgroundColor: palette.sand[400]
         }
       },
       flexContainer: {
@@ -72,19 +65,19 @@ const mainTheme = createMuiTheme({
         justifyContent: 'space-around',
       },
       indicator: {
-        backgroundColor: 'maroon',
+        backgroundColor: palette.red[500],
       }
     },
     MuiTab: {
       root: {
-        backgroundColor: colors.dayblue,
+        backgroundColor: palette.dayblue[200],
         flex: '1 0 20%',
         [breakpoints.up('md')]: {
           flex: '1 0 20%',
           minWidth: '20%'
         },
         '&.Mui-selected': {
-          backgroundColor: colors.red,
+          backgroundColor: palette.red[400],
           color: 'white',
           outline: 0,
           border: 'none',
@@ -94,7 +87,7 @@ const mainTheme = createMuiTheme({
           }
         },
         '&.MuiButtonBase-root:hover': {
-          backgroundColor: colors.yellow,
+          backgroundColor: palette.sand[200],
           // color: 'white',
           cursor: 'pointer'
         },
@@ -131,7 +124,7 @@ const mainTheme = createMuiTheme({
     MuiTooltip: {
       tooltip: {
         fontSize: '0.75rem',
-        backgroundColor: colors.nightblue,
+        backgroundColor: palette.nightblue[500],
         color: 'white'
       },
       tooltipPlacementTop: {
@@ -141,7 +134,7 @@ const mainTheme = createMuiTheme({
         bottom: '6px'
       },
       arrow: {
-        color: colors.nightblue
+        color: palette.nightblue[500]
       }
     },
   }

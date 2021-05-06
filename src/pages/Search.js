@@ -10,7 +10,7 @@ export default function Search() {
     <Box>
       <Navbar />
       <Container>
-        {/* A search form will go here some day */}
+        <input type="text" value="Not Available Yet" disabled/>
       </Container>
       <VillagersList />
     </Box>

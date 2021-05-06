@@ -6,7 +6,7 @@ import { Box, Card, CardContent, CardMedia, Typography } from '@material-ui/core
 import VillagerIcon from '../VillagerIcon'
 import GiftIcon from '../GiftIcon'
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     flex: '1 0 100%',
     display: 'flex',
@@ -16,6 +16,7 @@ const useStyles = makeStyles(() => ({
     maxWidth: '30%',
     boxSizing: 'border-box',
     minHeight: 200,
+    color: theme.palette.dayblue[400]
   },
   details: {
     display: 'flex',
@@ -31,7 +32,8 @@ const useStyles = makeStyles(() => ({
     margin: '0 0 0 0.5rem'
   },
   marriageable: {
-    borderLeft: '8px solid greenyellow'
+    borderLeft: '8px solid transparent',
+    borderLeftColor: theme.palette.green[400]
   },
   icon: {
     display: 'inline-block',
@@ -48,7 +50,7 @@ const useStyles = makeStyles(() => ({
   },
   status: {
     position: 'relative',
-    color: 'green',
+    color: theme.palette.green[700],
     marginLeft: '0.5rem',
     bottom: '0.25rem',
     fontSize: 'small',

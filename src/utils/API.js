@@ -8,7 +8,25 @@ const API = {
   getVillagers: () => {
     return axios.get(`${URL_PREFIX}/api/villagers`)
   },
-  getGifts: (preference) => {
+  getItems: () => {
+    return axios.get(`${URL_PREFIX}/api/items`)
+  },
+  getItemTypes: () => {
+    return axios.get(`${URL_PREFIX}/api/itemtypes`)
+  },
+  getEquipment: () => {
+    return axios.get(`${URL_PREFIX}/api/equipment`)
+  },
+  getAnimals: () => {
+    return axios.get(`${URL_PREFIX}/api/animals`)
+  },
+  getLocations: () => {
+    return axios.get(`${URL_PREFIX}/api/locations`)
+  },
+  getAllGifts: () => {
+    return axios.get(`${URL_PREFIX}/api/gifts`)
+  },
+  getGiftsByPreference: (preference) => {
     return axios.get(`${URL_PREFIX}/api/gifts/${preference}`)
   },
 }

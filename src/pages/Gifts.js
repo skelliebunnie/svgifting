@@ -28,17 +28,20 @@ export default function Gifts() {
 
   const [tabValue, setTabValue] = useState(0);
   const [lovedGifts, setLovedGifts] = useState([]);
+  // eslint-disable-next-line
   const [likedGifts, setLikedGifts] = useState([]);
+  // eslint-disable-next-line
   const [neutralGifts, setNeutralGifts] = useState([]);
+  // eslint-disable-next-line
   const [dislikedGifts, setDislikedGifts] = useState([]);
+  // eslint-disable-next-line
   const [hatedGifts, setHatedGifts] = useState([]);
   // eslint-disable-next-line
   const [includeUniversalLoves, setIncludeULoves] = useState(false);
 
   useEffect(() => {
-    API.getGifts('love').then(list => {
+    API.getGiftsByPreference('love').then(list => {
       setLovedGifts(list.data);
-      console.log(list.data);
     }).catch(err => console.error(err));
 
   // eslint-disable-next-line

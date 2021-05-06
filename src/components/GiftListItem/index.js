@@ -3,7 +3,7 @@ import { Card, CardContent, CardMedia, Typography } from '@material-ui/core'
 
 import VillagerIcon from '../VillagerIcon'
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     flex: '1 0 initial',
     width: '100%',
@@ -27,7 +27,7 @@ const useStyles = makeStyles(() => ({
     display: 'block',
   },
   status: {
-    color: 'green',
+    color: theme.palette.green[600],
     marginLeft: '2.15rem',
     fontSize: 'small'
   }
@@ -35,14 +35,14 @@ const useStyles = makeStyles(() => ({
 
 export default function GiftListItem(props) {
   const classes = useStyles();
-  // const fileName = '24px-' + props.name.replace('\'', '').split(' ').join('_') + '.png'
-  // const icon = require(`../../assets/item_icons/${fileName}`);
+  const fileName = '24px-' + props.gift.replace('\'', '').split(' ').join('_') + '.png'
+  const icon = require(`../../assets/item_icons/${fileName}`);
 
   return (
     <Card className={classes.root}>
       <CardMedia
         className={classes.giftIcon}
-        // image={icon.default}
+        image={icon.default}
         title={props.gift}
       />
       <div className={classes.details}>
