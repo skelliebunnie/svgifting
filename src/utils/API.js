@@ -5,6 +5,7 @@ const URL_PREFIX = "http://localhost:3030"
 // const URL_PREFIX = ""
 
 const API = {
+  // get
   getVillagers: () => {
     return axios.get(`${URL_PREFIX}/api/villagers`)
   },
@@ -29,6 +30,10 @@ const API = {
   getGiftsByPreference: (preference) => {
     return axios.get(`${URL_PREFIX}/api/gifts/${preference}`)
   },
+  // post / put / upsert
+  upsertItem: (data) => {
+    return axios.post(`${URL_PREFIX}/api/item/upsert`, data);
+  }
 }
 
 export default API

@@ -9,7 +9,7 @@ import { Box } from '@material-ui/core'
 import Search from './pages/Search'
 import Gifts from './pages/Gifts'
 import GiftForm from './pages/GiftForm'
-import AddItem from './pages/AddItem'
+import UpsertItem from './pages/UpsertItem'
 
 const palette = require('./utils/palette')
 
@@ -31,7 +31,7 @@ function App() {
           <Route exact path="/" component={Search} />
           <Route exact path="/gifts" component={Gifts} />
           <Route exact path="/assign-gifts" component={GiftForm} />
-          <Route exact path="/add-item" component={AddItem} />
+          <Route exact path="/add-item" component={UpsertItem} />
         </Switch>
       </Box>
     </ThemeProvider>
