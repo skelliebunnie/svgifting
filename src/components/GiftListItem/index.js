@@ -2,6 +2,7 @@ import { makeStyles } from '@material-ui/core/styles'
 import { Card, CardContent, CardMedia, Typography } from '@material-ui/core'
 
 import VillagerIcon from '../VillagerIcon'
+import GiftIcon from '../GiftIcon'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -35,14 +36,25 @@ const useStyles = makeStyles((theme) => ({
 
 export default function GiftListItem(props) {
   const classes = useStyles();
-  const fileName = '24px-' + props.gift.replace('\'', '').split(' ').join('_') + '.png'
-  const icon = require(`../../assets/item_icons/${fileName}`);
+
+  // let fileName = '24px-' + props.gift.replace("'", "").replace(",", "")
+  // if(fileName.includes(" ")) {
+  //   fileName = fileName.split(' ')
+
+  //   for(var word in fileName) {
+  //     word = word.length > 1 ? word.substring(0,1).toUpperCase() + word.substring(1, word.length - 1).toLowerCase() : word.toUpperCase()
+  //   }
+  //   fileName = fileName.join('_')
+  // }
+  // fileName += '.png'
+
+  // const icon = require(`../../assets/item_icons/${fileName}`) || require('../../assets/item_icons/Error_Item.png');
 
   return (
     <Card className={classes.root}>
       <CardMedia
         className={classes.giftIcon}
-        image={icon.default}
+        image={<GiftIcon name={props.gift} />}
         title={props.gift}
       />
       <div className={classes.details}>

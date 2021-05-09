@@ -99,6 +99,30 @@ export default function GiftPreferenceForm() {
 
   const handleFormSubmit = e => {
     console.log("the database will be updated here")
+
+    const items = formOptions.items.filter(item => item.isChecked)
+    const npcs = formOptions.npcs.filter(npc => npc.isChecked)
+
+    for(var i = 0; i < npcs.length; i++) {
+      const npcId = npcs[i].id;
+
+      for(var j = 0; j < items.length; j++) {
+        const itemId = items[j].id;
+
+        API.upsertGift({
+          VillagerId: npcId,
+          ItemId: itemId,
+          preference: formOptions.preference
+        })
+        .then(gifts => {
+          console.log(gifts.data);
+
+        })
+        .catch(err => console.error(err))
+      }
+
+    }
+
     console.log("and then the form cleared")
   }
 

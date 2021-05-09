@@ -33,7 +33,10 @@ const API = {
   // post / put / upsert
   upsertItem: (data) => {
     return axios.post(`${URL_PREFIX}/api/item/upsert`, data);
-  }
+  },
+  upsertGift: (data) => {
+    return axios.post(`${URL_PREFIX}/api/gift/upsert`, data);
+  },
 }
 
 export default API

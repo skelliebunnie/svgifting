@@ -11,9 +11,12 @@ const useStyles = makeStyles((theme) => ({
     marginRight: theme.spacing(2),
   },
   title: {
-    flex: '0 0 20%',
-    // letterSpacing: '0.1rem',
-    fontWeight: 'bold'
+    flex: '0 0 15%',
+    fontWeight: 'bold',
+    '& a': {
+      textDecoration: 'none',
+      color: 'white'
+    }
   },
   button: {
     flex: '1 0 initial',
@@ -30,9 +33,7 @@ export default function Navbar() {
   return (
     <AppBar position="static">
       <Toolbar>
-        <Typography variant="h5" className={classes.title}>
-          Stardew Valley Gifting
-        </Typography>
+        <Typography variant="h5" className={classes.title}><Link to='/'>Stardew Valley Gifting</Link></Typography>
         {/* Only show menu icon when screen is super small */}
         {window.innerWidth < 768 ? 
           <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
