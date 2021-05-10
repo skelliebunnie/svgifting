@@ -98,45 +98,30 @@ const useStyles = makeStyles((theme) => ({
 export default function GiftPreferenceForm() {
   const classes = useStyles();
 
-  const { npcs, items, itemTypes } = useContext(DatabaseContext)
+  const { dbNpcs, dbItems, dbItemTypes, addItemModalOpen, setAddItemModalOpen, getItems, alert, handleAlertClose } = useContext(DatabaseContext)
   
-  const [allItems, setAllItems] = useState(items)
-  const [allItemTypes, setAllItemTypes] = useState(itemTypes)
+  const [allItems, setAllItems] = useState(dbItems)
+  const [itemTypes, setItemTypes] = useState(dbItemTypes)
   const [formOptions, setFormOptions] = useState({
-    npcs: npcs,
-    items: items,
+    npcs: dbNpcs,
+    items: dbItems,
     preference: ''
   });
 
   const [searchTerm, setSearchTerm] = useState("")
-  const [addItemModalOpen, setAddItemModalOpen] = useState(false)
 
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const alertDuration = 6000;
 
-  // useEffect(() => {
-  //   API.getVillagers().then(list => {
-  //     // set the form options list of NPCs and add a new key/value pair for isChecked, defaulting to false
-  //     let npcList = list.data.map(npc => ({ id: npc.id, name: npc.name, isChecked: false }));
-  //     npcList.push({ id: 'all', name: 'All', isChecked: false })
-
-  //     API.getItems().then(list => {
-  //       // set the form options list of NPCs and add a new key/value pair for isChecked, defaulting to false
-  //       const itemList = list.data.map(item => ({ id: item.id, name: item.name, TypeId: item.TypeId, isChecked: false }));
-  //       setFormOptions({...formOptions, npcs: npcList, items: itemList });
-  //       setAllItems(itemList);
-
-  //     }).catch(err => console.error(err));
-
-  //   }).catch(err => console.error(err));
-
-  //   API.getItemTypes().then(types => {
-  //     let itemTypesList = types.data.map(type => ({ id: type.id, name: type.name, isChecked: true }))
-  //     itemTypesList.push({ id: 'allTypes', name: 'All', isChecked: true })
-  //     setAllItemTypes(itemTypesList);
-  //   }).catch(err => console.error(err));
-  // // eslint-disable-next-line
-  // }, [])
+  useEffect(() => {
+    setFormOptions({
+      ...formOptions,
+      npcs: dbNpcs,
+      items: dbItems
+    })
+    setAllItems(dbItems)
+    setItemTypes(dbItemTypes)
+  }, [dbNpcs, dbItems, dbItemTypes])
 
   const handleOnChange = e => {
 
@@ -191,7 +176,7 @@ export default function GiftPreferenceForm() {
   const handleItemTypeFilter = e => {
     const TypeId = e.target.value !== 'allTypes' ? parseInt(e.target.value) : e.target.value
   
-    let selectedTypes = allItemTypes;
+    let selectedTypes = itemTypes;
     let selectedTypeIds = [];
     let visibleItems = allItems;
 
@@ -218,7 +203,7 @@ export default function GiftPreferenceForm() {
 
     visibleItems = allItems.filter(item => selectedTypeIds.includes(item.TypeId))
 
-    setAllItemTypes([...selectedTypes])
+    setItemTypes([...selectedTypes])
     setFormOptions({
       ...formOptions,
       items: visibleItems
@@ -259,6 +244,8 @@ export default function GiftPreferenceForm() {
         }
   
       }
+
+      getItems();
     } else {
       if(npcs.length === 0) {
         enqueueSnackbar('Please select at least one (1) NPC', { variant: 'error', autoHideDuration: alertDuration, action: closeAlert })
@@ -367,7 +354,7 @@ export default function GiftPreferenceForm() {
               <Button className={classes.addItemBtn} onClick={handleOpenModal}>Add Item</Button>
             </Typography>
             <FormGroup className={classes.list}>
-              {allItemTypes.map(type => 
+              {itemTypes.map(type => 
                 <FormControlLabel
                   key={`${type.id}-label`}
                   label={type.name}

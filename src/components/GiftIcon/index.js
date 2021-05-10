@@ -24,7 +24,7 @@ export default function GiftIcon(props) {
 
   return (
     <Tooltip title={item_name} aria-label={item_name} placement="bottom" arrow>
-      <img src={icon_url(filename).default} alt={`${item_name} Icon`} width={props.size !== undefined ? props.size : 32} height={props.size !== undefined ? props.size : 32}  style={{display: 'inline-block', margin: '0 3px', verticalAlign: 'middle'}} />
+      <img src={icon_url(filename).default} alt={`${item_name} Icon`} width={props.size !== undefined ? props.size : 32} height={props.size !== undefined ? props.size : 32}  style={props.style !== undefined ? {...props.style} : {display: 'inline-block', margin: '0 3px', verticalAlign: 'middle'}} />
     </Tooltip>
   )
 }

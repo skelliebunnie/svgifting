@@ -1,20 +1,14 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
+import { DatabaseContext } from "../../contexts/DatabaseContext";
 import { withStyles, makeStyles } from '@material-ui/core/styles'
 import { Box, Container, Grid, Input, InputLabel, InputAdornment, TextField, FormControlLabel, FormControl, FormHelperText, Checkbox, Select, MenuItem, Slider, Typography, Button, RadioGroup, Radio } from '@material-ui/core'
 
 import ItemList from '../ItemList'
-import AlertSnack from '../AlertSnack'
 
 import API from '../../utils/API'
 
 import weatherIcon_sun from '../../assets/other_icons/weather_sun.png'
 import weatherIcon_rain from '../../assets/other_icons/weather_rain.png'
-
-import seasonIcon_spring from '../../assets/season_icons/24px-Spring.png'
-import seasonIcon_summer from '../../assets/season_icons/24px-Summer.png'
-import seasonIcon_fall from '../../assets/season_icons/24px-Fall.png'
-import seasonIcon_winter from '../../assets/season_icons/24px-Winter.png'
-import seasonIcon_all from '../../assets/season_icons/24px-All_Seasons_Icon.png'
 
 const CustomCheckbox = withStyles((theme) => ({
   root: {
@@ -83,74 +77,7 @@ const useStyles = makeStyles((theme) => ({
 export default function UpsertItemForm(props) {
   const classes = useStyles();
 
-  const [alert, setAlert] = useState({
-    open: false,
-    severity: 'info',
-    message: 'A Snackbar Alert'
-  });
-
-  const [selected, setSelected] = useState(null)
-
-  const defaultItemAvailability = {
-    weather: 'any',
-    SeasonId: [
-      {
-        id: 1,
-        name: 'Spring',
-        icon: seasonIcon_spring,
-        isChecked: false
-      },
-      {
-        id: 2,
-        name: 'Summer',
-        icon: seasonIcon_summer,
-        isChecked: false
-      },
-      {
-        id: 3,
-        name: 'Fall',
-        icon: seasonIcon_fall,
-        isChecked: false
-      },
-      {
-        id: 4,
-        name: 'Winter',
-        icon: seasonIcon_winter,
-        isChecked: false
-      },
-      {
-        id: 5,
-        name: 'All',
-        icon: seasonIcon_all,
-        isChecked: true
-      }
-    ],
-    LocationId: [],
-    chance: 0,
-    time: [600, 200]
-  };
-
-  const defaultFormOptions = {
-    name: '',
-    source: '',
-    sellPrice: 0,
-    edible: false,
-    difficulty: 0,
-    behavior: '',
-    size: [],
-    initialGrowthTime: 0,
-    reproductionTime: 0,
-    processingTime: 0,
-    EquipmentId: '',
-    AnimalId: [],
-    TypeId: '',
-    ...defaultItemAvailability
-  }
-
-  const [formOptions, setFormOptions] = useState({
-    ...defaultFormOptions,
-    ...defaultItemAvailability
-  });
+  const { dbItems, dbItemTypes, addItemFormSubmit, alert, handleAlertClose, addItemFormOptions, setAddItemFormOptions, defaultAddItemFormOptions, defaultItemAvailability, selected, setSelected } = useContext(DatabaseContext)
 
   const [itemList, setItemList] = useState([])
   const [itemTypes, setItemTypes] = useState([])
@@ -159,10 +86,11 @@ export default function UpsertItemForm(props) {
   const [locations, setLocations] = useState([])
 
   useEffect(() => {
-    API.getItemTypes().then(list => {
-      setItemTypes([{id: 0, name: "None"}, ...list.data])
-    }).catch(err => console.error(err));
+    setItemList(dbItems)
+    setItemTypes(dbItemTypes)
+  }, [dbItems, dbItemTypes])
 
+  useEffect(() => {
     API.getEquipment().then(list => {
       setEquipment(list.data)
     }).catch(err => console.error(err));
@@ -176,18 +104,8 @@ export default function UpsertItemForm(props) {
       locations.sort((a, b) => a.name > b.name ? 1 : -1)
       setLocations( locations )
     }).catch(err => console.error(err));
-
-    getItems();
   // eslint-disable-next-line
   }, []);
-
-  const getItems = () => {
-    API.getItems()
-      .then(list => {
-        setItemList(list.data)
-      })
-      .catch(err => console.error(err));
-  }
 
   useEffect(() => {
     if(selected !== null) {
@@ -204,18 +122,18 @@ export default function UpsertItemForm(props) {
       newFormOptions.processingTime = selected.processingTime !== null ? selected.processingTime : 0
       newFormOptions.sellPrice = selected.sellPrice !== null ? selected.sellPrice : 0
 
-      setFormOptions({...newFormOptions, ...defaultItemAvailability});
+      setAddItemFormOptions({...newFormOptions, ...defaultItemAvailability});
 
     } else {
-      setFormOptions({...defaultFormOptions, ...defaultItemAvailability});
+      setAddItemFormOptions({...defaultAddItemFormOptions, ...defaultItemAvailability});
 
     }
   // eslint-disable-next-line
   }, [selected])
 
   const handleTextChange = e => {
-    setFormOptions({
-      ...formOptions,
+    setAddItemFormOptions({
+      ...addItemFormOptions,
       [e.target.name]: e.target.value
     });
 
@@ -223,127 +141,121 @@ export default function UpsertItemForm(props) {
 
   const handleNumberChange = e => {
     // AnimalId must be an array so that multiple animals can be selected (e.g. for Wool, which can come from Rabbits *or* Sheep)
-    setFormOptions({
-      ...formOptions,
+    setAddItemFormOptions({
+      ...addItemFormOptions,
       [e.target.name]: e.target.name !== "AnimalId" && e.target.name !== "LocationId" ? parseInt(e.target.value) : e.target.value
     })
   }
 
   const handleBoolChange = e => {
-    setFormOptions({
-      ...formOptions,
+    setAddItemFormOptions({
+      ...addItemFormOptions,
       [e.target.name]: e.target.checked
     })
   }
 
   const handleCheckboxGroupChange = e => {
-      let list = formOptions[e.target.name];
+      let list = addItemFormOptions[e.target.name];
       list.forEach(item => {
         if(item.id === parseInt(e.target.value)) {
           item.isChecked = e.target.checked
         }
       })
 
-      setFormOptions({
-        ...formOptions,
+      setAddItemFormOptions({
+        ...addItemFormOptions,
         [e.target.name]: list
       })
   }
 
   const handleRadioChange = e => {
-    setFormOptions({
-      ...formOptions,
+    setAddItemFormOptions({
+      ...addItemFormOptions,
       [e.target.name]: e.target.value
     })
   }
 
   const processingTimeSliderChange = (e, newVal) => {
-    setFormOptions({
-      ...formOptions,
+    setAddItemFormOptions({
+      ...addItemFormOptions,
       processingTime: newVal
     })
   }
 
-  const handleFormSubmit = e => {
+  // const handleFormSubmit = e => {
 
-    let data = {...formOptions}
-    const formKeys = Object.keys(data);
+  //   let data = {...addItemFormOptions}
+  //   const formKeys = Object.keys(data);
 
-    for(var i = 0; i < formKeys.length; i++) {
-      if(data[formKeys[i]] === 0 || data[formKeys[i]] === "") {
-        data[formKeys[i]] = null
-      }
+  //   for(var i = 0; i < formKeys.length; i++) {
+  //     if(data[formKeys[i]] === 0 || data[formKeys[i]] === "") {
+  //       data[formKeys[i]] = null
+  //     }
 
-      if(formKeys[i] === "size" && formKeys[i].length === 2) {
-        data.size = formOptions.size.join("-");
-      } else {
-        data.size = null;
-      }
+  //     if(formKeys[i] === "size" && formKeys[i].length === 2) {
+  //       data.size = addItemFormOptions.size.join("-");
+  //     } else {
+  //       data.size = null;
+  //     }
 
-      if(formKeys[i] === "time" && formKeys[i].length === 2) {
-        data.size = formOptions.size.join("-");
-      } else {
-        data.size = null;
-      }
-    }
+  //     if(formKeys[i] === "time" && formKeys[i].length === 2) {
+  //       data.size = addItemFormOptions.size.join("-");
+  //     } else {
+  //       data.size = null;
+  //     }
+  //   }
 
-    // if the item is *not* an animal product OR the AnimalId.length === 0
-    // just 'null' the AnimalId and insert/update
-    if(formOptions.TypeId !== 4 || formOptions.AnimalId.length === 0) {
-      data.AnimalId = null;
-      // if it's not a *fish* either, go ahead and 'null' the weather as well
-      // since forage items will have item availability but won't be weather dependent
-      if(data.TypeId !== 14) data.weather = null;
+  //   // if the item is *not* an animal product OR the AnimalId.length === 0
+  //   // just 'null' the AnimalId and insert/update
+  //   if(addItemFormOptions.TypeId !== 4 || addItemFormOptions.AnimalId.length === 0) {
+  //     data.AnimalId = null;
+  //     // if it's not a *fish* either, go ahead and 'null' the weather as well
+  //     // since forage items will have item availability but won't be weather dependent
+  //     if(data.TypeId !== 14) data.weather = null;
 
-      itemToDatabase(data)
+  //     itemToDatabase(data)
 
-    } else {
-      // now here we're handling animal products that are actually assigned to an animal
-      // if the length is 1, we can just move on
-      if(formOptions.AnimalId.length === 1) {
-        data.AnimalId = data.AnimalId[0];
+  //   } else {
+  //     // now here we're handling animal products that are actually assigned to an animal
+  //     // if the length is 1, we can just move on
+  //     if(addItemFormOptions.AnimalId.length === 1) {
+  //       data.AnimalId = data.AnimalId[0];
 
-        itemToDatabase(data)
+  //       itemToDatabase(data)
 
-      } else if(formOptions.AnimalId.length > 1) {
-        // otherwise, we need to add an item for each animal selected (just how it works)
-        for(var j = 0; j < formOptions.AnimalId.length; j++) {
-          data.AnimalId = formOptions.AnimalId[j];
+  //     } else if(addItemFormOptions.AnimalId.length > 1) {
+  //       // otherwise, we need to add an item for each animal selected (just how it works)
+  //       for(var j = 0; j < addItemFormOptions.AnimalId.length; j++) {
+  //         data.AnimalId = addItemFormOptions.AnimalId[j];
 
-          itemToDatabase(data)
-        }
+  //         itemToDatabase(data)
+  //       }
 
-      }
-    }
-  }
+  //     }
+  //   }
+  // }
 
-  const itemToDatabase = (data) => {
-    API.upsertItem(data)
-      .then(results => {
-        setAlert({ open: true, message: formOptions.id !== undefined ? `${formOptions.name} updated successfully` : `${formOptions.name} saved successfully`, severity: 'success' });
-        setFormOptions({...defaultFormOptions, ...defaultItemAvailability})
-        setSelected(null)
-        getItems();
-      })
-      .catch(err => {
-        setAlert({ open: true, message: formOptions.id !== undefined ? `Error: ${formOptions.name} was not updated. Message: ${err.message}` : `Error: ${formOptions.name} was not saved. Message: ${err.message}`, severity: 'error' })
-        console.error(err.message);
-      });
-  }
+  // const itemToDatabase = (data) => {
+  //   API.upsertItem(data)
+  //     .then(results => {
+  //       setAlert({ open: true, message: addItemFormOptions.id !== undefined ? `${addItemFormOptions.name} updated successfully` : `${addItemFormOptions.name} saved successfully`, severity: 'success' });
+  //       setAddItemFormOptions({...defaultAddItemFormOptions, ...defaultItemAvailability})
+  //       setSelected(null)
+  //       getItems();
+  //     })
+  //     .catch(err => {
+  //       setAlert({ open: true, message: addItemFormOptions.id !== undefined ? `Error: ${addItemFormOptions.name} was not updated. Message: ${err.message}` : `Error: ${addItemFormOptions.name} was not saved. Message: ${err.message}`, severity: 'error' })
+  //       console.error(err.message);
+  //     });
+  // }
 
   const clearForm = e => {
-    setFormOptions({
-      ...defaultFormOptions,
+    setAddItemFormOptions({
+      ...defaultAddItemFormOptions,
       ...defaultItemAvailability
     });
 
     setSelected(null)
-  }
-
-  const handleAlertClose = (event, reason) => {
-    if(reason === 'clickaway') return;
-    
-    setAlert({...alert, open: false});
   }
 
   const handleItemClick = e => {
@@ -437,7 +349,7 @@ export default function UpsertItemForm(props) {
             </Typography>
             {/* NAME */}
             <FormControl className={classes.formControl}>
-              <TextField id="name" label="Name" name="name" value={formOptions.name} onChange={handleTextChange} required />
+              <TextField id="name" label="Name" name="name" value={addItemFormOptions.name} onChange={handleTextChange} required />
             </FormControl>
             {/* TYPE ID */}
             <FormControl className={classes.formControl}>
@@ -446,7 +358,7 @@ export default function UpsertItemForm(props) {
                   labelId="itemtype-label"
                   id="TypeId"
                   name="TypeId"
-                  value={formOptions.TypeId}
+                  value={addItemFormOptions.TypeId}
                   onChange={handleNumberChange}
                   style={{fontSize: '1.4rem'}}
                 >
@@ -455,23 +367,23 @@ export default function UpsertItemForm(props) {
             </FormControl>
             {/* IF TYPE IS "CROP, <xyz>" */}
             {
-              (formOptions.TypeId === 5 || formOptions.TypeId === 6 || formOptions.TypeId === 7) &&
+              (addItemFormOptions.TypeId === 5 || addItemFormOptions.TypeId === 6 || addItemFormOptions.TypeId === 7) &&
               <>
               <FormControl className={classes.formControl}>
                 <InputLabel>Initial Growth Time</InputLabel>
-                <Input type="number" name="initialGrowthTime" value={formOptions.initialGrowthTime} onChange={handleNumberChange} />
+                <Input type="number" name="initialGrowthTime" value={addItemFormOptions.initialGrowthTime} onChange={handleNumberChange} />
                 <FormHelperText>How many <strong>days</strong> does it take the crop to grow from seed (no fertilizer)?</FormHelperText>
               </FormControl>
               <FormControl className={classes.formControl}>
                 <InputLabel>Reproduction Time</InputLabel>
-                <Input type="number" name="reproductionTime" value={formOptions.reproductionTime} onChange={handleNumberChange} />
+                <Input type="number" name="reproductionTime" value={addItemFormOptions.reproductionTime} onChange={handleNumberChange} />
                 <FormHelperText>If this crop continues to reproduce after reaching maturity, how many <strong>days</strong> between harvests? If the crop does <em>not</em> reproduce, leave as 0</FormHelperText>
               </FormControl>
               </>
             }
             {/* IF TYPE IS ARTISAN GOODS */}
             {
-              (formOptions.TypeId === 3) &&
+              (addItemFormOptions.TypeId === 3) &&
               <>
               <FormControl className={classes.formControl}>
                 <InputLabel id="equipment-label">Equipment</InputLabel>
@@ -479,7 +391,7 @@ export default function UpsertItemForm(props) {
                     labelId="equipment-label"
                     id="EquipmentId"
                     name="EquipmentId"
-                    value={formOptions.EquipmentId}
+                    value={addItemFormOptions.EquipmentId}
                     onChange={handleNumberChange}
                     style={{fontSize: '1.4rem'}}
                   >
@@ -498,7 +410,7 @@ export default function UpsertItemForm(props) {
                       name="processingTime"
                       id="processingTimeSlider"
                       onChange={processingTimeSliderChange}
-                      value={formOptions.processingTime}
+                      value={addItemFormOptions.processingTime}
                       valueLabelDisplay="on"
                       min={0}
                       max={10000}
@@ -506,7 +418,7 @@ export default function UpsertItemForm(props) {
                     />
                   </Grid>
                   <Grid item style={{marginTop: '1rem', padding: 0}}>
-                    <Input name="processingTime" value={formOptions.processingTime} margin="dense" onBlur={handleNumberChange} onChange={handleNumberChange} inputProps={{step: 1, min: 0, max: 10000, type: 'number', 'aria-labelledby': 'proccessing-time-slider'}} endAdornment={<InputAdornment position="end">min.</InputAdornment>} />
+                    <Input name="processingTime" value={addItemFormOptions.processingTime} margin="dense" onBlur={handleNumberChange} onChange={handleNumberChange} inputProps={{step: 1, min: 0, max: 10000, type: 'number', 'aria-labelledby': 'proccessing-time-slider'}} endAdornment={<InputAdornment position="end">min.</InputAdornment>} />
                   </Grid>
                 </Grid>
               </FormControl>
@@ -514,14 +426,14 @@ export default function UpsertItemForm(props) {
             }
             {/* IF TYPE IS ANIMAL PRODUCTS */}
             {
-              (formOptions.TypeId === 4) &&
+              (addItemFormOptions.TypeId === 4) &&
               <FormControl className={classes.formControl}>
                 <InputLabel id="animals-label">Animal</InputLabel>
                 <Select
                     labelId="animals-label"
                     id="AnimalId"
                     name="AnimalId"
-                    value={formOptions.AnimalId}
+                    value={addItemFormOptions.AnimalId}
                     onChange={handleNumberChange}
                     style={{fontSize: '1.4rem'}}
                     multiple
@@ -533,13 +445,13 @@ export default function UpsertItemForm(props) {
 
             {/* IF TYPE IS FISH */}
             {
-              (formOptions.TypeId === 14) &&
+              (addItemFormOptions.TypeId === 14) &&
               <>
               {/* Difficulty, Behavior, Size */}
               <Box style={{display: 'flex', flexFlow: 'row wrap'}}>
                 <FormControl className={classes.formControl} style={{flex: 1}}>
                   <InputLabel>Difficulty</InputLabel>
-                  <Input name="difficulty" value={formOptions.difficulty} onBlur={handleNumberChange} onChange={handleNumberChange} min={0} max={100} />
+                  <Input name="difficulty" value={addItemFormOptions.difficulty} onBlur={handleNumberChange} onChange={handleNumberChange} min={0} max={100} />
                 </FormControl>
                 <FormControl className={classes.formControl} style={{flex: 1}}>
                   <InputLabel id="fish-behavior-label">Behavior</InputLabel>
@@ -547,7 +459,7 @@ export default function UpsertItemForm(props) {
                     labelId="fish-behavior-label"
                     id="fish-behavior"
                     name="behavior"
-                    value={formOptions.behavior}
+                    value={addItemFormOptions.behavior}
                     onChange={handleTextChange}
                   >
                     <MenuItem value="floater">Floater</MenuItem>
@@ -564,7 +476,7 @@ export default function UpsertItemForm(props) {
                   <Typography variant="h4" gutterBottom>
                     Weather
                   </Typography>
-                  <RadioGroup aria-label="weather" name="weather" value={formOptions.weather} onChange={handleRadioChange} style={{display: 'flex', flexFlow: 'row wrap'}}>
+                  <RadioGroup aria-label="weather" name="weather" value={addItemFormOptions.weather} onChange={handleRadioChange} style={{display: 'flex', flexFlow: 'row wrap'}}>
                     <FormControlLabel value="any" control={<Radio />} label="any" />
                     <FormControlLabel value="sun" control={<Radio />} label={<p style={{position: 'relative'}}><img src={weatherIcon_sun} alt="Sunny Weather" height={30} /><br/><span style={{position: 'absolute', fontSize: '0.75rem', textAlign: 'center', display: 'block', width: '100%', bottom: '-0.75rem'}}>Sun</span></p>} />
                     <FormControlLabel value="rain" control={<Radio />} label={<p style={{position: 'relative'}}><img src={weatherIcon_rain} alt="Rainy Weather" height={30} /><br/><span style={{position: 'absolute', fontSize: '0.75rem', textAlign: 'center', display: 'block', width: '100%', bottom: '-0.75rem'}}>Rain</span></p>} />
@@ -574,7 +486,7 @@ export default function UpsertItemForm(props) {
                   <Typography variant="h4" gutterBottom>
                     Season
                   </Typography>
-                  {formOptions.SeasonId.map(season => (
+                  {addItemFormOptions.SeasonId.map(season => (
                     <FormControlLabel
                       key={`season-${season.id}`}
                       label={<p style={{position: 'relative', display: 'inline-block'}}><img src={season.icon} alt={`Season: ${season.name}`} height={30} /><br/><span style={{position: 'absolute', fontSize: '0.75rem', textAlign: 'center', display: 'block', minWidth: '100%', bottom: '-0.75rem'}}>{season.name}</span></p>}
@@ -597,24 +509,24 @@ export default function UpsertItemForm(props) {
             {/* SELL PRICE (base) */}
             <FormControl className={classes.formControl}>
               <InputLabel>Sell Price</InputLabel>
-              <Input type="number" name="sellPrice" value={formOptions.sellPrice} onChange={handleNumberChange} />
+              <Input type="number" name="sellPrice" value={addItemFormOptions.sellPrice} onChange={handleNumberChange} />
             </FormControl>
 
             {/* SOURCE & EDIBILITY */}
             <Box style={{width: '100%'}}>
-              {formOptions.TypeId !== 2 && formOptions.TypeId !== 14 ?
+              {addItemFormOptions.TypeId !== 2 && addItemFormOptions.TypeId !== 14 ?
                 <FormControl className={classes.formControl} style={{display: 'inline-block', width: '88%'}}>
-                  <TextField id="source" label="Source" name="source" value={formOptions.source} onChange={handleTextChange} style={{width: '100%'}} />
+                  <TextField id="source" label="Source" name="source" value={addItemFormOptions.source} onChange={handleTextChange} style={{width: '100%'}} />
                   <FormHelperText>If the source is a recipe recieved in the mail, please use the format <span className={classes.code}>Name (mail, X+ :heart:)</span> where 'Name' is the name of the NPC and 'X' is the number of hearts required with that NPC</FormHelperText>
                 </FormControl>
                 :
                 <Box style={{flex: 1}}>
-                  {formOptions.TypeId === 2 &&
+                  {addItemFormOptions.TypeId === 2 &&
                   <>
                   <Typography variant="h4" gutterBottom>
                     Season
                   </Typography>
-                  {formOptions.SeasonId.map(season => (
+                  {addItemFormOptions.SeasonId.map(season => (
                     <FormControlLabel
                       key={`season-${season.id}`}
                       label={<p style={{position: 'relative', display: 'inline-block'}}><img src={season.icon} alt={`Season: ${season.name}`} height={30} /><br/><span style={{position: 'absolute', fontSize: '0.75rem', textAlign: 'center', display: 'block', minWidth: '100%', bottom: '-0.75rem'}}>{season.name}</span></p>}
@@ -637,7 +549,7 @@ export default function UpsertItemForm(props) {
                         labelId="location-label"
                         id="LocationId"
                         name="LocationId"
-                        value={formOptions.LocationId}
+                        value={addItemFormOptions.LocationId}
                         onChange={handleNumberChange}
                         style={{fontSize: '1.4rem', width: '100%'}}
                         multiple
@@ -655,14 +567,14 @@ export default function UpsertItemForm(props) {
                     name="edible"
                     value="edible"
                     onChange={handleBoolChange} 
-                    checked={formOptions.edible} />
+                    checked={addItemFormOptions.edible} />
                 }
                 style={{display: 'inline-block', marginTop: '0.75rem'}}
               />
             </Box>
             <Grid container spacing={2}>
               <Grid item lg={6}>
-                <Button variant="contained" className={`${classes.btn} ${classes.saveBtn}`} onClick={(e) => handleFormSubmit(e)}>
+                <Button variant="contained" className={`${classes.btn} ${classes.saveBtn}`} onClick={() => addItemFormSubmit(addItemFormOptions)}>
                   <Typography variant="h2">Save</Typography>
                 </Button>
               </Grid>
@@ -672,7 +584,6 @@ export default function UpsertItemForm(props) {
                 </Button>
               </Grid>
             </Grid>
-            <AlertSnack open={alert.open} severity={alert.severity} message={alert.message} handleClose={handleAlertClose} />
           </Container>
         </Grid>
       </Grid>
