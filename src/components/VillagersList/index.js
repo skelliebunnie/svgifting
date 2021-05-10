@@ -22,6 +22,10 @@ export default function VillagersList() {
 
   useEffect(() => {
     API.getVillagers().then(list => {
+      // let data = list.data;
+      // for(var i = 0; i < data.length; i++) {
+
+      // }
       setVillagers(list.data);
     }).catch(err => console.error(err));
   }, []);

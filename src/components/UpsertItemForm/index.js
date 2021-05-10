@@ -80,7 +80,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-export default function UpsertItemForm() {
+export default function UpsertItemForm(props) {
   const classes = useStyles();
 
   const [alert, setAlert] = useState({
@@ -424,11 +424,13 @@ export default function UpsertItemForm() {
 
   return (
     <Grid container spacing={0} style={{marginTop: '1rem'}}>
+        {props.includeItemList &&
         <Grid item lg={4}>
           <Typography variant="h3" style={{marginLeft: '1rem', textAlign: 'center'}}>Items</Typography>
           <ItemList onItemClick={handleItemClick} selected={selected} list={itemList} />
         </Grid>
-        <Grid item lg={8}>
+        }
+        <Grid item lg={props.includeItemList ? 8 : 12}>
           <Container className={classes.form}>
             <Typography variant="h2" gutterBottom style={{textAlign: 'center'}}>
               {selected === null ? 'New' : 'Update'} Item

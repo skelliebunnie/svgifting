@@ -1,6 +1,7 @@
 import { makeStyles } from '@material-ui/core/styles'
 import { Snackbar, IconButton } from '@material-ui/core'
 import { Close as CloseIcon } from '@material-ui/icons'
+import { withSnackbar } from 'notistack';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -22,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-export default function AlertSnack(props) {
+function AlertSnack(props) {
   const classes = useStyles();
 
   return (
@@ -41,3 +42,5 @@ export default function AlertSnack(props) {
     />
   )
 }
+
+export default withSnackbar(AlertSnack)

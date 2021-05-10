@@ -8,7 +8,7 @@ export default function UpsertItem() {
   return (
     <Box>
       <Navbar />
-      <UpsertItemForm />
+      <UpsertItemForm includeItemList={true} />
     </Box>
   );
 }

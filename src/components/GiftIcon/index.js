@@ -14,11 +14,17 @@ export default function GiftIcon(props) {
 
   const item_name = toTitleCase(props.name);
   const filename = '24px-' + toTitleCase(props.name).replace('\'', '').split(' ').join('_') + '.png';
-  const icon_url = require(`../../assets/item_icons/${filename}`);
+  const icon_url = (file) => {
+    try {
+      return require(`../../assets/item_icons/${file}`) ;
+    } catch (err) {
+      return require('../../assets/item_icons/Error_Item.png')
+    }
+  }
 
   return (
     <Tooltip title={item_name} aria-label={item_name} placement="bottom" arrow>
-      <img src={icon_url.default} alt={`${item_name} Icon`} width={props.size !== undefined ? props.size : 32} height={props.size !== undefined ? props.size : 32}  style={{display: 'inline-block', margin: '3px'}} />
+      <img src={icon_url(filename).default} alt={`${item_name} Icon`} width={props.size !== undefined ? props.size : 32} height={props.size !== undefined ? props.size : 32}  style={{display: 'inline-block', margin: '0 3px', verticalAlign: 'middle'}} />
     </Tooltip>
   )
 }

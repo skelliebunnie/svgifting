@@ -1,7 +1,14 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
+import { DatabaseContext } from "../../contexts/DatabaseContext";
 import { withStyles, makeStyles } from '@material-ui/core/styles'
-import { Box, Container, FormGroup, FormControlLabel, Checkbox, Typography, FormControl, InputLabel, Select, MenuItem, Button } from '@material-ui/core'
-// import { CheckBoxOutlineBlankIcon, CheckBoxIcon } from '@material-ui/icons'
+import { Grid, Container, FormGroup, FormControlLabel, Checkbox, Typography, FormControl, InputLabel, Select, MenuItem, TextField, Button, IconButton, Modal } from '@material-ui/core'
+import { Close as CloseIcon } from '@material-ui/icons'
+
+import UpsertItemForm from '../UpsertItemForm'
+import GiftIcon from '../GiftIcon'
+import VillagerIcon from '../VillagerIcon'
+
+import { useSnackbar } from 'notistack'
 
 import API from '../../utils/API'
 
@@ -17,7 +24,7 @@ const CustomCheckbox = withStyles((theme) => ({
 const useStyles = makeStyles((theme) => ({
   list: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(5, 1fr)',
+    gridTemplateColumns: 'repeat(4, 1fr)',
     margin: 0,
     gridAutoFlow: 'row',
     // gridColumnGap: '0.25rem'
@@ -29,7 +36,10 @@ const useStyles = makeStyles((theme) => ({
   col: {
     flex: '1 0 auto',
     padding: '0 1.5rem',
-    marginTop: '1rem'
+    marginTop: '1rem',
+    // '&:first-child': {
+    //   maxWidth: '25%'
+    // }
   },
   formControl: {
     margin: theme.spacing(1),
@@ -46,36 +56,93 @@ const useStyles = makeStyles((theme) => ({
     '&:hover': {
       backgroundColor: theme.palette.green[500]
     }
+  },
+  addItemBtn: {
+    backgroundColor: theme.palette.dayblue[500],
+    color: 'white',
+    fontSize: 'large',
+    margin: '0 1rem',
+    transition: 'all 0.3s ease-out',
+    '&:hover': {
+      backgroundColor: theme.palette.green[600],
+      color: 'white'
+    }
+  },
+  clearCheckboxes: {
+    color: theme.palette.red[600],
+    fontWeight: 'bold',
+    fontSize: '1rem',
+    verticalAlign: 'middle',
+    position: 'relative',
+    top: '-0.35rem'
+  },
+  invertSelection: {
+    color: theme.palette.sand[500],
+    fontWeight: 'bold',
+    fontSize: '1rem',
+    verticalAlign: 'middle',
+    position: 'relative',
+    top: '-0.35rem'
+  },
+  modal: {
+    padding: '2rem'
+  },
+  modalBody: {
+    position: 'relative',
+    backgroundColor: theme.palette.sand[100],
+    borderRadius: '4px',
+    padding: '0.5rem 1rem'
   }
 }));
 
 export default function GiftPreferenceForm() {
   const classes = useStyles();
 
+  const { npcs, items, itemTypes } = useContext(DatabaseContext)
+  
+  const [allItems, setAllItems] = useState(items)
+  const [allItemTypes, setAllItemTypes] = useState(itemTypes)
   const [formOptions, setFormOptions] = useState({
-    npcs: [],
-    items: [],
+    npcs: npcs,
+    items: items,
     preference: ''
   });
 
-  useEffect(() => {
-    API.getVillagers().then(list => {
-      // set the form options list of NPCs and add a new key/value pair for isChecked, defaulting to false
-      const npcList = list.data.map(npc => ({ id: npc.id, name: npc.name, isChecked: false }));
+  const [searchTerm, setSearchTerm] = useState("")
+  const [addItemModalOpen, setAddItemModalOpen] = useState(false)
 
-      API.getItems().then(list => {
-        // set the form options list of NPCs and add a new key/value pair for isChecked, defaulting to false
-        const itemList = list.data.map(item => ({ id: item.id, name: item.name, isChecked: false }));
-        setFormOptions({...formOptions, npcs: npcList, items: itemList });
-      }).catch(err => console.error(err));
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const alertDuration = 6000;
 
-    }).catch(err => console.error(err));
-  // eslint-disable-next-line
-  }, [])
+  // useEffect(() => {
+  //   API.getVillagers().then(list => {
+  //     // set the form options list of NPCs and add a new key/value pair for isChecked, defaulting to false
+  //     let npcList = list.data.map(npc => ({ id: npc.id, name: npc.name, isChecked: false }));
+  //     npcList.push({ id: 'all', name: 'All', isChecked: false })
+
+  //     API.getItems().then(list => {
+  //       // set the form options list of NPCs and add a new key/value pair for isChecked, defaulting to false
+  //       const itemList = list.data.map(item => ({ id: item.id, name: item.name, TypeId: item.TypeId, isChecked: false }));
+  //       setFormOptions({...formOptions, npcs: npcList, items: itemList });
+  //       setAllItems(itemList);
+
+  //     }).catch(err => console.error(err));
+
+  //   }).catch(err => console.error(err));
+
+  //   API.getItemTypes().then(types => {
+  //     let itemTypesList = types.data.map(type => ({ id: type.id, name: type.name, isChecked: true }))
+  //     itemTypesList.push({ id: 'allTypes', name: 'All', isChecked: true })
+  //     setAllItemTypes(itemTypesList);
+  //   }).catch(err => console.error(err));
+  // // eslint-disable-next-line
+  // }, [])
 
   const handleOnChange = e => {
 
-    if(e.target.name !== "preference") {
+    let opts = {...formOptions}
+
+    if(e.target.name !== "preference" && e.target.value !== "all") {
 
       let list = formOptions[e.target.name];
       list.forEach(item => {
@@ -84,62 +151,196 @@ export default function GiftPreferenceForm() {
         }
       })
 
-      setFormOptions({
-        ...formOptions,
-        [e.target.name]: list
-      })
+      opts[e.target.name] = list
+
+      if(e.target.name === 'npcs' && !e.target.checked) {
+        opts.npcs[opts.npcs.length - 1].isChecked = false
+      }
       
     } else {
-      setFormOptions({
-        ...formOptions,
-        preference: e.target.value
-      })
-    }
-  }
+      if(e.target.name === 'preference') opts.preference = e.target.value
+      if(e.target.value === 'all') opts.npcs.all = e.target.checked;
 
-  const handleFormSubmit = e => {
-    console.log("the database will be updated here")
+      if(e.target.value === "all" && e.target.checked) {
+        opts.npcs = formOptions.npcs.map(npc => ({id: npc.id, name: npc.name, isChecked: true}))
 
-    const items = formOptions.items.filter(item => item.isChecked)
-    const npcs = formOptions.npcs.filter(npc => npc.isChecked)
-
-    for(var i = 0; i < npcs.length; i++) {
-      const npcId = npcs[i].id;
-
-      for(var j = 0; j < items.length; j++) {
-        const itemId = items[j].id;
-
-        API.upsertGift({
-          VillagerId: npcId,
-          ItemId: itemId,
-          preference: formOptions.preference
-        })
-        .then(gifts => {
-          console.log(gifts.data);
-
-        })
-        .catch(err => console.error(err))
+      } else if(e.target.value === "all" && !e.target.checked) {
+        opts.npcs = formOptions.npcs.map(npc => ({id: npc.id, name: npc.name, isChecked: false}))
       }
 
     }
 
-    console.log("and then the form cleared")
+    setFormOptions({
+      ...formOptions,
+      ...opts
+    })
+    
+  }
+
+  const handleItemSearch = e => {
+    const searchFor = e.target.value.toLowerCase()
+    setSearchTerm(e.target.value)
+    // if there is no search term, the unfiltered list of items should be set
+    // otherwise, filter the items
+    setFormOptions({
+      ...formOptions,
+      items: searchFor === "" ? allItems : allItems.filter(item => item.name.toLowerCase().includes(searchFor))
+    })
+  }
+
+  const handleItemTypeFilter = e => {
+    const TypeId = e.target.value !== 'allTypes' ? parseInt(e.target.value) : e.target.value
+  
+    let selectedTypes = allItemTypes;
+    let selectedTypeIds = [];
+    let visibleItems = allItems;
+
+    if(TypeId !== 'allTypes') {
+      selectedTypes.forEach(type => {
+        if(type.id === TypeId) {
+          type.isChecked = e.target.checked
+        }
+
+        if(type.isChecked) selectedTypeIds.push(type.id)
+      });
+
+    } else {
+      selectedTypes = selectedTypes.map(type => ({...type, isChecked: e.target.checked }))
+
+      if(e.target.checked) {
+        allItems.forEach(item => {
+          selectedTypeIds.push(item.TypeId)
+        })
+      } else {
+        selectedTypeIds = []
+      }
+    }
+
+    visibleItems = allItems.filter(item => selectedTypeIds.includes(item.TypeId))
+
+    setAllItemTypes([...selectedTypes])
+    setFormOptions({
+      ...formOptions,
+      items: visibleItems
+    })
+  }
+
+  const handleFormSubmit = e => {
+    const items = formOptions.items.filter(item => item.isChecked)
+    const npcs = formOptions.npcs.filter(npc => npc.isChecked && npc.name !== "All")
+
+    if(items.length !== 0 && npcs.length !== 0 && formOptions.preference !== "") {
+      for(var i = 0; i < npcs.length; i++) {
+        const npcId = npcs[i].id;
+        const npcName = npcs[i].name;
+  
+        for(var j = 0; j < items.length; j++) {
+          const itemId = items[j].id;
+          const itemName = items[j].name;
+  
+          API.upsertGift({
+            VillagerId: npcId,
+            ItemId: itemId,
+            preference: formOptions.preference
+          })
+          .then(gifts => {
+            // console.log(gifts.data);
+            const pref = formOptions.preference === 'neutral' ? formOptions.preference : `${formOptions.preference}d`
+            const alert = { open: true, severity: 'success',  message: `${itemName} assigned as a '${pref}' gift to ${npcName}`}
+            enqueueSnackbar(alert.message, { variant: 'success', autoHideDuration: alertDuration, action: closeAlert })
+
+          })
+          .catch(err => {
+            console.error(err);
+            const alert = { open: true, severity: 'error', message: `${itemName} NOT assigned to ${npcName}. Error: ${err.message}` }
+            // <AlertSnack open={alert.open} severity={alert.severity} message={alert.message} handleClose={() => handleAlertClose(npcId)} />
+            enqueueSnackbar(alert.message, { variant: 'error', autoHideDuration: alertDuration, action: closeAlert })
+          })
+        }
+  
+      }
+    } else {
+      if(npcs.length === 0) {
+        enqueueSnackbar('Please select at least one (1) NPC', { variant: 'error', autoHideDuration: alertDuration, action: closeAlert })
+      }
+
+      if(items.length === 0) {
+        enqueueSnackbar('Please select at least one (1) item', { variant: 'error', autoHideDuration: alertDuration, action: closeAlert })
+      }
+
+      if(formOptions.preference === "") {
+        enqueueSnackbar('Please select a preference', { variant: 'error', autoHideDuration: alertDuration, action: closeAlert })
+      }
+    }
+  }
+
+  const closeAlert = key => {
+    return (
+      <IconButton size="small" aria-label="close" color="inherit" onClick={() => closeSnackbar(key)}>
+        <CloseIcon fontSize="small" />
+      </IconButton>
+    )
+  }
+
+  const handleOpenModal = () => {
+    setAddItemModalOpen(true)
+  }
+
+  const handleCloseModal = () => {
+    setAddItemModalOpen(false)
+  }
+
+  const clearCheckboxes = (target) => {
+    setFormOptions({
+      ...formOptions,
+      [target]: formOptions[target].map(n => ({...n, isChecked: false}))
+    })
+  }
+
+  const invertSelection = (target) => {
+    setFormOptions({
+      ...formOptions,
+      [target]: formOptions[target].map(n => (n.name === "All" ? {...n, isChecked: false} : {...n, isChecked: !n.isChecked}))
+    })
   }
 
   return (
-    <Box>
-      <Container className={classes.row} maxWidth="xl">
-        <Box className={classes.col} style={{borderRight: '1px solid dodgerblue'}}>
-          <Typography variant="h2" gutterBottom>
-            NPCs
-            <FormControl className={classes.formControl} style={{marginLeft: '3rem'}}>
+    <>
+    <Container maxWidth={'xl'} style={{padding: '2rem 0'}}>
+      <Grid container>
+        {/* NPCs */}
+        <Grid item lg={5} style={{borderRight: '1px solid dodgerblue'}}>
+          <Container>
+            <Typography variant="h2" gutterBottom style={{display: 'flex', justifyContent: 'space-between'}}>
+              <span>
+                NPCs
+                <Button onClick={() => clearCheckboxes('npcs')} className={classes.clearCheckboxes}>[Clear]</Button>
+                <Button onClick={() => invertSelection('npcs')} className={classes.invertSelection}>[Invert Selection]</Button>
+              </span>
+            </Typography>
+            <FormGroup className={classes.list}>
+              {formOptions.npcs.map(npc => 
+              <FormControlLabel 
+                key={`${npc.id}-label`} 
+                label={npc.id !== 'all' ? <><VillagerIcon name={npc.name} size={20} /> {npc.name}</> : 'All'} 
+                control={
+                  <CustomCheckbox 
+                  name="npcs"
+                  key={`${npc.id}-checkbox`}
+                  onChange={handleOnChange} 
+                  value={npc.id} 
+                  checked={npc.isChecked} />
+                } 
+              />)}
+            </FormGroup>
+            <FormControl className={classes.formControl} style={{width: '100%', marginTop: '2rem'}}>
               <InputLabel id="preference-label">Preference</InputLabel>
                 <Select
                   labelId="preference-label"
                   id="preference"
                   name="preference"
                   value={formOptions.preference}
-                  onChange={(e) => handleOnChange(e)}
+                  onChange={handleOnChange}
                   style={{fontSize: '1.4rem'}}
                 >
                   <MenuItem value="love">Love</MenuItem>
@@ -149,49 +350,79 @@ export default function GiftPreferenceForm() {
                   <MenuItem value="hate">Hate</MenuItem>
                 </Select>
             </FormControl>
-          </Typography>
-          <FormGroup className={classes.list}>
-            {formOptions.npcs.map(npc => 
-            <FormControlLabel 
-              key={`${npc.id}-label`} 
-              label={npc.name} 
-              control={
-                <CustomCheckbox 
-                name="npcs"
-                key={`${npc.id}-checkbox`}
-                onChange={(e) => handleOnChange(e)} 
-                value={npc.id} 
-                checked={npc.isChecked} />
-              } 
-            />)}
-          </FormGroup>
-        </Box>
-        <Box className={classes.col}>
-          <Typography variant="h2" gutterBottom>
-            Items
-          </Typography>
-          <FormGroup className={classes.list}>
-            {formOptions.items.map(item => 
-            <FormControlLabel 
-              key={`${item.id}-label`} 
-              label={item.name} 
-              control={
-                <CustomCheckbox 
-                name="items"
-                key={`${item.id}-checkbox`}
-                onChange={(e) => handleOnChange(e)} 
-                value={item.id} 
-                checked={item.isChecked} />
-              } 
-            />)}
-          </FormGroup>
-        </Box>
+            {window.innerWidth >= 1024 &&
+              <Button variant="contained" className={classes.saveBtn} onClick={(e) => handleFormSubmit(e)}>
+                <Typography variant="h2">Save</Typography>
+              </Button>
+            }
+          </Container>
+        </Grid>
+        {/* ITEMS */}
+        <Grid container item lg={7}>
+          <Container>
+            <Typography variant="h2" gutterBottom>
+              Items
+              <Button onClick={() => clearCheckboxes('items')} className={classes.clearCheckboxes}>[Clear]</Button>
+              <TextField id="searchItems" label="Search" type="search" value={searchTerm} style={{position: 'relative', marginLeft: '2rem', width: '60%', bottom: '-0.5rem'}} onChange={handleItemSearch} onBlur={handleItemSearch} />
+              <Button className={classes.addItemBtn} onClick={handleOpenModal}>Add Item</Button>
+            </Typography>
+            <FormGroup className={classes.list}>
+              {allItemTypes.map(type => 
+                <FormControlLabel
+                  key={`${type.id}-label`}
+                  label={type.name}
+                  control={
+                    <Checkbox 
+                      name="types"
+                      key={`${type.id}-checkbox`}
+                      value={type.id}
+                      onChange={handleItemTypeFilter}
+                      checked={type.isChecked}
+                    />
+                  }
+                />
+              )}
+            </FormGroup>
+            <FormGroup className={classes.list}>
+              {formOptions.items.map(item => 
+              <FormControlLabel 
+                key={`${item.id}-label`} 
+                label={<><GiftIcon name={item.name} size={20} /> {item.name}</>} 
+                control={
+                  <CustomCheckbox 
+                  name="items"
+                  key={`${item.id}-checkbox`}
+                  onChange={handleOnChange} 
+                  value={item.id} 
+                  checked={item.isChecked} />
+                } 
+              />)}
+            </FormGroup>
+          </Container>
+        </Grid>
+      </Grid>
+      {window.innerWidth < 1024 &&
+        <Container maxWidth="xl">
+          <Button variant="contained" className={classes.saveBtn} onClick={(e) => handleFormSubmit(e)}>
+            <Typography variant="h2">Save</Typography>
+          </Button>
+        </Container>
+      }
+    </Container>
+    <Modal
+      className={classes.modal}
+      open={addItemModalOpen}
+      onClose={handleCloseModal}
+      aria-labelledby="Add Item Modal"
+      aria-describedby="Add a new item to the database for assigning as a gift to NPCs"
+    >
+      <Container className={classes.modalBody}>
+        <IconButton aria-label="close" color="inherit" onClick={handleCloseModal} style={{position: 'absolute', right: '1rem', top: '0.75rem'}}>
+          <CloseIcon />
+        </IconButton>
+        <UpsertItemForm includeItemList={false} />
       </Container>
-      <Container maxWidth="xl">
-        <Button variant="contained" className={classes.saveBtn} onClick={(e) => handleFormSubmit(e)}>
-          <Typography variant="h2">Save</Typography>
-        </Button>
-      </Container>
-    </Box>
+    </Modal>
+    </>
   )
 }
