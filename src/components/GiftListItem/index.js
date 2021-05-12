@@ -1,8 +1,9 @@
+import { useContext } from 'react'
+import { DatabaseContext } from "../../contexts/DatabaseContext";
 import { makeStyles } from '@material-ui/core/styles'
 import { Card, CardContent, CardMedia, Typography } from '@material-ui/core'
 
 import VillagerIcon from '../VillagerIcon'
-import GiftIcon from '../GiftIcon'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -11,7 +12,7 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     textAlign: 'left',
     justifyContent: 'flex-start',
-    boxSizing: 'border-box'
+    boxSizing: 'border-box',
   },
   details: {
     display: 'flex',
@@ -21,8 +22,10 @@ const useStyles = makeStyles((theme) => ({
     flex: '1 0 auto',
   },
   giftIcon: {
-    width: 64,
-    backgroundSize: 32
+    minWidth: 54,
+    backgroundSize: '32px !important',
+    backgroundPosition: 'center 0.75rem',
+    borderRight: `1px solid ${theme.palette.dayblue[400]}`,
   },
   gift: {
     display: 'block',
@@ -37,24 +40,13 @@ const useStyles = makeStyles((theme) => ({
 export default function GiftListItem(props) {
   const classes = useStyles();
 
-  // let fileName = '24px-' + props.gift.replace("'", "").replace(",", "")
-  // if(fileName.includes(" ")) {
-  //   fileName = fileName.split(' ')
-
-  //   for(var word in fileName) {
-  //     word = word.length > 1 ? word.substring(0,1).toUpperCase() + word.substring(1, word.length - 1).toLowerCase() : word.toUpperCase()
-  //   }
-  //   fileName = fileName.join('_')
-  // }
-  // fileName += '.png'
-
-  // const icon = require(`../../assets/item_icons/${fileName}`) || require('../../assets/item_icons/Error_Item.png');
+  const { universalLoves } = useContext(DatabaseContext)
 
   return (
-    <Card className={classes.root}>
+    <Card className={classes.root} style={universalLoves.includes(props.gift) ? {border: '4px solid gold'} : {border: '4px solid transparent'}}>
       <CardMedia
         className={classes.giftIcon}
-        image={<GiftIcon name={props.gift} />}
+        image={props.icon.default}
         title={props.gift}
       />
       <div className={classes.details}>

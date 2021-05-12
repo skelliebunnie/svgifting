@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { makeStyles } from '@material-ui/core/styles'
-import { Container, Grid, Tooltip } from '@material-ui/core'
+import { Container, Grid } from '@material-ui/core'
 
 import GiftIcon from '../GiftIcon'
 
@@ -36,7 +36,7 @@ export default function ItemList({ onItemClick, selected, list }) {
   return (
     <Container className={classes.root}>
       <Grid container spacing={1} className={classes.gridContainer}>
-      {items.map(item => <Grid item key={item.id} className={(selected !== null && selected.id === item.id) ? `${classes.activeItem} ${classes.itemIcon}` : classes.itemIcon}><GiftIcon name={item.name} size={24} style={{position: 'relative', margin: '8px', verticalAlign: 'middle'}} /></Grid>)}
+      {items.map(item => <Grid item key={item.id} className={(selected !== null && selected.id === item.id) ? `${classes.activeItem} ${classes.itemIcon}` : classes.itemIcon} onClick={() => onItemClick(item)}><GiftIcon name={item.name} size={24} style={{position: 'relative', margin: '8px', verticalAlign: 'middle'}} /></Grid>)}
       </Grid>
     </Container>
   )

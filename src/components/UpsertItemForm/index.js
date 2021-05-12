@@ -77,7 +77,7 @@ const useStyles = makeStyles((theme) => ({
 export default function UpsertItemForm(props) {
   const classes = useStyles();
 
-  const { dbItems, dbItemTypes, addItemFormSubmit, alert, handleAlertClose, addItemFormOptions, setAddItemFormOptions, defaultAddItemFormOptions, defaultItemAvailability, selected, setSelected } = useContext(DatabaseContext)
+  const { dbItems, dbItemTypes, addItemFormSubmit, addItemFormOptions, setAddItemFormOptions, defaultAddItemFormOptions, defaultItemAvailability, selected, setSelected } = useContext(DatabaseContext)
 
   const [itemList, setItemList] = useState([])
   const [itemTypes, setItemTypes] = useState([])
@@ -258,12 +258,12 @@ export default function UpsertItemForm(props) {
     setSelected(null)
   }
 
-  const handleItemClick = e => {
-    if(selected === null || selected.id !== e.id) {
-      setSelected(e);
+  const handleItemClick = item => {
+    if(selected === null || selected.id !== item.id) {
+      setSelected(item);
 
     } else {
-      setSelected(null);
+      setSelected("");
 
     }
   }

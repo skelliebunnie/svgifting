@@ -13,7 +13,10 @@ const DatabaseContextProvider = (props) => {
 
   const [dbNpcs, setNpcs] = useState([]);
   const [dbItems, setItems] = useState([]);
+  const [allItems, setAllItems] = useState([])
   const [dbItemTypes, setItemTypes] = useState([]);
+
+  const universalLoves = ['Golden Pumpkin', 'Magic Rock Candy', 'Pearl', 'Prismatic Shard', "Rabbit's Foot"]
 
   const [alert, setAlert] = useState({
     open: false,
@@ -24,6 +27,7 @@ const DatabaseContextProvider = (props) => {
   const [addItemModalOpen, setAddItemModalOpen] = useState(false)
 
   const [selected, setSelected] = useState(null)
+  const [searchTerm, setSearchTerm] = useState("")
 
   const defaultItemAvailability = {
     weather: 'any',
@@ -103,12 +107,16 @@ const DatabaseContextProvider = (props) => {
     }).catch(err => console.error(err));
 
     getItems();
+  
+  // eslint-disable-next-line
   }, [])
 
   const getItems = () => {
     API.getItems()
       .then(list => {
-        setItems(list.data)
+        const data = list.data.map(item => ({...item, isChecked: false, icon: getIcon(item.name)}) )
+        setItems(data)
+        setAllItems(data)
       })
       .catch(err => console.error(err));
   }
@@ -170,10 +178,12 @@ const DatabaseContextProvider = (props) => {
     API.upsertItem(data)
       .then(results => {
         setAlert({ open: true, message: addItemFormOptions.id !== undefined ? `${addItemFormOptions.name} updated successfully` : `${addItemFormOptions.name} saved successfully`, severity: 'success' });
+
         setAddItemFormOptions({...defaultAddItemFormOptions, ...defaultItemAvailability})
         setSelected(null)
-        getItems();
         setAddItemModalOpen(false);
+        setItems([...dbItems, {...results.data, icon: getIcon(results.data.name, true)}])
+
       })
       .catch(err => {
         setAlert({ open: true, message: addItemFormOptions.id !== undefined ? `Error: ${addItemFormOptions.name} was not updated. Message: ${err.message}` : `Error: ${addItemFormOptions.name} was not saved. Message: ${err.message}`, severity: 'error' })
@@ -187,8 +197,46 @@ const DatabaseContextProvider = (props) => {
     setAlert({...alert, open: false});
   }
 
+  const toTitleCase = (str) => {
+    if(str !== undefined) {
+      str = str.split(' ');
+
+      for(var i = 0; i < str.length; i++) {
+        str[i] = str[i].charAt(0).toUpperCase() + str[i].slice(1);
+      }
+
+      return str.join(' ');
+    }
+
+    return 'Error Item'
+  }
+
+  const getIcon = (str, returnAsString) => {
+    let icon_file = null;
+    let filename =  '24px-'
+    filename += toTitleCase(str)
+    
+    filename = filename.replace("'", "").replace(",", "");
+    filename = filename.includes(" ") ? filename.split(" ").join("_") : filename
+    filename += '.png'
+
+    try {
+      icon_file = require(`../assets/item_icons/${filename}`);
+      filename = `../../assets/item_icons/${filename}`
+    } catch (err) {
+      icon_file = require('../assets/item_icons/Error_Item.png');
+      filename = '../../assets/item_icons/Error_Item.png'
+    }
+
+    if(returnAsString) {
+      return filename;
+    } else {
+      return icon_file;
+    }
+  }
+
   return (
-    <DatabaseContext.Provider value={{dbNpcs, dbItems, getItems, dbItemTypes, addItemModalOpen, setAddItemModalOpen, addItemFormSubmit, alert, setAlert, handleAlertClose, addItemFormOptions, setAddItemFormOptions, defaultAddItemFormOptions, defaultItemAvailability, selected, setSelected}}>
+    <DatabaseContext.Provider value={{dbNpcs, dbItems, setItems, getItems, allItems, setAllItems, dbItemTypes, addItemModalOpen, setAddItemModalOpen, addItemFormSubmit, alert, setAlert, handleAlertClose, addItemFormOptions, setAddItemFormOptions, defaultAddItemFormOptions, defaultItemAvailability, selected, setSelected, searchTerm, setSearchTerm, universalLoves, getIcon}}>
       {props.children}
     </DatabaseContext.Provider>
   )

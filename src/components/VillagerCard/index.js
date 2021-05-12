@@ -1,7 +1,8 @@
+import { useState, useEffect, useContext } from 'react'
+import { DatabaseContext } from '../../contexts/DatabaseContext'
 import { makeStyles } from '@material-ui/core/styles'
 import { Box, Card, CardContent, CardMedia, Typography } from '@material-ui/core'
-// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-// import { faHeart } from '@fortawesome/pro-duotone-svg-icons'
+
 
 import VillagerIcon from '../VillagerIcon'
 import GiftIcon from '../GiftIcon'
@@ -80,6 +81,20 @@ export default function VillagerCard(props) {
   const portrait_url = require(`../../assets/villager_portraits/${props.name}.png`);
   const love_emote = require(`../../assets/emotes/42px-Emote_Heart.png`);
 
+  const { universalLoves } = useContext(DatabaseContext);
+
+  const [gifts, setGifts] = useState([])
+
+  useEffect(() => {
+    if(props.includeULoves) {
+      setGifts(props.gifts)
+
+    } else {
+      setGifts( props.gifts.filter(gift => !universalLoves.includes(gift.name)) )
+
+    }
+  }, [props.includeULoves])
+
   return (
     <Card className={props.status && props.name !== 'Krobus' ? `${classes.root} ${classes.marriageable}` : classes.root}>
       <div className={classes.details}>
@@ -91,7 +106,7 @@ export default function VillagerCard(props) {
           <Typography variant="subtitle1" className={classes.status}>
             <strong>{props.status && props.name !== 'Krobus' ? 'Marriage Candidate' : ''}</strong>
           </Typography>
-          {props.gifts.length > 0 &&
+          {gifts.length > 0 &&
           <Box>
             <section className={classes.giftsContainer}>
             <Typography component="h5" variant="h5" className={classes.giftsTitle}>
@@ -99,7 +114,7 @@ export default function VillagerCard(props) {
               {/* <FontAwesomeIcon icon={faHeart} style={{fontSize: '2rem', color: 'crimson', verticalAlign: 'middle'}} /> */}
               Loved Gifts:
               </Typography>
-             {props.gifts.map(gift => gift.Gift.preference === 'love' && <GiftIcon key={gift.name} name={gift.name} size={24} />)}
+             {gifts.map(gift => gift.Gift.preference === 'love' && <GiftIcon key={gift.name} name={gift.name} icon={gift.icon} size={24} />)}
             </section>
           </Box>
           }

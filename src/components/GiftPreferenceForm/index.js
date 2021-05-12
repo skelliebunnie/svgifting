@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react'
+import { useState, useEffect, useContext, useRef } from 'react'
 import { DatabaseContext } from "../../contexts/DatabaseContext";
 import { withStyles, makeStyles } from '@material-ui/core/styles'
 import { Grid, Container, FormGroup, FormControlLabel, Checkbox, Typography, FormControl, InputLabel, Select, MenuItem, TextField, Button, IconButton, Modal } from '@material-ui/core'
@@ -98,30 +98,78 @@ const useStyles = makeStyles((theme) => ({
 export default function GiftPreferenceForm() {
   const classes = useStyles();
 
-  const { dbNpcs, dbItems, dbItemTypes, addItemModalOpen, setAddItemModalOpen, getItems, alert, handleAlertClose } = useContext(DatabaseContext)
+  const { dbNpcs, dbItems, allItems, setAllItems, dbItemTypes, addItemModalOpen, setAddItemModalOpen, searchTerm, setSearchTerm, getIcon } = useContext(DatabaseContext)
   
-  const [allItems, setAllItems] = useState(dbItems)
-  const [itemTypes, setItemTypes] = useState(dbItemTypes)
+  const [itemTypes, setItemTypes] = useState(dbItemTypes || [])
   const [formOptions, setFormOptions] = useState({
-    npcs: dbNpcs,
-    items: dbItems,
+    npcs: [],
+    items: [],
     preference: ''
   });
-
-  const [searchTerm, setSearchTerm] = useState("")
 
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const alertDuration = 6000;
 
+  const containerRef = useRef(null);
+  const searchRef = useRef(null);
+
   useEffect(() => {
-    setFormOptions({
-      ...formOptions,
-      npcs: dbNpcs,
-      items: dbItems
-    })
-    setAllItems(dbItems)
-    setItemTypes(dbItemTypes)
+    if(containerRef) {
+      setFormOptions({
+        ...formOptions,
+        npcs: dbNpcs,
+        items: dbItems
+      })
+      setItemTypes(dbItemTypes)
+
+      filterItemsOnLoad(dbItems);
+    }
+  //eslint-disable-next-line
   }, [dbNpcs, dbItems, dbItemTypes])
+
+  useEffect(() => {
+    if(!addItemModalOpen) {
+      const search = searchRef.current.children[1].children[0].value
+
+      API.getItems()
+      .then(list => {
+        let data = list.data.map(item => ({...item, isChecked: false, icon: getIcon(item.name)}))
+        setAllItems(data)
+
+        if(search !== undefined && search !== "") {
+          setSearchTerm(search);
+          
+          data = data.filter(item => item.name.toLowerCase().includes(search.toLowerCase()))
+          
+        } else {
+          setSearchTerm("")
+
+        }
+
+        const itemList = filterItemsOnLoad(data);
+
+        setFormOptions({
+          ...formOptions,
+          items: itemList
+        })
+        
+      })
+    }
+  //eslint-disable-next-line
+  }, [addItemModalOpen])
+
+  const filterItemsOnLoad = (items) => {
+    if((itemTypes.length > 0 && !itemTypes[itemTypes.length - 1].isChecked)) {
+      let selectedTypes = []
+      itemTypes.forEach(type => {
+        if(type.isChecked) selectedTypes.push(type.id)
+      })
+
+      return items.filter(item => selectedTypes.includes(item.TypeId))
+    }
+
+    return items;
+  }
 
   const handleOnChange = e => {
 
@@ -156,7 +204,6 @@ export default function GiftPreferenceForm() {
     }
 
     setFormOptions({
-      ...formOptions,
       ...opts
     })
     
@@ -164,7 +211,8 @@ export default function GiftPreferenceForm() {
 
   const handleItemSearch = e => {
     const searchFor = e.target.value.toLowerCase()
-    setSearchTerm(e.target.value)
+
+    setSearchTerm(searchFor)
     // if there is no search term, the unfiltered list of items should be set
     // otherwise, filter the items
     setFormOptions({
@@ -175,43 +223,50 @@ export default function GiftPreferenceForm() {
 
   const handleItemTypeFilter = e => {
     const TypeId = e.target.value !== 'allTypes' ? parseInt(e.target.value) : e.target.value
-  
+
     let selectedTypes = itemTypes;
     let selectedTypeIds = [];
-    let visibleItems = allItems;
+    let visible = allItems;
 
     if(TypeId !== 'allTypes') {
       selectedTypes.forEach(type => {
         if(type.id === TypeId) {
           type.isChecked = e.target.checked
         }
-
+  
         if(type.isChecked) selectedTypeIds.push(type.id)
-      });
+        if(!type.isChecked) selectedTypes[selectedTypes.length - 1].isChecked = false
+      })
 
     } else {
-      selectedTypes = selectedTypes.map(type => ({...type, isChecked: e.target.checked }))
-
       if(e.target.checked) {
-        allItems.forEach(item => {
-          selectedTypeIds.push(item.TypeId)
+        selectedTypes.forEach(type => {
+          type.isChecked = true;
+
+          selectedTypeIds.push(type.id)
         })
       } else {
         selectedTypeIds = []
+        selectedTypes.forEach(type => {
+          type.isChecked = false;
+        });
       }
     }
 
-    visibleItems = allItems.filter(item => selectedTypeIds.includes(item.TypeId))
+    console.log("selected TypeIds:", selectedTypeIds)
+    console.log("all Items", allItems)
 
-    setItemTypes([...selectedTypes])
+    visible = allItems.filter( item => selectedTypeIds.includes(item.TypeId) )
+
     setFormOptions({
       ...formOptions,
-      items: visibleItems
+      items: visible
     })
+    
   }
 
   const handleFormSubmit = e => {
-    const items = formOptions.items.filter(item => item.isChecked)
+    const items = allItems.filter(item => item.isChecked)
     const npcs = formOptions.npcs.filter(npc => npc.isChecked && npc.name !== "All")
 
     if(items.length !== 0 && npcs.length !== 0 && formOptions.preference !== "") {
@@ -245,7 +300,6 @@ export default function GiftPreferenceForm() {
   
       }
 
-      getItems();
     } else {
       if(npcs.length === 0) {
         enqueueSnackbar('Please select at least one (1) NPC', { variant: 'error', autoHideDuration: alertDuration, action: closeAlert })
@@ -275,13 +329,24 @@ export default function GiftPreferenceForm() {
 
   const handleCloseModal = () => {
     setAddItemModalOpen(false)
+
   }
 
   const clearCheckboxes = (target) => {
-    setFormOptions({
-      ...formOptions,
-      [target]: formOptions[target].map(n => ({...n, isChecked: false}))
-    })
+    if(target === "items") {
+      setSearchTerm("")
+      const itemList = allItems.map(item => ({...item, isChecked: false}))
+      setAllItems(itemList)
+      setFormOptions({
+        ...formOptions,
+        items: itemList
+      })
+    } else if(target === "npcs") {
+      setFormOptions({
+        ...formOptions,
+        npcs: formOptions.npcs.map(n => ({...n, isChecked: false}))
+      })
+    }
   }
 
   const invertSelection = (target) => {
@@ -293,7 +358,7 @@ export default function GiftPreferenceForm() {
 
   return (
     <>
-    <Container maxWidth={'xl'} style={{padding: '2rem 0'}}>
+    <Container ref={containerRef} maxWidth={'xl'} style={{padding: '2rem 0'}}>
       <Grid container>
         {/* NPCs */}
         <Grid item lg={5} style={{borderRight: '1px solid dodgerblue'}}>
@@ -316,7 +381,7 @@ export default function GiftPreferenceForm() {
                   key={`${npc.id}-checkbox`}
                   onChange={handleOnChange} 
                   value={npc.id} 
-                  checked={npc.isChecked} />
+                  checked={npc.isChecked || false} />
                 } 
               />)}
             </FormGroup>
@@ -350,7 +415,7 @@ export default function GiftPreferenceForm() {
             <Typography variant="h2" gutterBottom>
               Items
               <Button onClick={() => clearCheckboxes('items')} className={classes.clearCheckboxes}>[Clear]</Button>
-              <TextField id="searchItems" label="Search" type="search" value={searchTerm} style={{position: 'relative', marginLeft: '2rem', width: '60%', bottom: '-0.5rem'}} onChange={handleItemSearch} onBlur={handleItemSearch} />
+              <TextField ref={searchRef} id="searchItems" label="Search" type="search" value={searchTerm} style={{position: 'relative', marginLeft: '2rem', width: '60%', bottom: '-0.5rem'}} onChange={handleItemSearch} onBlur={handleItemSearch} />
               <Button className={classes.addItemBtn} onClick={handleOpenModal}>Add Item</Button>
             </Typography>
             <FormGroup className={classes.list}>
@@ -364,26 +429,30 @@ export default function GiftPreferenceForm() {
                       key={`${type.id}-checkbox`}
                       value={type.id}
                       onChange={handleItemTypeFilter}
-                      checked={type.isChecked}
+                      checked={type.isChecked || false}
                     />
                   }
                 />
               )}
             </FormGroup>
+            <hr />
             <FormGroup className={classes.list}>
               {formOptions.items.map(item => 
-              <FormControlLabel 
+              item.name !== "" &&
+                <FormControlLabel 
                 key={`${item.id}-label`} 
-                label={<><GiftIcon name={item.name} size={20} /> {item.name}</>} 
+                label={<><GiftIcon name={item.name} size={20} icon={item.icon !== undefined ? item.icon.default : item.icon} /> {item.name}</>} 
                 control={
                   <CustomCheckbox 
                   name="items"
                   key={`${item.id}-checkbox`}
                   onChange={handleOnChange} 
                   value={item.id} 
-                  checked={item.isChecked} />
+                  checked={item.isChecked || false} />
                 } 
-              />)}
+              />
+              
+              )}
             </FormGroup>
           </Container>
         </Grid>
