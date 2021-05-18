@@ -5,7 +5,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    flexGrow: 1,
+    marginBottom: '2rem'
   },
   menuButton: {
     marginRight: theme.spacing(2),
@@ -43,6 +43,7 @@ export default function Navbar() {
           <>
           <Button className={classes.button} color="inherit"><Link to='/'>Villagers / NPCs</Link></Button>
           <Button className={classes.button} color="inherit"><Link to='/gifts'>Gifts</Link></Button>
+          <Button className={classes.button} color="inherit"><Link to='/events'>Events</Link></Button>
           </>
         }
       </Toolbar>

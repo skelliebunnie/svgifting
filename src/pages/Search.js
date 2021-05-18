@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { Box, Container, TextField, FormControlLabel, Checkbox } from '@material-ui/core'
-import Navbar from '../components/Navbar'
 
 import VillagersList from '../components/VillagersList'
 
@@ -13,7 +12,6 @@ export default function Search() {
 
   return (
     <Box>
-      <Navbar />
       <Container maxWidth={'lg'}>
         <TextField type="search" value="Search Not Available Yet" style={{width: '100%', margin: '1rem 0'}} disabled />
         <FormControlLabel

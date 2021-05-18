@@ -18,7 +18,8 @@ const core = {
   brown:      '#6B3710',
   sand:       '#DDA059',
   yellow:     '#FFD921',
-  green:      '#58AC14'
+  green:      '#58AC14',
+  pink:       '#ee729c'
 };
 
 const rgbToHex = (r, g, b) => {

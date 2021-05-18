@@ -5,7 +5,7 @@ import { Box, Card, CardContent, CardMedia, Typography } from '@material-ui/core
 
 
 import VillagerIcon from '../VillagerIcon'
-import GiftIcon from '../GiftIcon'
+import ItemIcon from '../ItemIcon'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -93,6 +93,7 @@ export default function VillagerCard(props) {
       setGifts( props.gifts.filter(gift => !universalLoves.includes(gift.name)) )
 
     }
+  // eslint-disable-next-line
   }, [props.includeULoves])
 
   return (
@@ -114,7 +115,7 @@ export default function VillagerCard(props) {
               {/* <FontAwesomeIcon icon={faHeart} style={{fontSize: '2rem', color: 'crimson', verticalAlign: 'middle'}} /> */}
               Loved Gifts:
               </Typography>
-             {gifts.map(gift => gift.Gift.preference === 'love' && <GiftIcon key={gift.name} name={gift.name} icon={gift.icon} size={24} />)}
+             {gifts.map(gift => gift.Gift.preference === 'love' && <ItemIcon key={gift.name} name={gift.name} icon={gift.icon} size={24} />)}
             </section>
           </Box>
           }

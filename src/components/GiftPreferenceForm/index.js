@@ -5,7 +5,7 @@ import { Grid, Container, FormGroup, FormControlLabel, Checkbox, Typography, For
 import { Close as CloseIcon } from '@material-ui/icons'
 
 import UpsertItemForm from '../UpsertItemForm'
-import GiftIcon from '../GiftIcon'
+import ItemIcon from '../ItemIcon'
 import VillagerIcon from '../VillagerIcon'
 
 import { useSnackbar } from 'notistack'
@@ -441,7 +441,7 @@ export default function GiftPreferenceForm() {
               item.name !== "" &&
                 <FormControlLabel 
                 key={`${item.id}-label`} 
-                label={<><GiftIcon name={item.name} size={20} icon={item.icon !== undefined ? item.icon.default : item.icon} /> {item.name}</>} 
+                label={<><ItemIcon name={item.name} size={20} icon={item.icon !== undefined ? item.icon.default : item.icon} /> {item.name}</>} 
                 control={
                   <CustomCheckbox 
                   name="items"

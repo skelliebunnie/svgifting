@@ -8,8 +8,11 @@ import { Box } from '@material-ui/core'
 import { SnackbarProvider } from 'notistack'
 import DatabaseContextProvider from './contexts/DatabaseContext';
 
+import Navbar from './components/Navbar'
+
 import Search from './pages/Search'
 import Gifts from './pages/Gifts'
+import Events from './pages/Events'
 import GiftForm from './pages/GiftForm'
 import UpsertItem from './pages/UpsertItem'
 
@@ -18,7 +21,10 @@ const palette = require('./utils/palette')
 const useStyles = makeStyles(() => ({
   root: {
     minHeight: '100vh',
-    backgroundColor: palette.dayblue[200]
+    backgroundColor: palette.dayblue[50]
+  },
+  navbarMargin: {
+
   },
   info: {
     background: `${palette.dayblue[500]} !important`,
@@ -41,8 +47,12 @@ function App() {
   const location = useLocation();
   const classes = useStyles();
 
+  const eventToken = location.pathname.includes("admin") ? true : false;
+  localStorage.setItem('token', eventToken)
+
   return (
     <ThemeProvider theme={mainTheme}>
+      <Navbar />
       <SnackbarProvider
         maxSnack={5} 
         classes={{
@@ -54,10 +64,11 @@ function App() {
         preventDuplicate
       >
         <DatabaseContextProvider>
-          <Box className={classes.root}>
+          <Box className={classes.root} style={location.pathname !== '/gifts' ? {paddingTop: '2rem'} : {}}>
             <Switch location={location} key={location.pathname}>
               <Route exact path="/" component={Search} />
               <Route exact path="/gifts" component={Gifts} />
+              <Route path="/events" component={Events} />
               <Route exact path="/assign-gifts" component={GiftForm} />
               <Route exact path="/add-item" component={UpsertItem} />
             </Switch>

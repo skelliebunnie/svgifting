@@ -4,8 +4,6 @@ import { makeStyles } from '@material-ui/core/styles'
 import { Box, AppBar, Tabs, Tab, Container, FormControlLabel, Checkbox } from '@material-ui/core'
 import API from '../utils/API'
 
-import Navbar from '../components/Navbar'
-
 import TabPanel from '../components/TabPanel'
 import GiftListItem from '../components/GiftListItem'
 
@@ -92,7 +90,7 @@ export default function Gifts() {
       setHatedGifts(allGifts[4] || [])
 
     }
-  }, [includeUniversalLoves])
+  }, [includeUniversalLoves, universalLoves, allGifts])
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
@@ -100,7 +98,6 @@ export default function Gifts() {
 
   return (
     <Box>
-      <Navbar />
       <div className={classes.root}>
         <AppBar position="static">
           <Tabs value={tabValue} onChange={handleTabChange} aria-label="villagers grouped by gifts, grouped by preference" indicatorColor="secondary">

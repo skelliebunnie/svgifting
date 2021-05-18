@@ -211,18 +211,21 @@ const DatabaseContextProvider = (props) => {
     return 'Error Item'
   }
 
-  const getIcon = (str, returnAsString) => {
+  const getIcon = (str, dir=null, ext='png', returnAsString) => {
     let icon_file = null;
-    let filename =  '24px-'
+    let filename =  dir === 'item_icons' || dir === null || dir === true ? '24px-' : '';
     filename += toTitleCase(str)
     
     filename = filename.replace("'", "").replace(",", "");
     filename = filename.includes(" ") ? filename.split(" ").join("_") : filename
-    filename += '.png'
+    filename += ext === null ? '.png' : `.${ext}`
+
+    if(dir === null || dir === true) { dir = 'item_icons' }
+    if(returnAsString === null) { returnAsString = false }
 
     try {
-      icon_file = require(`../assets/item_icons/${filename}`);
-      filename = `../../assets/item_icons/${filename}`
+      icon_file = require(`../assets/${dir}/${filename}`);
+      filename = `../../assets/${dir}/${filename}`
     } catch (err) {
       icon_file = require('../assets/item_icons/Error_Item.png');
       filename = '../../assets/item_icons/Error_Item.png'

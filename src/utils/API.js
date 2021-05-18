@@ -30,6 +30,15 @@ const API = {
   getGiftsByPreference: (preference) => {
     return axios.get(`${URL_PREFIX}/api/gifts/${preference}`)
   },
+  getSeasons: () => {
+    return axios.get(`${URL_PREFIX}/api/seasons`)
+  },
+  getEvents: () => {
+    return axios.get(`${URL_PREFIX}/api/events`)
+  },
+  getEventsBySeason: (season) => {
+    return axios.get(`${URL_PREFIX}/api/events/${season}`)
+  },
   // post / put / upsert
   upsertItem: (data) => {
     return axios.post(`${URL_PREFIX}/api/item/upsert`, data);
@@ -37,6 +46,13 @@ const API = {
   upsertGift: (data) => {
     return axios.post(`${URL_PREFIX}/api/gift/upsert`, data);
   },
+  postEvent: (data) => {
+    return axios.post(`${URL_PREFIX}/api/event`, data);
+  },
+  // delete
+  deleteEvent: (id) => {
+    return axios.delete(`${URL_PREFIX}/api/event/${id}`);
+  }
 }
 
 export default API
