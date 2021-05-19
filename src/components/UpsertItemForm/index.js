@@ -182,74 +182,7 @@ export default function UpsertItemForm(props) {
     })
   }
 
-  // const handleFormSubmit = e => {
-
-  //   let data = {...addItemFormOptions}
-  //   const formKeys = Object.keys(data);
-
-  //   for(var i = 0; i < formKeys.length; i++) {
-  //     if(data[formKeys[i]] === 0 || data[formKeys[i]] === "") {
-  //       data[formKeys[i]] = null
-  //     }
-
-  //     if(formKeys[i] === "size" && formKeys[i].length === 2) {
-  //       data.size = addItemFormOptions.size.join("-");
-  //     } else {
-  //       data.size = null;
-  //     }
-
-  //     if(formKeys[i] === "time" && formKeys[i].length === 2) {
-  //       data.size = addItemFormOptions.size.join("-");
-  //     } else {
-  //       data.size = null;
-  //     }
-  //   }
-
-  //   // if the item is *not* an animal product OR the AnimalId.length === 0
-  //   // just 'null' the AnimalId and insert/update
-  //   if(addItemFormOptions.TypeId !== 4 || addItemFormOptions.AnimalId.length === 0) {
-  //     data.AnimalId = null;
-  //     // if it's not a *fish* either, go ahead and 'null' the weather as well
-  //     // since forage items will have item availability but won't be weather dependent
-  //     if(data.TypeId !== 14) data.weather = null;
-
-  //     itemToDatabase(data)
-
-  //   } else {
-  //     // now here we're handling animal products that are actually assigned to an animal
-  //     // if the length is 1, we can just move on
-  //     if(addItemFormOptions.AnimalId.length === 1) {
-  //       data.AnimalId = data.AnimalId[0];
-
-  //       itemToDatabase(data)
-
-  //     } else if(addItemFormOptions.AnimalId.length > 1) {
-  //       // otherwise, we need to add an item for each animal selected (just how it works)
-  //       for(var j = 0; j < addItemFormOptions.AnimalId.length; j++) {
-  //         data.AnimalId = addItemFormOptions.AnimalId[j];
-
-  //         itemToDatabase(data)
-  //       }
-
-  //     }
-  //   }
-  // }
-
-  // const itemToDatabase = (data) => {
-  //   API.upsertItem(data)
-  //     .then(results => {
-  //       setAlert({ open: true, message: addItemFormOptions.id !== undefined ? `${addItemFormOptions.name} updated successfully` : `${addItemFormOptions.name} saved successfully`, severity: 'success' });
-  //       setAddItemFormOptions({...defaultAddItemFormOptions, ...defaultItemAvailability})
-  //       setSelected(null)
-  //       getItems();
-  //     })
-  //     .catch(err => {
-  //       setAlert({ open: true, message: addItemFormOptions.id !== undefined ? `Error: ${addItemFormOptions.name} was not updated. Message: ${err.message}` : `Error: ${addItemFormOptions.name} was not saved. Message: ${err.message}`, severity: 'error' })
-  //       console.error(err.message);
-  //     });
-  // }
-
-  const clearForm = e => {
+  const clearForm = () => {
     setAddItemFormOptions({
       ...defaultAddItemFormOptions,
       ...defaultItemAvailability
@@ -354,16 +287,16 @@ export default function UpsertItemForm(props) {
             {/* TYPE ID */}
             <FormControl className={classes.formControl}>
               <InputLabel id="itemtype-label">Item Type</InputLabel>
-                <Select
-                  labelId="itemtype-label"
-                  id="TypeId"
-                  name="TypeId"
-                  value={addItemFormOptions.TypeId}
-                  onChange={handleNumberChange}
-                  style={{fontSize: '1.4rem'}}
-                >
-                  {itemTypes.map(type => <MenuItem key={`typeid-${type.id}`} value={type.id}>{type.name}</MenuItem>)}
-                </Select>
+              <Select
+                labelId="itemtype-label"
+                id="TypeId"
+                name="TypeId"
+                value={addItemFormOptions.TypeId}
+                onChange={handleNumberChange}
+                style={{fontSize: '1.4rem'}}
+              >
+                {itemTypes.map(type => <MenuItem key={`typeid-${type.id}`} value={type.id}>{type.name}</MenuItem>)}
+              </Select>
             </FormControl>
             {/* IF TYPE IS "CROP, <xyz>" */}
             {

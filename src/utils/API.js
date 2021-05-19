@@ -49,6 +49,9 @@ const API = {
   postEvent: (data) => {
     return axios.post(`${URL_PREFIX}/api/event`, data);
   },
+  upsertEvent: (data) => {
+    return axios.post(`${URL_PREFIX}/api/event/upsert`, data);
+  },
   // delete
   deleteEvent: (id) => {
     return axios.delete(`${URL_PREFIX}/api/event/${id}`);

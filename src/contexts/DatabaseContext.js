@@ -24,7 +24,11 @@ const DatabaseContextProvider = (props) => {
     message: 'A Snackbar Alert'
   });
 
+  /**
+   * ADDING ITEMS (page & modal)
+   */
   const [addItemModalOpen, setAddItemModalOpen] = useState(false)
+  const [addEventModalOpen, setAddEventModalOpen] = useState(false)
 
   const [selected, setSelected] = useState(null)
   const [searchTerm, setSearchTerm] = useState("")
@@ -90,6 +94,27 @@ const DatabaseContextProvider = (props) => {
     ...defaultItemAvailability
   });
 
+  /**
+   * ADDING EVENTS (form, which is displayed in a modal)
+   */
+  const [selectedSeason, setSelectedSeason] = useState({id: 1, name: 'Spring'})
+  const [selectedDate, setSelectedDate] = useState(1)
+
+  const [seasons, setSeasons] = useState([])
+  const [events, setEvents] = useState([])
+
+  const [dates, setDates] = useState([])
+  const defaultNewEvent = {
+    name: "",
+    day: selectedDate,
+    VillagerId: '',
+    SeasonId: selectedSeason.id,
+    type: 'other',
+    startTime: '2021-01-01T09:00:00',
+    endTime: '2021-01-01T14:00:00'
+  }
+  const [newEvent, setNewEvent] = useState(defaultNewEvent)
+
   useEffect(() => {
     API.getVillagers().then(list => {
       // set the form options list of NPCs and add a new key/value pair for isChecked, defaulting to false
@@ -107,9 +132,44 @@ const DatabaseContextProvider = (props) => {
     }).catch(err => console.error(err));
 
     getItems();
-  
+
+    /**
+     * CREATING NEW EVENTS
+     */
+    const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+    let datesArray = []
+    let n = 0;
+    for(var i = 1; i <= 28; i++) {
+      datesArray.push({
+        date: i,
+        name: weekdays[n]
+      });
+
+      if(n < 7) {
+        n++;
+
+      } if (n % 7 === 0) {
+        n = 0;
+      }
+    }
+
+    setDates(datesArray)
+
+    API.getSeasons()
+      .then(seasons => {
+        setSeasons([...seasons.data])
+      })
+      .catch(err => {
+        console.error(err);
+      })
+    
+    getEvents(selectedSeason.id);
   // eslint-disable-next-line
-  }, [])
+  }, [selectedSeason.id])
+
+  useEffect(() => {
+    setNewEvent(n => ({...n, day: selectedDate}))
+  }, [selectedDate])
 
   const getItems = () => {
     API.getItems()
@@ -119,6 +179,14 @@ const DatabaseContextProvider = (props) => {
         setAllItems(data)
       })
       .catch(err => console.error(err));
+  }
+
+  const getEvents = (SeasonId) => {
+    API.getEventsBySeason(SeasonId)
+      .then(results => {
+        setEvents(results.data)
+      })
+      .catch(err => console.error(err))
   }
 
   const addItemFormSubmit = () => {
@@ -182,7 +250,7 @@ const DatabaseContextProvider = (props) => {
         setAddItemFormOptions({...defaultAddItemFormOptions, ...defaultItemAvailability})
         setSelected(null)
         setAddItemModalOpen(false);
-        setItems([...dbItems, {...results.data, icon: getIcon(results.data.name, true)}])
+        setItems([...dbItems, {...results.data, icon: getIcon(results.data.name, 'item_icons', 'png', true)}])
 
       })
       .catch(err => {
@@ -238,8 +306,67 @@ const DatabaseContextProvider = (props) => {
     }
   }
 
+  /**
+   * CREATE / DELETE EVENTS
+   */
+   const addEvent = () => {
+    const eventData = newEvent;
+    if(eventData.VillagerId === '') eventData.VillagerId = null
+    eventData.SeasonId = eventData.SeasonId !== selectedSeason.id ? eventData.SeasonId = selectedSeason.id : eventData.SeasonId
+    eventData.startTime = typeof eventData.startTime === 'string' ? eventData.startTime.substring(11) : formatTime(eventData.startTime)
+    eventData.endTime = typeof eventData.endTime === 'string' ? eventData.endTime.substring(11) : formatTime(eventData.endTime)
+
+    console.log("insert this", eventData)
+    API.upsertEvent(eventData)
+      .then((event) => {
+        let season = seasons.filter(season => season.id === parseInt(eventData.SeasonId));
+        setAlert({ open: true, severity: "success", message: `"${event.data.name}" added successfully to ${season[0].name} ${eventData.day}`})
+        
+        getEvents(selectedSeason.id);
+
+        setNewEvent(defaultNewEvent)
+        
+        setAddEventModalOpen(false)
+      })
+      .catch(err => {
+        setAlert({open: true, severity: 'error', message: `"${eventData.name}" NOT created.\nERROR: ${err.message}`});
+      })
+  }
+
+  const formatTime = (dt) => {
+    let [hour, minute, second] = dt.toLocaleTimeString("en-US", {hour12: false}).split(/:| /)
+    return `${hour}:${minute}:${second}`
+  }
+
+  const deleteEvent = (id) => {
+    let eventData;
+    for(var i = 0; i < events.length; i++) {
+      if(events[i].id === id) {
+        eventData = events[i];
+      }
+    }
+
+    API.deleteEvent(id)
+      .then(deleted => {
+        let season = seasons.filter(season => season.id === parseInt(eventData.SeasonId));
+        setAlert({open: true, severity: 'success', message: `"${deleted.data.name}" event deleted successfully from ${season[0].name} ${deleted.data.day}`});
+
+        setEvents( events.filter(event => event.id !== id) )
+      })
+      .catch(err => {
+        console.error(err)
+        setAlert({open: true, severity: 'error', message: `"${eventData.name}" NOT deleted.\nERROR: ${err.message}`});
+      })
+  }
+
+  const handleSeasonChange = (season, id) => {
+    setSelectedSeason({id: id, season: season});
+
+    getEvents(id)
+  }
+
   return (
-    <DatabaseContext.Provider value={{dbNpcs, dbItems, setItems, getItems, allItems, setAllItems, dbItemTypes, addItemModalOpen, setAddItemModalOpen, addItemFormSubmit, alert, setAlert, handleAlertClose, addItemFormOptions, setAddItemFormOptions, defaultAddItemFormOptions, defaultItemAvailability, selected, setSelected, searchTerm, setSearchTerm, universalLoves, getIcon}}>
+    <DatabaseContext.Provider value={{dbNpcs, dbItems, setItems, getItems, allItems, setAllItems, dbItemTypes, addItemModalOpen, setAddItemModalOpen, addItemFormSubmit, alert, setAlert, handleAlertClose, addItemFormOptions, setAddItemFormOptions, defaultAddItemFormOptions, defaultItemAvailability, selected, setSelected, searchTerm, setSearchTerm, universalLoves, getIcon, dates, seasons, events, selectedDate, setSelectedDate, selectedSeason, setSelectedSeason, handleSeasonChange, defaultNewEvent, newEvent, setNewEvent, addEvent, deleteEvent, addEventModalOpen, setAddEventModalOpen}}>
       {props.children}
     </DatabaseContext.Provider>
   )

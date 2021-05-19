@@ -28,7 +28,7 @@ export default function VillagersList(props) {
       let data = list.data;
       for(var i = 0; i < data.length; i++) {
         for(var j = 0; j < data[i].Items.length; j++) {
-          data[i].Items[j].icon = getIcon( data[i].Items[j].name, false).default
+          data[i].Items[j].icon = getIcon( data[i].Items[j].name, 'item_icons', 'png', false ).default
         }
       }
       setVillagers(data);
