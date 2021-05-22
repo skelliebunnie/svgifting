@@ -320,7 +320,7 @@ const DatabaseContextProvider = (props) => {
     API.upsertEvent(eventData)
       .then((event) => {
         let season = seasons.filter(season => season.id === parseInt(eventData.SeasonId));
-        setAlert({ open: true, severity: "success", message: `"${event.data.name}" added successfully to ${season[0].name} ${eventData.day}`})
+        setAlert({ open: true, severity: "success", message: `"${eventData.name}" added successfully to ${season[0].name} ${eventData.day}`})
         
         getEvents(selectedSeason.id);
 
