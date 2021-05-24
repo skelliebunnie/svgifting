@@ -55,7 +55,7 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
-const iconColumn = {
+const villagerIcon = {
   headerName: " ",
   align: 'center',
   disableColumnMenu: true,
@@ -64,19 +64,27 @@ const iconColumn = {
   )
 }
 
+const giftIcons = {
+  disableColumnMenu: true,
+  renderCell: (({value}) => (
+    <div>
+    {value.length > 0 ? value.map(item => <ItemIcon key={item.name} name={item.name} size={24} style={{position: 'relative', margin: '8px', verticalAlign: 'middle'}} />) : ""}
+    </div>
+  ))
+}
+
 export default function VillagersList(props) {
   const classes = useStyles();
 
   const [villagers, setVillagers] = useState([]);
-
   const { getIcon, universalLoves } = useContext(DatabaseContext)
 
   const dataGridColumns = [
-    { field: "icon", flex: 0, ...iconColumn },
+    { field: "icon", flex: 0, ...villagerIcon },
     { field: 'name', headerName: "Name", flex: 1 },
     { field: 'available', headerName: "Marriage Candidate", flex: 1 },
     { field: 'birthday', headerName: 'Birthday', flex: 1 },
-    // { field: 'gifts', headerName: 'Loved Gifts' }
+    { field: 'gifts', headerName: 'Loved Gifts', flex: 1, ...giftIcons }
   ]
   
   const [dataGridRows, setDataGridRows] = useState([])
@@ -84,24 +92,18 @@ export default function VillagersList(props) {
   useEffect(() => {
     API.getVillagers().then(list => {
       let data = list.data;
-      let rows = [];
-
+      const rows = createTableRows(data);
+      
       for(var i = 0; i < data.length; i++) {
-        let row = {
-          id: data[i].id,
-          icon: data[i].name,
-          name: data[i].name,
-          available: data[i].available && data[i].name !== 'Krobus' ? true : false,
-          birthday: data[i].Seasons.length > 0 ? `${data[i].Seasons[0].name} ${data[i].Seasons[0].Event.day}`: 'unavailable',
-          // gifts: []
-        };
+        // filter out gifts that are not 'loved'
+        data[i].Items = data[i].Items.filter(item => item.Gift.preference === 'love')
 
         for(var j = 0; j < data[i].Items.length; j++) {
-          data[i].Items[j].icon = getIcon( data[i].Items[j].name, 'item_icons', 'png', false ).default
-          // row.gifts.push(getIcon( data[i].Items[j].name, 'item_icons', 'png', false ).default)
-        }
+          const item = data[i].Items[j];
+          const icon = getIcon( item.name, 'item_icons', 'png', false ).default
 
-        rows.push(row)
+          data[i].Items[j].icon = icon
+        }
       }
       
       setVillagers(data);
@@ -111,6 +113,41 @@ export default function VillagersList(props) {
   
   // eslint-disable-next-line
   }, []);
+
+  useEffect(() => {
+    let newRows = [];
+    for(var i = 0; i < dataGridRows.length; i++) {
+      let row = dataGridRows[i]
+      row.gifts = props.includeULoves ? row.allGifts : row.allGifts.filter(item => !universalLoves.includes(item.name))
+
+      newRows.push(row)
+    }
+
+    setDataGridRows(newRows);
+  // eslint-disable-next-line
+  }, [props.includeULoves, universalLoves])
+
+  const createTableRows = (data) => {
+    let rows = [];
+
+    for(var i = 0; i < data.length; i++) {
+      data[i].Items = data[i].Items.filter(item => item.Gift.preference === 'love')
+
+      let row = {
+        id: data[i].id,
+        icon: data[i].name,
+        name: data[i].name,
+        available: data[i].available && data[i].name !== 'Krobus' ? true : false,
+        birthday: data[i].Seasons.length > 0 ? `${data[i].Seasons[0].name} ${data[i].Seasons[0].Event.day}`: 'unavailable',
+        allGifts: data[i].Items,
+        gifts: data[i].Items
+      };
+
+      rows.push(row)
+    }
+
+    return rows;
+  }
 
   return (
     <Container className={classes.root} maxWidth={(props.format === 'Grid' || props.format === 'Table') ? 'xl' : 'lg'}>

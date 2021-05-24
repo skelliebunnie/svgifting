@@ -118,6 +118,7 @@ const DatabaseContextProvider = (props) => {
     if(!addEventModalOpen) {
       setNewEvent(defaultNewEvent)
     }
+  //eslint-disable-next-line
   }, [addEventModalOpen])
 
   useEffect(() => {

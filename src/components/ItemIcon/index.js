@@ -1,3 +1,5 @@
+import { useContext } from 'react'
+import { DatabaseContext } from "../../contexts/DatabaseContext";
 import { makeStyles } from '@material-ui/core/styles'
 import Tooltip from '@material-ui/core/Tooltip'
 
@@ -28,8 +30,27 @@ const useStyles = makeStyles(() => ({
 export default function ItemIcon(props) {
   const classes = useStyles();
 
-  let main_icon = props.swap !== undefined && props.swap === true ? props.overlay : props.icon
-  let overlay_icon = props.swap !== undefined && props.swap === true ? props.icon : props.overlay
+  const { getIcon } = useContext(DatabaseContext)
+
+  let overlay_image, icon_image;
+
+  if(props.overlay !== undefined && !props.overlay.includes(".png") && !props.overlay.includes("gif")) {
+    overlay_image = require(props.overlay).default
+
+  } else if(props.overlay !== undefined) {
+    overlay_image = props.overlay
+  }
+
+  if(props.image !== undefined && !props.icon.includes(".png") && !props.icon.includes("gif")) {
+    icon_image = require(props.icon).default
+  } else if(props.icon !== undefined) {
+    icon_image = props.icon
+  } else {
+    icon_image = getIcon(props.name, 'item_icons', 'png', false).default
+  }
+
+  let main_icon = props.swap !== undefined && props.swap === true ? overlay_image : icon_image
+  let overlay_icon = props.swap !== undefined && props.swap === true ? icon_image : overlay_image
 
   if(typeof main_icon === 'object' && main_icon.default !== undefined) main_icon = main_icon.default 
   if(typeof overlay_icon === 'object' && overlay_icon.default !== undefined) overlay_icon = overlay_icon.default 
