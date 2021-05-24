@@ -95,14 +95,16 @@ export default function Villagers() {
         <FilterUniversallyLovedGifts uLovesChecked={uLovesChecked} toggleUniversalLoves={toggleUniversalLoves} />
         <Grid container>
           <Grid item xs={12} lg={6}>
-            <SortVillagers options={sortOptions} sortBy={sortBy} handleInputChange={handleInputChange} />
-          </Grid>
-           <Grid item xs={12} lg={6}>
             <DisplayOptions options={displayOptions} display={display} handleInputChange={handleInputChange} />
-         </Grid>
+          </Grid>
+          <Grid item xs={12} lg={6}>
+          {display !== 'Table' &&
+            <SortVillagers options={sortOptions} sortBy={sortBy} handleInputChange={handleInputChange} />
+          }
+          </Grid>
         </Grid>
       </Container>
-      <VillagersList includeULoves={uLovesChecked} format={display} />
+      <VillagersList includeULoves={uLovesChecked} format={display} sortBy={sortBy} />
     </Box>
   );
 }

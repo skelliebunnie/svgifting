@@ -36,6 +36,11 @@ const useStyles = makeStyles((theme) => ({
     borderLeft: '8px solid transparent',
     borderLeftColor: theme.palette.green[400]
   },
+  birthday: {
+    display: 'block',
+    marginLeft: 40,
+    color: theme.palette.gray[500]
+  },
   icon: {
     display: 'inline-block',
     verticalAlign: 'bottom',
@@ -47,7 +52,7 @@ const useStyles = makeStyles((theme) => ({
     verticalAlign: 'center',
     fontVariant: 'small-caps',
     fontSize: '2.25rem',
-    marginBottom: '1rem'
+    marginBottom: '0'
   },
   status: {
     position: 'relative',
@@ -61,7 +66,7 @@ const useStyles = makeStyles((theme) => ({
   giftsContainer: {
     position: 'relative',
     width: '80%',
-    marginTop: '0.5rem',
+    marginTop: '1.5rem',
     marginBottom: '1rem',
     padding: '1.5rem 1.5rem 0.5rem 2.5rem',
     borderRadius: '4px',
@@ -106,6 +111,9 @@ export default function VillagerCard(props) {
           </Typography>
           <Typography variant="subtitle1" className={classes.status}>
             <strong>{props.status && props.name !== 'Krobus' ? 'Marriage Candidate' : ''}</strong>
+          </Typography>
+          <Typography className={classes.birthday}>
+            <strong>Birthday:</strong> {`${props.data.Seasons[0].name} ${props.data.Seasons[0].Event.day}`}
           </Typography>
           {gifts.length > 0 &&
           <Box>
