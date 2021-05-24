@@ -34,11 +34,19 @@ export default function VillagerIcon(props) {
   const overlay = props.overlay !== undefined ? <img src={props.swap ? icon_url.default : props.overlay} alt={props.overlayAlt !== undefined ? props.overlayAlt : 'Overlay Icon'} width={props.overlaySize !== undefined ? props.overlaySize : props.size !== undefined ? props.size / 2 : 24} height={props.overlaySize !== undefined ? props.overlaySize : props.size !== undefined ? props.size / 2 : 24} className={`${classes.overlayIcon} ${props.position !== undefined ? props.position : 'bottomLeft'}`} /> : ''
 
   return (
-    <Tooltip title={props.tooltip !== undefined ? props.tooltip : props.name} aria-label={props.name} placement="bottom" arrow>
-      <p className={classes.iconContainer}>
-        {image}
-        {props.overlay !== undefined && overlay}
-      </p>
-    </Tooltip>
+    <>
+    {(props.tooltip || props.tooltip === undefined) ?
+      <Tooltip title={props.tooltip !== undefined ? props.tooltip : props.name} aria-label={props.name} placement="bottom" arrow>
+        <p className={classes.iconContainer}>
+          {image}
+          {props.overlay !== undefined && overlay}
+        </p>
+      </Tooltip>
+
+      :
+
+      <p className={classes.iconContainer}>{image}{props.overlay !== undefined && overlay}</p>
+    }
+    </>
   )
 }

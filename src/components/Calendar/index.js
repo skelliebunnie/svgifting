@@ -3,12 +3,13 @@ import { DatabaseContext } from "../../contexts/DatabaseContext";
 import { makeStyles } from '@material-ui/core/styles'
 
 import { Container, Grid, Card, CardContent, Button, IconButton, Typography, CardActions, Modal } from '@material-ui/core'
-import { Add as AddIcon, Delete as DeleteIcon, Close as CloseIcon } from '@material-ui/icons';
+import { Add as AddIcon, Close as CloseIcon } from '@material-ui/icons';
 
 import VillagerIcon from '../VillagerIcon'
 import ItemIcon from '../ItemIcon'
 
 import AddEventForm from '../AddEventForm'
+import ContextMenu from '../ContextMenu'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -194,6 +195,10 @@ export default function Calendar({ modalState, openModal, closeModal }) {
   const [allSeasons, setAllSeasons] = useState([])
   const [allEvents, setAllEvents] = useState([])
 
+  const [showContextMenu, setShowContextMenu] = useState(false);
+  const [contextMenuPos, setContextMenuPos] = useState({x: null, y: null})
+  const [selectedEvent, setSelectedEvent] = useState(null);
+
   useEffect(() => {
     setAllSeasons(seasons);
     setAllEvents(events);
@@ -201,11 +206,49 @@ export default function Calendar({ modalState, openModal, closeModal }) {
   }, [seasons, events])
 
   const openNewEventUpdate = (event) => {
+    console.log("Editing Event:", event)
     let updateEvent = event;
     updateEvent.startTime = `2021-01-01T${event.startTime}`
     updateEvent.endTime = `2021-01-01T${event.endTime}`
     setNewEvent(updateEvent)
     openModal(event.day)
+  }
+
+  const handleContextMenu = (e, eventData) => {
+    e.preventDefault();
+
+    if(eventData !== null && eventData !== undefined) {
+      setShowContextMenu(true);
+      setContextMenuPos({
+        x: e.pageX + 8,
+        y: e.pageY + 15
+      });
+
+      setSelectedEvent(eventData);
+    } else {
+      setShowContextMenu(false);
+      setContextMenuPos({
+        x: null,
+        y: null
+      })
+      setSelectedEvent(null)
+    }
+  }
+
+  const handleContextMenuClose = (e, action) => {
+    setContextMenuPos({
+      x: null,
+      y: null
+    });
+    setShowContextMenu(false);
+
+    if(action === 'edit') {
+      openNewEventUpdate(selectedEvent)
+    }
+
+    if(action === 'delete') {
+      deleteEvent(selectedEvent.id)
+    }
   }
 
   return (
@@ -227,21 +270,18 @@ export default function Calendar({ modalState, openModal, closeModal }) {
               {
               allEvents.map(event => (event.day === date) && 
                 <Grid item key={event.id} className={classes.eventBlock}>
-                  <span onClick={() => openNewEventUpdate(event)}>
-                  {(event.type === 'birthday' && event.VillagerId !== null) ? 
-                  <VillagerIcon tooltip={event.name} name={event.Villager.name} overlay={cakeIcon} swap={true} size={38} overlaySize={32} /> 
-                  : 
-                  event.type === 'checkup' ? 
-                  <VillagerIcon tooltip={event.name} name={event.Villager.name} overlay={checkupIcon} swap={true} size={38} overlaySize={32} /> 
-                  :
-                  (event.type === 'other' && event.VillagerId !== null) ?
-                  <VillagerIcon tooltip={event.name} name={event.Villager.name} overlay={otherEventTypeIcon} swap={true} size={38} overlaySize={32} />
-                  :
-                  <ItemIcon tooltip={true} icon={event.name === "Night Market" ? nightMarketIcon : event.type === 'other' ? otherEventTypeIcon : festivalIcon} name={event.name} />}
+                  <span onContextMenu={token ? (e) => handleContextMenu(e, event) : ''}>
+                    {(event.type === 'birthday' && event.VillagerId !== null) ? 
+                    <VillagerIcon tooltip={event.name} name={event.Villager.name} overlay={cakeIcon} swap={true} size={38} overlaySize={32} /> 
+                    : 
+                    event.type === 'checkup' ? 
+                    <VillagerIcon tooltip={event.name} name={event.Villager.name} overlay={checkupIcon} swap={true} size={38} overlaySize={32} /> 
+                    :
+                    (event.type === 'other' && event.VillagerId !== null) ?
+                    <VillagerIcon tooltip={event.name} name={event.Villager.name} overlay={otherEventTypeIcon} swap={true} size={38} overlaySize={32} />
+                    :
+                    <ItemIcon tooltip={true} icon={event.name === "Night Market" ? nightMarketIcon : event.type === 'other' ? otherEventTypeIcon : festivalIcon} name={event.name} />}
                   </span>
-                  {token && 
-                    <IconButton className={classes.deleteBtn} onClick={() => deleteEvent(event.id)} style={{display: 'inline-block', margin: 0, padding: 0}}><DeleteIcon /></IconButton>
-                  }
                 </Grid>
               )}
               </Grid>
@@ -269,6 +309,7 @@ export default function Calendar({ modalState, openModal, closeModal }) {
           <AddEventForm />
         </Container>
       </Modal>
+      <ContextMenu showMenu={showContextMenu} menuPos={contextMenuPos} handleClose={handleContextMenuClose} label={"Event"} />
     </Container>
   )
 }

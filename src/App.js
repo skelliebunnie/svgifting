@@ -10,7 +10,7 @@ import DatabaseContextProvider from './contexts/DatabaseContext';
 
 import Navbar from './components/Navbar'
 
-import Search from './pages/Search'
+import Villagers from './pages/Villagers'
 import Gifts from './pages/Gifts'
 import Events from './pages/Events'
 import GiftForm from './pages/GiftForm'
@@ -52,7 +52,7 @@ function App() {
 
   return (
     <ThemeProvider theme={mainTheme}>
-      <Navbar />
+      <Navbar active={location.pathname} />
       <SnackbarProvider
         maxSnack={5} 
         classes={{
@@ -66,7 +66,7 @@ function App() {
         <DatabaseContextProvider>
           <Box className={classes.root} style={location.pathname !== '/gifts' ? {paddingTop: '2rem'} : {}}>
             <Switch location={location} key={location.pathname}>
-              <Route exact path="/" component={Search} />
+              <Route exact path="/" component={Villagers} />
               <Route exact path="/gifts" component={Gifts} />
               <Route path="/events" component={Events} />
               <Route exact path="/assign-gifts" component={GiftForm} />

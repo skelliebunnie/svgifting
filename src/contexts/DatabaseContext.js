@@ -90,8 +90,7 @@ const DatabaseContextProvider = (props) => {
   }
 
   const [addItemFormOptions, setAddItemFormOptions] = useState({
-    ...defaultAddItemFormOptions,
-    ...defaultItemAvailability
+    ...defaultAddItemFormOptions
   });
 
   /**
@@ -114,6 +113,12 @@ const DatabaseContextProvider = (props) => {
     endTime: '2021-01-01T14:00:00'
   }
   const [newEvent, setNewEvent] = useState(defaultNewEvent)
+
+  useEffect(() => {
+    if(!addEventModalOpen) {
+      setNewEvent(defaultNewEvent)
+    }
+  }, [addEventModalOpen])
 
   useEffect(() => {
     API.getVillagers().then(list => {
@@ -330,7 +335,7 @@ const DatabaseContextProvider = (props) => {
       })
       .catch(err => {
         setAlert({open: true, severity: 'error', message: `"${eventData.name}" NOT created.\nERROR: ${err.message}`});
-      })
+      });
   }
 
   const formatTime = (dt) => {
@@ -341,7 +346,7 @@ const DatabaseContextProvider = (props) => {
   const deleteEvent = (id) => {
     let eventData;
     for(var i = 0; i < events.length; i++) {
-      if(events[i].id === id) {
+    if(events[i].id === id) {
         eventData = events[i];
       }
     }
