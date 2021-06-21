@@ -21,7 +21,7 @@ function FilterUniversallyLovedGifts({ uLovesChecked, toggleUniversalLoves }) {
   )
 }
 
-function SortVillagers({ options, sortBy, handleInputChange }) {
+function SortOptions({ options, sortBy, handleInputChange }) {
   return (
     <>
     <InputLabel id="sortby-label">Sort By</InputLabel>
@@ -72,15 +72,17 @@ function DisplayOptions({ options, display, handleInputChange }) {
 }
 
 export default function Villagers() {
-  const sortOptions = ["Villager Name", "Birthday <Season, Day>", "Availability"]
+  const sortOptions = ["Villager Name", "Birthday <Season, Day>", "Number of Loved Gifts"]
   const displayOptions = ["Grid", "List", "Table"]
 
-  const [uLovesChecked, setULovesChecked] = useState(true)
+  const [uLovesChecked, setULovesChecked] = useState(JSON.parse(localStorage.getItem("sv_include_uloves")) || false);
   const [sortBy, setSortBy] = useState('Villager Name')
   const [display, setDisplay] = useState('Grid')
 
   const toggleUniversalLoves = () => {
     setULovesChecked(!uLovesChecked)
+
+    localStorage.setItem("sv_include_uloves", !uLovesChecked);
   }
 
   const handleInputChange = (e, input) => {
@@ -99,7 +101,7 @@ export default function Villagers() {
           </Grid>
           <Grid item xs={12} lg={6}>
           {display !== 'Table' &&
-            <SortVillagers options={sortOptions} sortBy={sortBy} handleInputChange={handleInputChange} />
+            <SortOptions options={sortOptions} sortBy={sortBy} handleInputChange={handleInputChange} />
           }
           </Grid>
         </Grid>

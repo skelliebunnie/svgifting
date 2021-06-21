@@ -9,76 +9,84 @@ import ItemIcon from '../ItemIcon'
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    flex: '1 0 100%',
-    display: 'flex',
+    flex: "1 0 auto",
+    display: "flex",
     margin: 24,
-    textAlign: 'left',
-    justifyContent: 'space-between',
-    maxWidth: '30%',
-    boxSizing: 'border-box',
+    textAlign: "left",
+    justifyContent: "space-between",
+    boxSizing: "border-box",
     minHeight: 200,
-    color: theme.palette.dayblue[400]
+    color: theme.palette.dayblue[400],
+    width: "100%",
+    [theme.breakpoints.up("lg")]: {
+      width: "45%",
+      maxWidth: "45%"
+    },
+    [theme.breakpoints.up("xl")]: {
+      width: '30%',
+      maxWidth: '30%'
+    }
   },
   details: {
-    display: 'flex',
-    flexDirection: 'column',
+    display: "flex",
+    flexDirection: "column",
   },
   content: {
-    flex: '1 0 auto',
+    flex: "1 0 auto",
   },
   portrait: {
     minWidth: 200,
-    backgroundSize: 'cover',
-    backgroundPosition: 'center top',
-    margin: '0 0 0 0.5rem'
+    backgroundSize: "cover",
+    backgroundPosition: "center top",
+    margin: "0 0 0 0.5rem",
   },
   marriageable: {
-    borderLeft: '8px solid transparent',
-    borderLeftColor: theme.palette.green[400]
+    borderLeft: "8px solid transparent",
+    borderLeftColor: theme.palette.green[400],
   },
   birthday: {
-    display: 'block',
+    display: "block",
     marginLeft: 40,
-    color: theme.palette.gray[500]
+    color: theme.palette.gray[500],
   },
   icon: {
-    display: 'inline-block',
-    verticalAlign: 'bottom',
-    position: 'relative',
-    left: '-0.25rem'
+    display: "inline-block",
+    verticalAlign: "bottom",
+    position: "relative",
+    left: "-0.25rem",
   },
   name: {
-    display: 'inline-block',
-    verticalAlign: 'center',
-    fontVariant: 'small-caps',
-    fontSize: '2.25rem',
-    marginBottom: '0'
+    display: "inline-block",
+    verticalAlign: "center",
+    fontVariant: "small-caps",
+    fontSize: "2.25rem",
+    marginBottom: "0",
   },
   status: {
-    position: 'relative',
+    position: "relative",
     color: theme.palette.green[700],
-    marginLeft: '0.5rem',
-    bottom: '0.25rem',
-    fontSize: 'small',
-    display: 'inline-block',
-    verticalAlign: 'center'
+    marginLeft: "0.5rem",
+    bottom: "0.25rem",
+    fontSize: "small",
+    display: "inline-block",
+    verticalAlign: "center",
   },
   giftsContainer: {
-    position: 'relative',
-    width: '80%',
-    marginTop: '1.5rem',
-    marginBottom: '1rem',
-    padding: '1.5rem 1.5rem 0.5rem 2.5rem',
-    borderRadius: '4px',
-    border: '1px solid gainsboro'
+    position: "relative",
+    width: "80%",
+    marginTop: "1.5rem",
+    marginBottom: "1rem",
+    padding: "1.5rem 1.5rem 0.5rem 2.5rem",
+    borderRadius: "4px",
+    border: "1px solid gainsboro",
   },
   giftsTitle: {
-    position: 'absolute',
-    top: '-1rem',
-    left: '-1.75rem',
-    background: 'white',
-    padding: '0 0.75rem 0 1.25rem',
-  }
+    position: "absolute",
+    top: "-1rem",
+    left: "-1.75rem",
+    background: "white",
+    padding: "0 0.75rem 0 1.25rem",
+  },
 }));
 
 export default function VillagerCard(props) {

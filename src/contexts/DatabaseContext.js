@@ -132,6 +132,7 @@ const DatabaseContextProvider = (props) => {
 
     API.getItemTypes().then(types => {
       let itemTypesList = types.data.map(type => ({ ...type, isChecked: true }))
+      itemTypesList.push({ id: 'otherTypes', name: 'Other', isChecked: true })
       itemTypesList.push({ id: 'allTypes', name: 'All', isChecked: true })
       setItemTypes(itemTypesList);
 

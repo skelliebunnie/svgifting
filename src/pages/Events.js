@@ -1,7 +1,7 @@
 import { useContext } from 'react'
 import { DatabaseContext } from "../contexts/DatabaseContext";
 
-import { Box } from '@material-ui/core'
+import { Container } from '@material-ui/core'
 
 import Calendar from '../components/Calendar'
 
@@ -20,9 +20,10 @@ export default function Events() {
   }
   
   return (
-    <Box>
+    <Container maxWidth="lg">
       <Calendar openModal={openModal} closeModal={closeModal} modalState={addEventModalOpen} />
+      <p><em>The week begins on Monday for everything <strong>EXCEPT</strong> gift-giving! The "gift-giving week" begins on SUNDAY.</em></p>
       <AlertSnack open={alert.open} severity={alert.severity} message={alert.message} handleClose={handleAlertClose} />
-    </Box>
+    </Container>
   )
 }

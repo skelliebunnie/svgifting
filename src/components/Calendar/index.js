@@ -13,171 +13,219 @@ import ContextMenu from '../ContextMenu'
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    backgroundColor: 'transparent'
+    backgroundColor: "transparent",
   },
   calendarWeekday: {
-    width: `${100 / 7}%`,
     backgroundColor: theme.palette.nightblue[700],
     color: theme.palette.dayblue[200],
-    textAlign: 'center',
-    padding: '0.25rem 1rem',
-    '& + &': {
-      borderLeft: `1px solid ${theme.palette.dayblue[200]}`
-    }
+    padding: "0.5rem 1rem",
+    width: "35%",
+    verticalAlign: "middle",
+    display: "flex",
+    flexFlow: "row nowrap",
+    justifyContent: "space-between",
+    alignItems: "center",
+
+    "& h6": {
+      display: "inline-block",
+      padding: 0,
+      margin: 0,
+    },
+
+    "&.alt": {
+      backgroundColor: theme.palette.nightblue[800],
+    },
+
+    '&.Saturday': {
+      backgroundColor: theme.palette.green[700],
+    },
+
+    '&.Sunday': {
+      backgroundColor: theme.palette.green[800],
+    },
+
+    "& + &": {
+      borderLeft: `1px solid ${theme.palette.dayblue[200]}`,
+    },
+
+    [theme.breakpoints.up("md")]: {
+      padding: "0.25rem 1rem",
+      textAlign: "center",
+      width: `${100 / 7}%`,
+    },
   },
   eventCard: {
-    position: 'relative',
-    width: `${100 / 7}%`,
-    display: 'flex',
-    flexFlow: 'row nowrap',
-    justifyContent: 'center',
-    alignItems: 'stretch',
-    borderBottom: `1px solid ${theme.palette.nightblue[700]}`,
-    borderLeft: `1px solid ${theme.palette.nightblue[700]}`,
+    position: "relative",
+    display: "flex",
+    flexFlow: "row nowrap",
+    justifyContent: "center",
+    alignItems: "stretch",
     padding: 0,
+    border: `1px solid ${theme.palette.nightblue[700]}`,
 
-    '& .card': {
+    "& + &": {
+      borderTop: 0,
+    },
+
+    "& .card": {
       flex: 1,
-      display: 'flex',
-      flexFlow: 'column nowrap',
-      justifyContent: 'stretch',
-      alignItems: 'stretch',
+      display: "flex",
+      flexFlow: "column nowrap",
+      justifyContent: "stretch",
+      alignItems: "stretch",
       borderRadius: 0,
     },
 
-    '&:nth-child(7n)': {
-      borderRight: `1px solid ${theme.palette.nightblue[700]}`
-    }
+    "&:nth-child(7n)": {
+      borderRight: `1px solid ${theme.palette.nightblue[700]}`,
+    },
+
+    [theme.breakpoints.up("md")]: {
+      width: `${100 / 7}%`,
+      border: 0,
+      borderBottom: `1px solid ${theme.palette.nightblue[700]}`,
+      borderLeft: `1px solid ${theme.palette.nightblue[700]}`,
+    },
   },
   dateContainer: {
     padding: 0,
     margin: 0,
+    display: "inline-block",
   },
   date: {
-    padding: '0.5rem',
-    margin: '0.25rem 0.15rem 0.15rem 0.25rem',
-    color: theme.palette.dayblue[700],
-    display: 'inline-block',
+    padding: "0.5rem",
+    margin: "0.1rem",
+    color: "white",
+    display: "inline-block",
     border: `2px solid ${theme.palette.dayblue[500]}`,
-    borderRadius: '50%',
-    width: '1.2rem',
-    height: '1.15rem',
-    textAlign: 'center',
-    lineHeight: '1rem',
-    fontWeight: 'bold', 
-    fontSize: 'large'
+    borderRadius: "50%",
+    width: "1.2rem",
+    height: "1.15rem",
+    textAlign: "center",
+    lineHeight: "1rem",
+    fontWeight: "bold",
+    fontSize: "large",
+
+    [theme.breakpoints.up("md")]: {
+      color: theme.palette.dayblue[700],
+      padding: "0.5rem",
+      margin: "0.25rem 0.15rem 0.15rem 0.25rem",
+    },
   },
   eventCardContent: {
-    textAlign: 'left',
-    minHeight: '6rem',
-    padding: '0.15rem 0.25rem'
+    textAlign: "left",
+    padding: "0.15rem 0.25rem",
+
+    [theme.breakpoints.up("md")]: {
+      minHeight: "6rem",
+    },
   },
   eventCardActions: {
-    textAlign: 'right',
-    justifyContent: 'flex-end'
+    textAlign: "right",
+    justifyContent: "flex-end",
   },
   eventBlock: {
-    position: 'relative',
-    display: 'inline-block',
-    margin: '0 5px 0 0', 
+    position: "relative",
+    display: "inline-block",
+    margin: "0 5px 0 0",
     padding: 0,
-    '&:hover': {
-      cursor: 'pointer'
-    }
+    "&:hover": {
+      cursor: "pointer",
+    },
   },
   checkboxes: {
-    padding: '0 0.5rem',
-    '& .MuiFormControlLabel-label': {
-      fontSize: 'smaller'
-    }
+    padding: "0 0.5rem",
+    "& .MuiFormControlLabel-label": {
+      fontSize: "smaller",
+    },
   },
   seasonBtn: {
     margin: theme.spacing(1),
-    transition: 'all 0.3s ease-out',
+    transition: "all 0.3s ease-out",
   },
   SpringBtn: {
     backgroundColor: theme.palette.green[200],
-    border: '2px solid transparent',
+    border: "2px solid transparent",
 
-    '&:hover': {
+    "&:hover": {
       backgroundColor: theme.palette.green[600],
-      color: 'white',
+      color: "white",
     },
 
-    '&.active': {
+    "&.active": {
       backgroundColor: theme.palette.green[500],
       borderColor: theme.palette.green[600],
-      color: 'white'
-    }
+      color: "white",
+    },
   },
   SummerBtn: {
     backgroundColor: theme.palette.pink[200],
-    border: '2px solid transparent',
+    border: "2px solid transparent",
 
-    '&:hover': {
-      color: 'white',
+    "&:hover": {
+      color: "white",
       backgroundColor: theme.palette.pink[600],
     },
 
-    '&.active': {
+    "&.active": {
       backgroundColor: theme.palette.pink[500],
       borderColor: theme.palette.pink[600],
-      color: 'white'
-    }
+      color: "white",
+    },
   },
   FallBtn: {
     backgroundColor: theme.palette.sand[200],
-    border: '2px solid transparent',
+    border: "2px solid transparent",
 
-    '&:hover': {
-      color: 'white',
+    "&:hover": {
+      color: "white",
       backgroundColor: theme.palette.sand[600],
     },
 
-    '&.active': {
+    "&.active": {
       backgroundColor: theme.palette.sand[500],
       borderColor: theme.palette.sand[600],
-      color: 'white',
-    }
+      color: "white",
+    },
   },
   WinterBtn: {
     backgroundColor: theme.palette.dayblue[200],
-    border: '2px solid transparent',
+    border: "2px solid transparent",
 
-    '&:hover': {
-      color: 'white',
+    "&:hover": {
+      color: "white",
       backgroundColor: theme.palette.dayblue[600],
     },
 
-    '&.active': {
+    "&.active": {
       backgroundColor: theme.palette.dayblue[500],
       borderColor: theme.palette.dayblue[600],
-      color: 'white'
-    }
+      color: "white",
+    },
   },
   deleteBtn: {
-    verticalAlign: 'top',
+    verticalAlign: "top",
     margin: 0,
     padding: "0 0.1rem",
-    color: theme.palette.red[500]
+    color: theme.palette.red[500],
   },
   addBtn: {
-    display: 'inline-block',
+    display: "inline-block",
     backgroundColor: theme.palette.green[500],
-    color: 'white',
-    '&:hover': {
-      backgroundColor: theme.palette.green[700]
-    }
+    color: "white",
+    "&:hover": {
+      backgroundColor: theme.palette.green[700],
+    },
   },
   modal: {
-    padding: '2rem'
+    padding: "2rem",
   },
   modalBody: {
-    position: 'relative',
+    position: "relative",
     backgroundColor: theme.palette.sand[100],
-    borderRadius: '4px',
-    padding: '0.5rem 1rem'
-  }
+    borderRadius: "4px",
+    padding: "0.5rem 1rem",
+  },
 }));
 
 export default function Calendar({ modalState, openModal, closeModal }) {
@@ -252,48 +300,174 @@ export default function Calendar({ modalState, openModal, closeModal }) {
   }
 
   return (
-    <Container maxWidth={token ? 'xl' : 'lg'}>
-      {allSeasons.map(season => <Button key={season.id} className={season.id === selectedSeason.id ? `${classes.seasonBtn} ${classes[`${season.name}Btn`]} active` : `${classes.seasonBtn} ${classes[`${season.name}Btn`]}`} onClick={() => handleSeasonChange(season.name, season.id)}>{season.name}</Button>)}
-      
+    <>
+      {allSeasons.map((season) => (
+        <Button
+          key={season.id}
+          className={
+            season.id === selectedSeason.id
+              ? `${classes.seasonBtn} ${classes[`${season.name}Btn`]} active`
+              : `${classes.seasonBtn} ${classes[`${season.name}Btn`]}`
+          }
+          onClick={() => handleSeasonChange(season.name, season.id)}
+        >
+          {season.name}
+        </Button>
+      ))}
+
       <Grid container spacing={0}>
-        {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(weekday => <Grid container item key={weekday} className={classes.calendarWeekday}><Typography variant="h6" style={{textAlign: 'center', width: '100%'}}>{weekday}</Typography></Grid>)}
-        {dates.map(({date}) => 
-        <Grid container item key={date} className={classes.eventCard}>
-          <Card elevation={0} className="card">
-            <CardContent className={classes.eventCardContent}>
-              <Grid container>
-              <Grid item className={classes.dateContainer}>
-                <Typography className={classes.date} gutterBottom>
-                  {date}
-                </Typography>
-              </Grid>
-              {
-              allEvents.map(event => (event.day === date) && 
-                <Grid item key={event.id} className={classes.eventBlock}>
-                  <span onContextMenu={token ? (e) => handleContextMenu(e, event) : ''}>
-                    {(event.type === 'birthday' && event.VillagerId !== null) ? 
-                    <VillagerIcon tooltip={event.name} name={event.Villager.name} overlay={cakeIcon} swap={true} size={38} overlaySize={32} /> 
-                    : 
-                    event.type === 'checkup' ? 
-                    <VillagerIcon tooltip={event.name} name={event.Villager.name} overlay={checkupIcon} swap={true} size={38} overlaySize={32} /> 
-                    :
-                    (event.type === 'other' && event.VillagerId !== null) ?
-                    <VillagerIcon tooltip={event.name} name={event.Villager.name} overlay={otherEventTypeIcon} swap={true} size={38} overlaySize={32} />
-                    :
-                    <ItemIcon tooltip={true} icon={event.name === "Night Market" ? nightMarketIcon : event.type === 'other' ? otherEventTypeIcon : festivalIcon} name={event.name} />}
-                  </span>
-                </Grid>
-              )}
-              </Grid>
-            </CardContent>
-            {token &&
-              <CardActions className={classes.eventCardActions}>
-                <IconButton className={classes.addBtn} onClick={() => openModal(date)} size="small"><AddIcon /></IconButton>
-              </CardActions>
-            }
-          </Card>
-        </Grid>
+        {window.innerWidth >= 768 ? (
+          [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+            "Sunday",
+          ].map((weekday) => (
+            <Grid
+              container
+              item
+              key={weekday}
+              className={`${classes.calendarWeekday} ${weekday}`}
+            >
+              <Typography
+                variant="h6"
+                style={{ textAlign: "center", width: "100%" }}
+              >
+                {weekday}
+              </Typography>
+            </Grid>
+          ))
+        ) : (
+          <></>
         )}
+        {dates.map(({ date }) => {
+          const weekdayName = [1, 8, 15, 22].includes(date)
+            ? "Monday"
+            : [2, 9, 16, 23].includes(date)
+            ? "Tuesday"
+            : [3, 10, 17, 24].includes(date)
+            ? "Wednesday"
+            : [4, 11, 18, 25].includes(date)
+            ? "Thursday"
+            : [5, 12, 19, 26].includes(date)
+            ? "Friday"
+            : [6, 13, 20, 27].includes(date)
+            ? "Saturday"
+            : "Sunday";
+
+          return (
+            <Grid container item key={date} className={classes.eventCard}>
+              {window.innerWidth < 768 ? (
+                <Grid
+                  container
+                  item
+                  className={
+                    date % 2 !== 0
+                      ? `${classes.calendarWeekday} ${weekdayName} alt`
+                      : `${classes.calendarWeekday} ${weekdayName}`
+                  }
+                >
+                  <Grid item className={classes.dateContainer}>
+                    <Typography className={classes.date} gutterBottom>
+                      {date}
+                    </Typography>
+                  </Grid>
+                  <Typography variant="h6">{weekdayName}</Typography>
+                </Grid>
+              ) : (
+                ""
+              )}
+              <Card elevation={0} className="card">
+                <CardContent className={classes.eventCardContent}>
+                  <Grid container>
+                    {window.innerWidth >= 768 ? (
+                      <Grid item className={classes.dateContainer}>
+                        <Typography className={classes.date} gutterBottom>
+                          {date}
+                        </Typography>
+                      </Grid>
+                    ) : (
+                      ""
+                    )}
+                    {allEvents.map(
+                      (event) =>
+                        event.day === date && (
+                          <Grid
+                            item
+                            key={event.id}
+                            className={classes.eventBlock}
+                          >
+                            <span
+                              onContextMenu={
+                                token ? (e) => handleContextMenu(e, event) : ""
+                              }
+                            >
+                              {event.type === "birthday" &&
+                              event.VillagerId !== null ? (
+                                <VillagerIcon
+                                  tooltip={event.name}
+                                  name={event.Villager.name}
+                                  overlay={cakeIcon}
+                                  swap={true}
+                                  size={38}
+                                  overlaySize={32}
+                                />
+                              ) : event.type === "checkup" ? (
+                                <VillagerIcon
+                                  tooltip={event.name}
+                                  name={event.Villager.name}
+                                  overlay={checkupIcon}
+                                  swap={true}
+                                  size={38}
+                                  overlaySize={32}
+                                />
+                              ) : event.type === "other" &&
+                                event.VillagerId !== null ? (
+                                <VillagerIcon
+                                  tooltip={event.name}
+                                  name={event.Villager.name}
+                                  overlay={otherEventTypeIcon}
+                                  swap={true}
+                                  size={38}
+                                  overlaySize={32}
+                                />
+                              ) : (
+                                <ItemIcon
+                                  tooltip={true}
+                                  icon={
+                                    event.name === "Night Market"
+                                      ? nightMarketIcon
+                                      : event.type === "other"
+                                      ? otherEventTypeIcon
+                                      : festivalIcon
+                                  }
+                                  name={event.name}
+                                />
+                              )}
+                            </span>
+                          </Grid>
+                        )
+                    )}
+                  </Grid>
+                </CardContent>
+                {token && (
+                  <CardActions className={classes.eventCardActions}>
+                    <IconButton
+                      className={classes.addBtn}
+                      onClick={() => openModal(date)}
+                      size="small"
+                    >
+                      <AddIcon />
+                    </IconButton>
+                  </CardActions>
+                )}
+              </Card>
+            </Grid>
+          );
+        })}
       </Grid>
       <Modal
         className={classes.modal}
@@ -303,13 +477,23 @@ export default function Calendar({ modalState, openModal, closeModal }) {
         aria-describedby="Add a new event"
       >
         <Container className={classes.modalBody}>
-          <IconButton aria-label="close" color="inherit" onClick={closeModal} style={{position: 'absolute', right: '1rem', top: '0.75rem'}}>
+          <IconButton
+            aria-label="close"
+            color="inherit"
+            onClick={closeModal}
+            style={{ position: "absolute", right: "1rem", top: "0.75rem" }}
+          >
             <CloseIcon />
           </IconButton>
           <AddEventForm />
         </Container>
       </Modal>
-      <ContextMenu showMenu={showContextMenu} menuPos={contextMenuPos} handleClose={handleContextMenuClose} label={"Event"} />
-    </Container>
-  )
+      <ContextMenu
+        showMenu={showContextMenu}
+        menuPos={contextMenuPos}
+        handleClose={handleContextMenuClose}
+        label={"Event"}
+      />
+    </>
+  );
 }

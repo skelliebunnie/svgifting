@@ -22,77 +22,108 @@ const CustomCheckbox = withStyles((theme) => ({
 }))((props) => <Checkbox color="default" {...props} />)
 
 const useStyles = makeStyles((theme) => ({
+  root: {
+    padding: 0,
+    paddingTop: "2rem",
+    [theme.breakpoints.down("md")]: {
+      paddingTop: 0,
+    },
+  },
   list: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(4, 1fr)',
+    display: "grid",
     margin: 0,
-    gridAutoFlow: 'row',
-    // gridColumnGap: '0.25rem'
+    gridAutoFlow: "row",
+
+    "&.text-col-2": {
+      gridTemplateColumns: "repeat(2, 1fr)",
+    },
+
+    [theme.breakpoints.up("md")]: {
+      gridTemplateColumns: "repeat(4, 1fr)",
+    },
   },
   row: {
-    display: 'flex',
-    flexFlow: 'row wrap',
+    display: "flex",
+    flexFlow: "row wrap",
   },
   col: {
-    flex: '1 0 auto',
-    padding: '0 1.5rem',
-    marginTop: '1rem',
+    flex: "1 0 auto",
+    padding: "0 1.5rem",
+    marginTop: "1rem",
     // '&:first-child': {
     //   maxWidth: '25%'
     // }
   },
   formControl: {
-    margin: theme.spacing(1),
     minWidth: 120,
+    [theme.breakpoints.up("md")]: {
+      margin: theme.spacing(1),
+    },
+  },
+  searchItemsField: {
+    position: "relative",
+    width: "100%",
+
+    [theme.breakpoints.up("md")]: {
+      bottom: "-0.5rem",
+      width: "60%",
+      marginLeft: "2rem",
+    },
+  },
+  preferenceSelect: {
+    fontSize: "1.4rem",
+    [theme.breakpoints.down("md")]: {
+      margin: 0,
+    },
   },
   selectEmpty: {
     marginTop: theme.spacing(2),
   },
   saveBtn: {
     backgroundColor: theme.palette.green[300],
-    width: '100%',
-    marginTop: '2rem',
-    marginBottom: '3rem',
-    '&:hover': {
-      backgroundColor: theme.palette.green[500]
-    }
+    width: "100%",
+    marginTop: "2rem",
+    marginBottom: "3rem",
+    "&:hover": {
+      backgroundColor: theme.palette.green[500],
+    },
   },
   addItemBtn: {
     backgroundColor: theme.palette.dayblue[500],
-    color: 'white',
-    fontSize: 'large',
-    margin: '0 1rem',
-    transition: 'all 0.3s ease-out',
-    '&:hover': {
+    color: "white",
+    fontSize: "large",
+    margin: "0 1rem",
+    transition: "all 0.3s ease-out",
+    "&:hover": {
       backgroundColor: theme.palette.green[600],
-      color: 'white'
-    }
+      color: "white",
+    },
   },
   clearCheckboxes: {
     color: theme.palette.red[600],
-    fontWeight: 'bold',
-    fontSize: '1rem',
-    verticalAlign: 'middle',
-    position: 'relative',
-    top: '-0.35rem'
+    fontWeight: "bold",
+    fontSize: "1rem",
+    verticalAlign: "middle",
+    position: "relative",
+    top: "-0.35rem",
   },
   invertSelection: {
     color: theme.palette.sand[500],
-    fontWeight: 'bold',
-    fontSize: '1rem',
-    verticalAlign: 'middle',
-    position: 'relative',
-    top: '-0.35rem'
+    fontWeight: "bold",
+    fontSize: "1rem",
+    verticalAlign: "middle",
+    position: "relative",
+    top: "-0.35rem",
   },
   modal: {
-    padding: '2rem'
+    padding: "2rem",
   },
   modalBody: {
-    position: 'relative',
+    position: "relative",
     backgroundColor: theme.palette.sand[100],
-    borderRadius: '4px',
-    padding: '0.5rem 1rem'
-  }
+    borderRadius: "4px",
+    padding: "0.5rem 1rem",
+  },
 }));
 
 export default function GiftPreferenceForm() {
@@ -161,6 +192,7 @@ export default function GiftPreferenceForm() {
   const filterItemsOnLoad = (items) => {
     if((itemTypes.length > 0 && !itemTypes[itemTypes.length - 1].isChecked)) {
       let selectedTypes = []
+
       itemTypes.forEach(type => {
         if(type.isChecked) selectedTypes.push(type.id)
       })
@@ -222,24 +254,28 @@ export default function GiftPreferenceForm() {
   }
 
   const handleItemTypeFilter = e => {
-    const TypeId = e.target.value !== 'allTypes' ? parseInt(e.target.value) : e.target.value
+    const TypeId = e.target.value !== 'allTypes' && e.target.value !== 'otherTypes' ? parseInt(e.target.value) : e.target.value
 
     let selectedTypes = itemTypes;
     let selectedTypeIds = [];
     let visible = allItems;
 
-    if(TypeId !== 'allTypes') {
+    let allSelected = true;
+
+    if(TypeId !== 'allTypes' && TypeId !== 'otherTypes') {
       selectedTypes.forEach(type => {
         if(type.id === TypeId) {
           type.isChecked = e.target.checked
         }
   
         if(type.isChecked) selectedTypeIds.push(type.id)
-        if(!type.isChecked) selectedTypes[selectedTypes.length - 1].isChecked = false
+        if(!type.isChecked && type.id !== 'allTypes') allSelected = false;
       })
 
-    } else {
+    } else if(TypeId === 'allTypes') {
       if(e.target.checked) {
+        allSelected = true;
+
         selectedTypes.forEach(type => {
           type.isChecked = true;
 
@@ -251,10 +287,24 @@ export default function GiftPreferenceForm() {
           type.isChecked = false;
         });
       }
+    } else if(TypeId === 'otherTypes') {
+
+      selectedTypes.forEach((type) => {
+        if (type.id === "otherTypes") {
+          type.isChecked = e.target.checked;
+        }
+
+        if(type.isChecked && type.id !== "otherTypes") selectedTypeIds.push(type.id)
+        if (!type.isChecked && type.id !== "allTypes") allSelected = false;
+
+      });
+
+      if(e.target.checked) selectedTypeIds.push(null);
+      
     }
 
-    console.log("selected TypeIds:", selectedTypeIds)
-    console.log("all Items", allItems)
+    // console.log("selected TypeIds:", selectedTypeIds)
+    selectedTypes[selectedTypes.length - 1].isChecked = allSelected;
 
     visible = allItems.filter( item => selectedTypeIds.includes(item.TypeId) )
 
@@ -358,42 +408,69 @@ export default function GiftPreferenceForm() {
 
   return (
     <>
-    <Container ref={containerRef} maxWidth={'xl'} style={{padding: '2rem 0'}}>
-      <Grid container>
-        {/* NPCs */}
-        <Grid item lg={5} style={{borderRight: '1px solid dodgerblue'}}>
-          <Container>
-            <Typography variant="h2" gutterBottom style={{display: 'flex', justifyContent: 'space-between'}}>
-              <span>
-                NPCs
-                <Button onClick={() => clearCheckboxes('npcs')} className={classes.clearCheckboxes}>[Clear]</Button>
-                <Button onClick={() => invertSelection('npcs')} className={classes.invertSelection}>[Invert Selection]</Button>
-              </span>
-            </Typography>
-            <FormGroup className={classes.list}>
-              {formOptions.npcs.map(npc => 
-              <FormControlLabel 
-                key={`${npc.id}-label`} 
-                label={npc.id !== 'all' ? <><VillagerIcon name={npc.name} size={20} /> {npc.name}</> : 'All'} 
-                control={
-                  <CustomCheckbox 
-                  name="npcs"
-                  key={`${npc.id}-checkbox`}
-                  onChange={handleOnChange} 
-                  value={npc.id} 
-                  checked={npc.isChecked || false} />
-                } 
-              />)}
-            </FormGroup>
-            <FormControl className={classes.formControl} style={{width: '100%', marginTop: '2rem'}}>
-              <InputLabel id="preference-label">Preference</InputLabel>
+      <Container ref={containerRef} maxWidth="xl" className={classes.root}>
+        <Grid container>
+          {/* NPCs */}
+          <Grid item lg={5} style={{ borderRight: "1px solid dodgerblue" }}>
+            <Container>
+              <Typography
+                variant="h2"
+                gutterBottom
+                style={{ display: "flex", justifyContent: "space-between" }}
+              >
+                <span>
+                  NPCs
+                  <Button
+                    onClick={() => clearCheckboxes("npcs")}
+                    className={classes.clearCheckboxes}
+                  >
+                    [Clear]
+                  </Button>
+                  <Button
+                    onClick={() => invertSelection("npcs")}
+                    className={classes.invertSelection}
+                  >
+                    [Invert Selection]
+                  </Button>
+                </span>
+              </Typography>
+              <FormGroup className={`${classes.list} text-col-2`}>
+                {formOptions.npcs.map((npc) => (
+                  <FormControlLabel
+                    key={`${npc.id}-label`}
+                    label={
+                      npc.id !== "all" ? (
+                        <>
+                          <VillagerIcon name={npc.name} size={20} /> {npc.name}
+                        </>
+                      ) : (
+                        "All"
+                      )
+                    }
+                    control={
+                      <CustomCheckbox
+                        name="npcs"
+                        key={`${npc.id}-checkbox`}
+                        onChange={handleOnChange}
+                        value={npc.id}
+                        checked={npc.isChecked || false}
+                      />
+                    }
+                  />
+                ))}
+              </FormGroup>
+              <FormControl
+                className={classes.formControl}
+                style={{ width: "100%", marginTop: "2rem" }}
+              >
+                <InputLabel id="preference-label">Preference</InputLabel>
                 <Select
                   labelId="preference-label"
                   id="preference"
                   name="preference"
                   value={formOptions.preference}
                   onChange={handleOnChange}
-                  style={{fontSize: '1.4rem'}}
+                  className={classes.preferenceSelect}
                 >
                   <MenuItem value="love">Love</MenuItem>
                   <MenuItem value="like">Like</MenuItem>
@@ -401,84 +478,131 @@ export default function GiftPreferenceForm() {
                   <MenuItem value="dislike">Dislike</MenuItem>
                   <MenuItem value="hate">Hate</MenuItem>
                 </Select>
-            </FormControl>
-            {window.innerWidth >= 1024 &&
-              <Button variant="contained" className={classes.saveBtn} onClick={(e) => handleFormSubmit(e)}>
-                <Typography variant="h2">Save</Typography>
-              </Button>
-            }
-          </Container>
-        </Grid>
-        {/* ITEMS */}
-        <Grid container item lg={7}>
-          <Container>
-            <Typography variant="h2" gutterBottom>
-              Items
-              <Button onClick={() => clearCheckboxes('items')} className={classes.clearCheckboxes}>[Clear]</Button>
-              <TextField ref={searchRef} id="searchItems" label="Search" type="search" value={searchTerm} style={{position: 'relative', marginLeft: '2rem', width: '60%', bottom: '-0.5rem'}} onChange={handleItemSearch} onBlur={handleItemSearch} />
-              <Button className={classes.addItemBtn} onClick={handleOpenModal}>Add Item</Button>
-            </Typography>
-            <FormGroup className={classes.list}>
-              {itemTypes.map(type => 
-                <FormControlLabel
-                  key={`${type.id}-label`}
-                  label={type.name}
-                  control={
-                    <Checkbox 
-                      name="types"
-                      key={`${type.id}-checkbox`}
-                      value={type.id}
-                      onChange={handleItemTypeFilter}
-                      checked={type.isChecked || false}
-                    />
-                  }
+              </FormControl>
+              {window.innerWidth >= 1024 && (
+                <Button
+                  variant="contained"
+                  className={classes.saveBtn}
+                  onClick={(e) => handleFormSubmit(e)}
+                >
+                  <Typography variant="h2">Save</Typography>
+                </Button>
+              )}
+            </Container>
+          </Grid>
+          {/* ITEMS */}
+          <Grid container item lg={7}>
+            <Container>
+              <Typography variant="h2" gutterBottom>
+                Items
+                <Button
+                  onClick={() => clearCheckboxes("items")}
+                  className={classes.clearCheckboxes}
+                >
+                  [Clear]
+                </Button>
+                <TextField
+                  ref={searchRef}
+                  id="searchItems"
+                  className={classes.searchItemsField}
+                  label="Search"
+                  type="search"
+                  value={searchTerm}
+                  onChange={handleItemSearch}
+                  onBlur={handleItemSearch}
                 />
-              )}
-            </FormGroup>
-            <hr />
-            <FormGroup className={classes.list}>
-              {formOptions.items.map(item => 
-              item.name !== "" &&
-                <FormControlLabel 
-                key={`${item.id}-label`} 
-                label={<><ItemIcon name={item.name} size={20} icon={item.icon !== undefined ? item.icon.default : item.icon} /> {item.name}</>} 
-                control={
-                  <CustomCheckbox 
-                  name="items"
-                  key={`${item.id}-checkbox`}
-                  onChange={handleOnChange} 
-                  value={item.id} 
-                  checked={item.isChecked || false} />
-                } 
-              />
-              
-              )}
-            </FormGroup>
-          </Container>
+                <Button
+                  className={classes.addItemBtn}
+                  onClick={handleOpenModal}
+                >
+                  Add Item
+                </Button>
+              </Typography>
+              <FormGroup className={classes.list}>
+                {itemTypes.map((type) => (
+                  <FormControlLabel
+                    key={`${type.id}-label`}
+                    label={type.name}
+                    control={
+                      <Checkbox
+                        name="types"
+                        key={`${type.id}-checkbox`}
+                        value={type.id}
+                        onChange={handleItemTypeFilter}
+                        checked={type.isChecked || false}
+                      />
+                    }
+                  />
+                ))}
+              </FormGroup>
+              <hr />
+              <FormGroup className={classes.list}>
+                {formOptions.items.map(
+                  (item) =>
+                    item.name !== "" && (
+                      <FormControlLabel
+                        key={`${item.id}-label`}
+                        label={
+                          <>
+                            <ItemIcon
+                              name={item.name}
+                              size={20}
+                              icon={
+                                item.icon !== undefined
+                                  ? item.icon.default
+                                  : item.icon
+                              }
+                            />{" "}
+                            {item.name}
+                          </>
+                        }
+                        control={
+                          <CustomCheckbox
+                            name="items"
+                            key={`${item.id}-checkbox`}
+                            onChange={handleOnChange}
+                            value={item.id}
+                            checked={item.isChecked || false}
+                          />
+                        }
+                      />
+                    )
+                )}
+              </FormGroup>
+            </Container>
+          </Grid>
         </Grid>
-      </Grid>
-      {window.innerWidth < 1024 &&
-        <Container maxWidth="xl">
-          <Button variant="contained" className={classes.saveBtn} onClick={(e) => handleFormSubmit(e)}>
-            <Typography variant="h2">Save</Typography>
-          </Button>
-        </Container>
-      }
-    </Container>
-    <Modal
-      className={classes.modal}
-      open={addItemModalOpen}
-      onClose={handleCloseModal}
-      aria-labelledby="Add Item Modal"
-      aria-describedby="Add a new item to the database for assigning as a gift to NPCs"
-    >
-      <Container className={classes.modalBody}>
-        <IconButton aria-label="close" color="inherit" onClick={handleCloseModal} style={{position: 'absolute', right: '1rem', top: '0.75rem'}}>
-          <CloseIcon />
-        </IconButton>
-        <UpsertItemForm includeItemList={false} />
+        {window.innerWidth < 1024 && (
+          <Container maxWidth="xl">
+            <Button
+              variant="contained"
+              className={classes.saveBtn}
+              onClick={(e) => handleFormSubmit(e)}
+            >
+              <Typography variant="h2">Save</Typography>
+            </Button>
+          </Container>
+        )}
       </Container>
-    </Modal>
+      <Modal
+        className={classes.modal}
+        open={addItemModalOpen}
+        onClose={handleCloseModal}
+        aria-labelledby="Add Item Modal"
+        aria-describedby="Add a new item to the database for assigning as a gift to NPCs"
+      >
+        <Container className={classes.modalBody}>
+          <IconButton
+            aria-label="close"
+            color="inherit"
+            onClick={handleCloseModal}
+            style={{ position: "absolute", right: "1rem", top: "0.75rem" }}
+          >
+            <CloseIcon />
+          </IconButton>
+          <UpsertItemForm includeItemList={false} />
+        </Container>
+      </Modal>
     </>
-  )
+  );
 }

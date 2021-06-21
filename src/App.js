@@ -69,8 +69,8 @@ function App() {
               <Route exact path="/" component={Villagers} />
               <Route exact path="/gifts" component={Gifts} />
               <Route path="/events" component={Events} />
-              <Route exact path="/assign-gifts" component={GiftForm} />
-              <Route exact path="/add-item" component={UpsertItem} />
+              <Route exact path="/admin/gifts/assign" component={GiftForm} />
+              <Route exact path="/admin/gifts" component={UpsertItem} />
             </Switch>
           </Box>
         </DatabaseContextProvider>

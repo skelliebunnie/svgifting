@@ -104,7 +104,7 @@ export default function VillagersList(props) {
 
   useEffect(() => {
     API.getVillagers().then(list => {
-      let data = sortData(list.data, props.sortBy);
+      let data = sortData(list.data, sortBy);
       
       for(var i = 0; i < data.length; i++) {
         // filter out gifts that are not 'loved'
@@ -133,6 +133,8 @@ export default function VillagersList(props) {
   }, []);
 
   useEffect(() => {
+    sortData(villagers, sortBy);
+    
     let newRows = [];
     for(var i = 0; i < dataGridRows.length; i++) {
       let row = dataGridRows[i]
@@ -152,6 +154,7 @@ export default function VillagersList(props) {
     createTableRows(villagerData);
 
     setSortBy(props.sortBy);
+    //eslint-disable-next-line
   }, [props.sortBy])
 
   const createTableRows = (data) => {
@@ -181,6 +184,30 @@ export default function VillagersList(props) {
 
   const sortData = (data, sortBy='Villager Name') => {
 
+    if (sortBy === "Number of Loved Gifts") {
+      // console.log("sorting by number of loved gifts", data);
+      data.sort((a, b) => {
+        // here, we're sorting largest to smallest (descending)
+        return a.Items.length > b.Items.length ? -1 : 1;
+      })
+
+    } else if (sortBy === "Birthday <Season, Day>") {
+      data.sort((a, b) => {
+        if (a.birthdaySeasonId === b.birthdaySeasonId) {
+          return a.birthdayDate > b.birthdayDate ? 1 : -1;
+
+        } else {
+          return a.birthdaySeasonId > b.birthdaySeasonId ? 1 : -1;
+
+        }
+      });
+    } else {
+      data.sort((a, b) => {
+        // here, we're sorting "smallest" to "largest" (ascending)
+        return a.name > b.name ? 1 : -1;
+      });
+    }
+
     if(sortBy === 'Availability') {
       data.sort((a, b) => {
         // true first
@@ -188,57 +215,93 @@ export default function VillagersList(props) {
         // false first
         // return (a.available === b.available)? 0: a.available ? 1 : -1;
       })
-    } else if(sortBy === 'Birthday <Season, Day>') {
-      data.sort((a, b) => {
-        if(a.birthdaySeasonId === b.birthdaySeasonId) {
-          return a.birthdayDate > b.birthdayDate ? 1 : -1;
-
-        } else {
-          return a.birthdaySeasonId > b.birthdaySeasonId ? 1 : -1;
-
-        }
-      })
-    } else {
-      data.sort((a, b) => {
-        return a.name > b.name ? 1 : -1;
-      })
     }
 
     return data;
   }
 
   return (
-    <Container className={classes.root} maxWidth={(props.format === 'Grid' || props.format === 'Table') ? 'xl' : 'lg'}>
+    <Container
+      className={classes.root}
+      maxWidth={
+        props.format === "Grid" || props.format === "Table" ? "xl" : "lg"
+      }
+    >
       {/* GRID DISPLAY */}
-      {props.format === 'Grid' && 
-        villagers.map(villager => <VillagerCard key={villager.name} name={villager.name} status={villager.available} gifts={villager.Items} includeULoves={props.includeULoves} data={villager} />)
-      }
+      {props.format === "Grid" &&
+        villagers.map((villager) => (
+          <VillagerCard
+            key={villager.name}
+            name={villager.name}
+            status={villager.available}
+            gifts={villager.Items}
+            includeULoves={props.includeULoves}
+            data={villager}
+          />
+        ))}
       {/* LIST DISPLAY */}
-      {props.format === 'List' &&
+      {props.format === "List" && (
         <div className={classes.displayList}>
-        {villagers.map(villager => 
-          <article key={villager.name}>
-            <section style={{display: 'flex', flexFlow: 'row wrap'}}>
-              <div style={{flex: 0, margin: 0, padding: 0, lineHeight: '1rem'}}>
-                <VillagerIcon name={villager.name} style={{verticalAlign: 'middle', margin: 0}} />
-              </div>
-              <div style={{flex: 1}}>
-                <p style={{margin: '0.25rem 0'}}><strong>{villager.name}</strong> {(villager.available && villager.name !== "Krobus") && <span style={{color: 'green'}}>[Marriage Candidate]</span>}</p>
-                <p style={{margin: '0.25rem 0'}}><strong>Birthday:</strong> {villager.birthday}</p>
-              </div>
-            </section>
-            <ul className={classes.giftList}>
-              {villager.Items.map(item => ((props.includeULoves || (!props.includeULoves && !universalLoves.includes(item.name))) && item.Gift.preference === 'love') && <li key={item.id}><ItemIcon key={item.name} name={item.name} icon={item.icon} size={24} /></li>)}
-            </ul>
-          </article>
-        )}
+          {villagers.map((villager) => (
+            <article key={villager.name}>
+              <section style={{ display: "flex", flexFlow: "row wrap" }}>
+                <div
+                  style={{ flex: 0, margin: 0, padding: 0, lineHeight: "1rem" }}
+                >
+                  <VillagerIcon
+                    name={villager.name}
+                    style={{ verticalAlign: "middle", margin: 0 }}
+                  />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <p style={{ margin: "0.25rem 0" }}>
+                    <strong>{villager.name}</strong>{" "}
+                    {villager.available && villager.name !== "Krobus" && (
+                      <span style={{ color: "green" }}>
+                        [Marriage Candidate]
+                      </span>
+                    )}
+                  </p>
+                  <p style={{ margin: "0.25rem 0" }}>
+                    <strong>Birthday:</strong> {villager.birthday}
+                  </p>
+                </div>
+              </section>
+              <ul className={classes.giftList}>
+                {villager.Items.map(
+                  (item) =>
+                    (props.includeULoves ||
+                      (!props.includeULoves &&
+                        !universalLoves.includes(item.name))) &&
+                    item.Gift.preference === "love" && (
+                      <li key={item.id}>
+                        <ItemIcon
+                          key={item.name}
+                          name={item.name}
+                          icon={item.icon}
+                          size={24}
+                        />
+                      </li>
+                    )
+                )}
+              </ul>
+            </article>
+          ))}
         </div>
-      }
+      )}
 
       {/* TABLE DISPLAY */}
-      {props.format === 'Table' &&
-        <DataGrid rows={dataGridRows} columns={dataGridColumns} pageSize={10} autoHeight components={{Toolbar: GridToolbar}} disableColumnSelector={true} disableColumnFilter={true} />
-      }
+      {props.format === "Table" && (
+        <DataGrid
+          rows={dataGridRows}
+          columns={dataGridColumns}
+          pageSize={10}
+          autoHeight
+          components={{ Toolbar: GridToolbar }}
+          disableColumnSelector={true}
+          disableColumnFilter={true}
+        />
+      )}
     </Container>
   );
 }

@@ -268,7 +268,7 @@ export default function UpsertItemForm(props) {
   }
 
   return (
-    <Grid container spacing={0} style={{marginTop: '1rem'}}>
+    <Grid container spacing={0} style={{marginTop: '1rem'}} md>
         {props.includeItemList &&
         <Grid item lg={4}>
           <Typography variant="h3" style={{marginLeft: '1rem', textAlign: 'center'}}>Items</Typography>
