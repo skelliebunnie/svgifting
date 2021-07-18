@@ -3,7 +3,6 @@ import { DatabaseContext } from "../../contexts/DatabaseContext";
 import { makeStyles } from '@material-ui/core/styles'
 import { Container } from '@material-ui/core'
 import { DataGrid, GridToolbar } from '@material-ui/data-grid'
-import API from '../../utils/API'
 
 import VillagerCard from '../VillagerCard'
 import VillagerIcon from '../VillagerIcon'
@@ -76,8 +75,9 @@ const giftIcons = {
 export default function VillagersList(props) {
   const classes = useStyles();
 
-  const [villagers, setVillagers] = useState([]);
-  const { getIcon, universalLoves } = useContext(DatabaseContext)
+  const { universalLoves, sortVillagerData } = useContext(DatabaseContext);
+
+  const [villagers, setVillagers] = useState(props.villagers);
 
   const dataGridColumns = [
     { field: "icon", flex: 0, ...villagerIcon, sortable: false, disableColumnMenu: true },
@@ -103,37 +103,14 @@ export default function VillagersList(props) {
   const [sortBy, setSortBy] = useState(props.sortBy)
 
   useEffect(() => {
-    API.getVillagers().then(list => {
-      let data = sortData(list.data, sortBy);
-      
-      for(var i = 0; i < data.length; i++) {
-        // filter out gifts that are not 'loved'
-        data[i].Items = data[i].Items.filter(item => item.Gift.preference === 'love')
+    setVillagers(props.villagers);
+    const rows = createTableRows(props.villagers);
+    setDataGridRows(rows);
 
-        for(var j = 0; j < data[i].Items.length; j++) {
-          const item = data[i].Items[j];
-          const icon = getIcon( item.name, 'item_icons', 'png', false ).default
-          data[i].birthday = data[i].Seasons.length > 0 ? `${data[i].Seasons[0].name} ${data[i].Seasons[0].Event.day}`: 'unavailable';
-          data[i].Items[j].icon = icon
-        }
-
-        data[i].birthdaySeasonId = data[i].Seasons[0].id;
-        data[i].birthdaySeason = data[i].Seasons[0].name;
-        data[i].birthdayDate = data[i].Seasons[0].Event.day
-      }
-
-      const rows = createTableRows(data);
-      
-      setVillagers(data);
-      setDataGridRows(rows);
-
-    }).catch(err => console.error(err));
-  
-  // eslint-disable-next-line
-  }, []);
+  }, [props.villagers]);
 
   useEffect(() => {
-    sortData(villagers, sortBy);
+    // sortData(villagers, sortBy);
     
     let newRows = [];
     for(var i = 0; i < dataGridRows.length; i++) {
@@ -148,7 +125,7 @@ export default function VillagersList(props) {
   }, [props.includeULoves, universalLoves])
 
   useEffect(() => {
-    const villagerData = sortData(villagers, props.sortBy);
+    const villagerData = sortVillagerData(villagers, props.sortBy);
     setVillagers(villagerData);
     
     createTableRows(villagerData);
@@ -182,44 +159,6 @@ export default function VillagersList(props) {
     return rows;
   }
 
-  const sortData = (data, sortBy='Villager Name') => {
-
-    if (sortBy === "Number of Loved Gifts") {
-      // console.log("sorting by number of loved gifts", data);
-      data.sort((a, b) => {
-        // here, we're sorting largest to smallest (descending)
-        return a.Items.length > b.Items.length ? -1 : 1;
-      })
-
-    } else if (sortBy === "Birthday <Season, Day>") {
-      data.sort((a, b) => {
-        if (a.birthdaySeasonId === b.birthdaySeasonId) {
-          return a.birthdayDate > b.birthdayDate ? 1 : -1;
-
-        } else {
-          return a.birthdaySeasonId > b.birthdaySeasonId ? 1 : -1;
-
-        }
-      });
-    } else {
-      data.sort((a, b) => {
-        // here, we're sorting "smallest" to "largest" (ascending)
-        return a.name > b.name ? 1 : -1;
-      });
-    }
-
-    if(sortBy === 'Availability') {
-      data.sort((a, b) => {
-        // true first
-        return (a.available === b.available) ? 0 : a.available && a.name !== 'Krobus' ? -1 : 1
-        // false first
-        // return (a.available === b.available)? 0: a.available ? 1 : -1;
-      })
-    }
-
-    return data;
-  }
-
   return (
     <Container
       className={classes.root}
@@ -237,6 +176,7 @@ export default function VillagersList(props) {
             gifts={villager.Items}
             includeULoves={props.includeULoves}
             data={villager}
+            includeLink={true}
           />
         ))}
       {/* LIST DISPLAY */}

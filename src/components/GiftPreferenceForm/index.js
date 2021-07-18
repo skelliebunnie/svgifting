@@ -40,6 +40,10 @@ const useStyles = makeStyles((theme) => ({
 
     [theme.breakpoints.up("md")]: {
       gridTemplateColumns: "repeat(4, 1fr)",
+
+      "&.md-text-col-4": {
+        gridTemplateColumns: "repeat(4, 1fr)",
+      },
     },
   },
   row: {
@@ -434,7 +438,7 @@ export default function GiftPreferenceForm() {
                   </Button>
                 </span>
               </Typography>
-              <FormGroup className={`${classes.list} text-col-2`}>
+              <FormGroup className={`${classes.list} text-col-2 md-text-col-4`}>
                 {formOptions.npcs.map((npc) => (
                   <FormControlLabel
                     key={`${npc.id}-label`}

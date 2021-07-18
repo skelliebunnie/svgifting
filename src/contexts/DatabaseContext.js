@@ -323,7 +323,7 @@ const DatabaseContextProvider = (props) => {
     eventData.startTime = typeof eventData.startTime === 'string' ? eventData.startTime.substring(11) : formatTime(eventData.startTime)
     eventData.endTime = typeof eventData.endTime === 'string' ? eventData.endTime.substring(11) : formatTime(eventData.endTime)
 
-    console.log("insert this", eventData)
+    // console.log("insert this", eventData)
     API.upsertEvent(eventData)
       .then((event) => {
         let season = seasons.filter(season => season.id === parseInt(eventData.SeasonId));
@@ -372,8 +372,94 @@ const DatabaseContextProvider = (props) => {
     getEvents(id)
   }
 
+  const sortVillagerData = (data, sortBy = "Villager Name") => {
+    if (sortBy === "Number of Loved Gifts") {
+      // console.log("sorting by number of loved gifts", data);
+      data.sort((a, b) => {
+        // here, we're sorting largest to smallest (descending)
+        return a.Items.length > b.Items.length ? -1 : 1;
+      });
+    } else if (sortBy === "Birthday <Season, Day>") {
+      data.sort((a, b) => {
+        if (a.birthdaySeasonId === b.birthdaySeasonId) {
+          return a.birthdayDate > b.birthdayDate ? 1 : -1;
+        } else {
+          return a.birthdaySeasonId > b.birthdaySeasonId ? 1 : -1;
+        }
+      });
+    } else {
+      data.sort((a, b) => {
+        // here, we're sorting "smallest" to "largest" (ascending)
+        return a.name > b.name ? 1 : -1;
+      });
+    }
+
+    if (sortBy === "Availability") {
+      data.sort((a, b) => {
+        // true first
+        return a.available === b.available
+          ? 0
+          : a.available && a.name !== "Krobus"
+            ? -1
+            : 1;
+        // false first
+        // return (a.available === b.available)? 0: a.available ? 1 : -1;
+      });
+    }
+
+    return data;
+  };
+
+  const sortItemData = (data, sortBy = "Gift Name") => {
+    // console.log("sort items by:", sortBy)
+    if (sortBy === "Number of NPCs") {
+      // console.log("sorting by number of loved gifts", data);
+      data.sort((a, b) => {
+        // here, we're sorting largest to smallest (descending)
+        return a.Villagers.length > b.Villagers.length ? -1 : 1;
+      });
+    } else if (sortBy === "Seasonal") {
+      if(data[0].Seasons !== undefined) {
+        data.sort((a, b) => {
+          return a.Seasons[0].id > b.Seasons[0].id ? -1 : 1;
+        });
+      }
+    } else {
+      data.sort((a, b) => {
+        // here, we're sorting "smallest" to "largest" (ascending)
+        return a.name > b.name ? 1 : -1;
+      });
+    }
+
+    if (sortBy === "Availability") {
+      data.sort((a, b) => {
+        // true first
+        return a.available === b.available
+          ? 0
+          : a.available && a.name !== "Krobus"
+            ? -1
+            : 1;
+        // false first
+        // return (a.available === b.available)? 0: a.available ? 1 : -1;
+      });
+    }
+
+    return data;
+  };
+
+  const getURL = (str) => {
+    let filename = toTitleCase(str);
+
+    filename = filename.replace("'", "%27").replace(",", "");
+    filename = filename.includes(" ")
+      ? filename.split(" ").join("_")
+      : filename;
+
+    return `https://stardewvalleywiki.com/${filename}`;
+  };
+
   return (
-    <DatabaseContext.Provider value={{dbNpcs, dbItems, setItems, getItems, allItems, setAllItems, dbItemTypes, addItemModalOpen, setAddItemModalOpen, addItemFormSubmit, alert, setAlert, handleAlertClose, addItemFormOptions, setAddItemFormOptions, defaultAddItemFormOptions, defaultItemAvailability, selected, setSelected, searchTerm, setSearchTerm, universalLoves, getIcon, dates, seasons, events, selectedDate, setSelectedDate, selectedSeason, setSelectedSeason, handleSeasonChange, defaultNewEvent, newEvent, setNewEvent, addEvent, deleteEvent, addEventModalOpen, setAddEventModalOpen}}>
+    <DatabaseContext.Provider value={{ dbNpcs, dbItems, setItems, getItems, allItems, setAllItems, dbItemTypes, addItemModalOpen, setAddItemModalOpen, addItemFormSubmit, alert, setAlert, handleAlertClose, addItemFormOptions, setAddItemFormOptions, defaultAddItemFormOptions, defaultItemAvailability, selected, setSelected, searchTerm, setSearchTerm, universalLoves, getIcon, dates, seasons, events, selectedDate, setSelectedDate, selectedSeason, setSelectedSeason, handleSeasonChange, defaultNewEvent, newEvent, setNewEvent, addEvent, deleteEvent, addEventModalOpen, setAddEventModalOpen, sortVillagerData, sortItemData, getURL}}>
       {props.children}
     </DatabaseContext.Provider>
   )

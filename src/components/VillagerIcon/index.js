@@ -1,3 +1,5 @@
+import { useContext } from 'react';
+import { DatabaseContext } from "../../contexts/DatabaseContext";
 import { makeStyles } from '@material-ui/core/styles'
 import Tooltip from '@material-ui/core/Tooltip'
 
@@ -27,26 +29,56 @@ const useStyles = makeStyles(() => ({
 
 export default function VillagerIcon(props) {
   const classes = useStyles();
+  const { getURL } = useContext(DatabaseContext);
+
   const icon_url = require(`../../assets/villager_icons/${props.name}_Icon.png`);
 
   const image = <img src={props.swap && props.overlay !== undefined ? props.overlay : icon_url.default} alt={`${props.name} Icon`} width={props.size !== undefined ? props.size : 32} height={props.size !== undefined ? props.size : 32} style={props.style !== undefined ? {...props.style} : {margin: 0}} />;
 
-  const overlay = props.overlay !== undefined ? <img src={props.swap ? icon_url.default : props.overlay} alt={props.overlayAlt !== undefined ? props.overlayAlt : 'Overlay Icon'} width={props.overlaySize !== undefined ? props.overlaySize : props.size !== undefined ? props.size / 2 : 24} height={props.overlaySize !== undefined ? props.overlaySize : props.size !== undefined ? props.size / 2 : 24} className={`${classes.overlayIcon} ${props.position !== undefined ? props.position : 'bottomLeft'}`} /> : ''
+  const overlay = props.overlay !== undefined ? <img src={props.swap ? icon_url.default : props.overlay} alt={props.overlayAlt !== undefined ? props.overlayAlt : 'Overlay Icon'} width={props.overlaySize !== undefined ? props.overlaySize : props.size !== undefined ? props.size / 2 : 24} height={props.overlaySize !== undefined ? props.overlaySize : props.size !== undefined ? props.size / 2 : 24} className={`${classes.overlayIcon} ${props.position !== undefined ? props.position : 'bottomLeft'}`} /> : '';
+
+  const url = props.includeLink ? getURL(props.name) : "";
 
   return (
     <>
-    {(props.tooltip || props.tooltip === undefined) ?
-      <Tooltip title={props.tooltip !== undefined ? props.tooltip : props.name} aria-label={props.name} placement="bottom" arrow>
-        <p className={classes.iconContainer}>
-          {image}
-          {props.overlay !== undefined && overlay}
-        </p>
-      </Tooltip>
-
-      :
-
-      <p className={classes.iconContainer}>{image}{props.overlay !== undefined && overlay}</p>
-    }
+      {props.tooltip || props.tooltip === undefined ? (
+        <Tooltip
+          title={props.tooltip !== undefined ? props.tooltip : props.name}
+          aria-label={props.name}
+          placement="bottom"
+          arrow
+        >
+          {props.includeLink ? (
+            <a href={url} target="_blank" rel="noreferrer">
+              <p className={classes.iconContainer}>
+                {image}
+                {props.overlay !== undefined && overlay}
+              </p>
+            </a>
+          ) : (
+            <p className={classes.iconContainer}>
+              {image}
+              {props.overlay !== undefined && overlay}
+            </p>
+          )}
+        </Tooltip>
+      ) : (
+        <>
+          {props.includeLink ? (
+              <a href={url} target="_blank" rel="noreferrer">
+              <p className={classes.iconContainer}>
+                {image}
+                {props.overlay !== undefined && overlay}
+              </p>
+            </a>
+          ) : (
+            <p className={classes.iconContainer}>
+              {image}
+              {props.overlay !== undefined && overlay}
+            </p>
+          )}
+        </>
+      )}
     </>
-  )
+  );
 }

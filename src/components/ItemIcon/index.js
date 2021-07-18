@@ -30,7 +30,7 @@ const useStyles = makeStyles(() => ({
 export default function ItemIcon(props) {
   const classes = useStyles();
 
-  const { getIcon } = useContext(DatabaseContext)
+  const { getIcon, getURL } = useContext(DatabaseContext)
 
   let overlay_image, icon_image;
 
@@ -59,25 +59,51 @@ export default function ItemIcon(props) {
 
   const overlay = props.overlay !== undefined ? <img src={overlay_icon} alt={props.overlayAlt !== undefined ? props.overlayAlt : `Overlay Icon`} width={props.size !== undefined ? props.size / 2 : 24} height={props.size !== undefined ? props.size / 2 : 24} className={`${classes.overlayIcon} ${props.position !== undefined ? props.position : 'bottomLeft'}`} /> : '';
 
-  if(props) {
+  const url = props.includeLink ? getURL(props.name) : '';
+
+  if(props.tooltip || props.tooltip === undefined) {
     return (
-      <Tooltip title={props.name} aria-label={props.name} placement="bottom" arrow type="div">
-        <p className={classes.iconContainer}>
-          {image}
-          {(props.overlay !== undefined && props.overlay !== '') &&
-            {overlay}
-          }
-        </p>
+      <Tooltip
+        title={props.name}
+        aria-label={props.name}
+        placement="bottom"
+        arrow
+        type="div"
+      >
+        {props.includeLink ? (
+          <a href={url} target="_blank" rel="noreferrer">
+            <p className={classes.iconContainer}>
+              {image}
+              {props.overlay !== undefined &&
+                props.overlay !== "" && { overlay }}
+            </p>
+          </a>
+        ) : (
+          <p className={classes.iconContainer}>
+            {image}
+            {props.overlay !== undefined && props.overlay !== "" && { overlay }}
+          </p>
+        )}
       </Tooltip>
-    )
+    );
   } else {
     return (
-      <p className={classes.iconContainer}>
-        {image}
-        {(props.overlay !== undefined && props.overlay !== '') &&
-          {overlay}
-        }
-      </p>
-    )
+      <>
+        {props.includeLink ? (
+          <a href={url} target="_blank" rel="noreferrer">
+            <p className={classes.iconContainer}>
+              {image}
+              {props.overlay !== undefined &&
+                props.overlay !== "" && { overlay }}
+            </p>
+          </a>
+        ) : (
+          <p className={classes.iconContainer}>
+            {image}
+            {props.overlay !== undefined && props.overlay !== "" && { overlay }}
+          </p>
+        )}
+      </>
+    );
   }
 }

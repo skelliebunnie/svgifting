@@ -91,10 +91,12 @@ const useStyles = makeStyles((theme) => ({
 
 export default function VillagerCard(props) {
   const classes = useStyles();
+  const { universalLoves, getURL } = useContext(DatabaseContext);
+
   const portrait_url = require(`../../assets/villager_portraits/${props.name}.png`);
   const love_emote = require(`../../assets/emotes/42px-Emote_Heart.png`);
 
-  const { universalLoves } = useContext(DatabaseContext);
+  const villager_url = props.includeLink ? getURL(props.name) : '';
 
   const [gifts, setGifts] = useState([])
 
@@ -110,7 +112,13 @@ export default function VillagerCard(props) {
   }, [props.includeULoves])
 
   return (
-    <Card className={props.status && props.name !== 'Krobus' ? `${classes.root} ${classes.marriageable}` : classes.root}>
+    <Card
+      className={
+        props.status && props.name !== "Krobus"
+          ? `${classes.root} ${classes.marriageable}`
+          : classes.root
+      }
+    >
       <div className={classes.details}>
         <CardContent className={classes.content}>
           <VillagerIcon name={props.name} />
@@ -118,23 +126,48 @@ export default function VillagerCard(props) {
             {props.name}
           </Typography>
           <Typography variant="subtitle1" className={classes.status}>
-            <strong>{props.status && props.name !== 'Krobus' ? 'Marriage Candidate' : ''}</strong>
+            <strong>
+              {props.status && props.name !== "Krobus"
+                ? "Marriage Candidate"
+                : ""}
+            </strong>
           </Typography>
           <Typography className={classes.birthday}>
-            <strong>Birthday:</strong> {`${props.data.Seasons[0].name} ${props.data.Seasons[0].Event.day}`}
+            <strong>Birthday:</strong>{" "}
+            {`${props.data.Seasons[0].name} ${props.data.Seasons[0].Event.day}`}
           </Typography>
-          {gifts.length > 0 &&
-          <Box>
-            <section className={classes.giftsContainer}>
-            <Typography component="h5" variant="h5" className={classes.giftsTitle}>
-              <img src={love_emote.default} alt="Love" style={{ width: 24, marginRight: '0.35rem' }} />
-              {/* <FontAwesomeIcon icon={faHeart} style={{fontSize: '2rem', color: 'crimson', verticalAlign: 'middle'}} /> */}
-              Loved Gifts:
-              </Typography>
-             {gifts.map(gift => gift.Gift.preference === 'love' && <ItemIcon key={gift.name} name={gift.name} icon={gift.icon} size={24} />)}
-            </section>
-          </Box>
-          }
+          {gifts.length > 0 && (
+            <Box>
+              <section className={classes.giftsContainer}>
+                <Typography
+                  component="h5"
+                  variant="h5"
+                  className={classes.giftsTitle}
+                >
+                  <img
+                    src={love_emote.default}
+                    alt="Love"
+                    style={{ width: 24, marginRight: "0.35rem" }}
+                  />
+                  {/* <FontAwesomeIcon icon={faHeart} style={{fontSize: '2rem', color: 'crimson', verticalAlign: 'middle'}} /> */}
+                  Loved Gifts:
+                </Typography>
+                {gifts.map(
+                  (gift) =>
+                    gift.Gift.preference === "love" && (
+                      <ItemIcon
+                        key={gift.name}
+                        name={gift.name}
+                        icon={gift.icon}
+                        size={24}
+                        includeLink={true}
+                      />
+                    )
+                )}
+              </section>
+              {props.includeLink ? <a href={villager_url} target="_blank" rel="noreferrer">View Wiki</a> : ''}
+            </Box>
+          )}
         </CardContent>
       </div>
       <CardMedia
@@ -143,5 +176,5 @@ export default function VillagerCard(props) {
         title={props.name}
       />
     </Card>
-  )
+  );
 }

@@ -1,5 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect, useContext } from 'react'
+import { DatabaseContext } from "../contexts/DatabaseContext";
 import { Box, Container, Grid, FormControl, FormControlLabel, Checkbox, InputLabel, RadioGroup, Radio } from '@material-ui/core'
+
+import API from '../utils/API'
 
 import SearchVillagers from '../components/SearchVillagers'
 import VillagersList from '../components/VillagersList'
@@ -72,12 +75,50 @@ function DisplayOptions({ options, display, handleInputChange }) {
 }
 
 export default function Villagers() {
+  const { getIcon, sortVillagerData } = useContext(DatabaseContext);
+
   const sortOptions = ["Villager Name", "Birthday <Season, Day>", "Number of Loved Gifts"]
   const displayOptions = ["Grid", "List", "Table"]
 
   const [uLovesChecked, setULovesChecked] = useState(JSON.parse(localStorage.getItem("sv_include_uloves")) || false);
   const [sortBy, setSortBy] = useState('Villager Name')
   const [display, setDisplay] = useState('Grid')
+
+  const [villagers, setVillagers] = useState([])
+  const [searchValue, setSearchValue] = useState('')
+  const [searchInputValue, setSearchInputValue] = useState('')
+
+  useEffect(() => {
+    API.getVillagers()
+      .then((list) => {
+        let data = sortVillagerData(list.data, sortBy);
+        setVillagers(data);
+        setSearchValue(data[0].name);
+
+        for (var i = 0; i < data.length; i++) {
+          // filter out gifts that are not 'loved'
+          data[i].Items = data[i].Items.filter(
+            (item) => item.Gift.preference === "love"
+          );
+
+          for (var j = 0; j < data[i].Items.length; j++) {
+            const item = data[i].Items[j];
+            const icon = getIcon(item.name, "item_icons", "png", false).default;
+            data[i].birthday =
+              data[i].Seasons.length > 0
+                ? `${data[i].Seasons[0].name} ${data[i].Seasons[0].Event.day}`
+                : "unavailable";
+            data[i].Items[j].icon = icon;
+          }
+
+          data[i].birthdaySeasonId = data[i].Seasons[0].id;
+          data[i].birthdaySeason = data[i].Seasons[0].name;
+          data[i].birthdayDate = data[i].Seasons[0].Event.day;
+        }
+      })
+      .catch((err) => console.error(err));
+  // eslint-disable-next-line
+  }, [])
 
   const toggleUniversalLoves = () => {
     setULovesChecked(!uLovesChecked)
@@ -92,21 +133,42 @@ export default function Villagers() {
 
   return (
     <Box>
-      <Container maxWidth={'lg'}>
-        <SearchVillagers />
-        <FilterUniversallyLovedGifts uLovesChecked={uLovesChecked} toggleUniversalLoves={toggleUniversalLoves} />
+      <Container maxWidth={"lg"}>
+        <SearchVillagers
+          value={searchValue}
+          setValue={setSearchValue}
+          inputValue={searchInputValue}
+          setInputValue={setSearchInputValue}
+        />
+        <FilterUniversallyLovedGifts
+          uLovesChecked={uLovesChecked}
+          toggleUniversalLoves={toggleUniversalLoves}
+        />
         <Grid container>
           <Grid item xs={12} lg={6}>
-            <DisplayOptions options={displayOptions} display={display} handleInputChange={handleInputChange} />
+            <DisplayOptions
+              options={displayOptions}
+              display={display}
+              handleInputChange={handleInputChange}
+            />
           </Grid>
           <Grid item xs={12} lg={6}>
-          {display !== 'Table' &&
-            <SortOptions options={sortOptions} sortBy={sortBy} handleInputChange={handleInputChange} />
-          }
+            {display !== "Table" && (
+              <SortOptions
+                options={sortOptions}
+                sortBy={sortBy}
+                handleInputChange={handleInputChange}
+              />
+            )}
           </Grid>
         </Grid>
       </Container>
-      <VillagersList includeULoves={uLovesChecked} format={display} sortBy={sortBy} />
+      <VillagersList
+        includeULoves={uLovesChecked}
+        format={display}
+        sortBy={sortBy}
+        villagers={villagers}
+      />
     </Box>
   );
 }
