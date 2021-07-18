@@ -4,8 +4,8 @@ import { Box, Container, Grid, FormControl, FormControlLabel, Checkbox, InputLab
 
 import API from '../utils/API'
 
-import SearchVillagers from '../components/SearchVillagers'
-import VillagersList from '../components/VillagersList'
+import SearchNpcs from '../components/SearchNpcs'
+import NpcsList from '../components/NpcsList'
 
 function FilterUniversallyLovedGifts({ uLovesChecked, toggleUniversalLoves }) {
   return (
@@ -29,7 +29,7 @@ function SortOptions({ options, sortBy, handleInputChange }) {
     <>
     <InputLabel id="sortby-label">Sort By</InputLabel>
     <FormControl>
-      <RadioGroup aria-label="sort villagers by" name="sortby" value={sortBy} onChange={(e) => handleInputChange(e, 'sort')}>
+      <RadioGroup aria-label="sort npcs by" name="sortby" value={sortBy} onChange={(e) => handleInputChange(e, 'sort')}>
         <Grid container>
             {options.map(opt => 
               <Grid key={opt} item>
@@ -74,25 +74,25 @@ function DisplayOptions({ options, display, handleInputChange }) {
   )
 }
 
-export default function Villagers() {
-  const { getIcon, sortVillagerData } = useContext(DatabaseContext);
+export default function Npcs() {
+  const { getIcon, sortNpcData } = useContext(DatabaseContext);
 
-  const sortOptions = ["Villager Name", "Birthday <Season, Day>", "Number of Loved Gifts"]
+  const sortOptions = ["Npc Name", "Birthday <Season, Day>", "Number of Loved Gifts"]
   const displayOptions = ["Grid", "List", "Table"]
 
   const [uLovesChecked, setULovesChecked] = useState(JSON.parse(localStorage.getItem("sv_include_uloves")) || false);
-  const [sortBy, setSortBy] = useState('Villager Name')
+  const [sortBy, setSortBy] = useState('Npc Name')
   const [display, setDisplay] = useState('Grid')
 
-  const [villagers, setVillagers] = useState([])
+  const [npcs, setNpcs] = useState([])
   const [searchValue, setSearchValue] = useState('')
   const [searchInputValue, setSearchInputValue] = useState('')
 
   useEffect(() => {
-    API.getVillagers()
+    API.getNpcs()
       .then((list) => {
-        let data = sortVillagerData(list.data, sortBy);
-        setVillagers(data);
+        let data = sortNpcData(list.data, sortBy);
+        setNpcs(data);
         setSearchValue(data[0].name);
 
         for (var i = 0; i < data.length; i++) {
@@ -134,7 +134,7 @@ export default function Villagers() {
   return (
     <Box>
       <Container maxWidth={"lg"}>
-        <SearchVillagers
+        <SearchNpcs
           value={searchValue}
           setValue={setSearchValue}
           inputValue={searchInputValue}
@@ -163,11 +163,11 @@ export default function Villagers() {
           </Grid>
         </Grid>
       </Container>
-      <VillagersList
+      <NpcsList
         includeULoves={uLovesChecked}
         format={display}
         sortBy={sortBy}
-        villagers={villagers}
+        npcs={npcs}
       />
     </Box>
   );

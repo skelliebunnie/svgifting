@@ -4,9 +4,9 @@ import { withStyles, makeStyles } from '@material-ui/core/styles'
 import { Grid, Container, FormGroup, FormControlLabel, Checkbox, Typography, FormControl, InputLabel, Select, MenuItem, TextField, Button, IconButton, Modal } from '@material-ui/core'
 import { Close as CloseIcon } from '@material-ui/icons'
 
-import UpsertItemForm from '../UpsertItemForm'
+import AdminItemsForm from '../AdminItemsForm'
 import ItemIcon from '../ItemIcon'
-import VillagerIcon from '../VillagerIcon'
+import NpcIcon from '../NpcIcon'
 
 import { useSnackbar } from 'notistack'
 
@@ -130,10 +130,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function GiftPreferenceForm() {
+export default function AdminGiftsForm() {
   const classes = useStyles();
 
-  const { dbNpcs, dbItems, allItems, setAllItems, dbItemTypes, addItemModalOpen, setAddItemModalOpen, searchTerm, setSearchTerm, getIcon } = useContext(DatabaseContext)
+  const { dbNpcs, dbItems, allItems, setAllItems, dbItemTypes, addItemModalOpen, setAddItemModalOpen, itemSearchTerm, setItemSearchTerm, getIcon } = useContext(DatabaseContext)
   
   const [itemTypes, setItemTypes] = useState(dbItemTypes || [])
   const [formOptions, setFormOptions] = useState({
@@ -172,12 +172,12 @@ export default function GiftPreferenceForm() {
         setAllItems(data)
 
         if(search !== undefined && search !== "") {
-          setSearchTerm(search);
+          setItemSearchTerm(search);
           
           data = data.filter(item => item.name.toLowerCase().includes(search.toLowerCase()))
           
         } else {
-          setSearchTerm("")
+          setItemSearchTerm("")
 
         }
 
@@ -248,7 +248,7 @@ export default function GiftPreferenceForm() {
   const handleItemSearch = e => {
     const searchFor = e.target.value.toLowerCase()
 
-    setSearchTerm(searchFor)
+    setItemSearchTerm(searchFor)
     // if there is no search term, the unfiltered list of items should be set
     // otherwise, filter the items
     setFormOptions({
@@ -333,7 +333,7 @@ export default function GiftPreferenceForm() {
           const itemName = items[j].name;
   
           API.upsertGift({
-            VillagerId: npcId,
+            NpcId: npcId,
             ItemId: itemId,
             preference: formOptions.preference
           })
@@ -388,7 +388,7 @@ export default function GiftPreferenceForm() {
 
   const clearCheckboxes = (target) => {
     if(target === "items") {
-      setSearchTerm("")
+      setItemSearchTerm("")
       const itemList = allItems.map(item => ({...item, isChecked: false}))
       setAllItems(itemList)
       setFormOptions({
@@ -445,7 +445,7 @@ export default function GiftPreferenceForm() {
                     label={
                       npc.id !== "all" ? (
                         <>
-                          <VillagerIcon name={npc.name} size={20} /> {npc.name}
+                          <NpcIcon name={npc.name} size={20} /> {npc.name}
                         </>
                       ) : (
                         "All"
@@ -511,7 +511,7 @@ export default function GiftPreferenceForm() {
                   className={classes.searchItemsField}
                   label="Search"
                   type="search"
-                  value={searchTerm}
+                  value={itemSearchTerm}
                   onChange={handleItemSearch}
                   onBlur={handleItemSearch}
                 />
@@ -604,7 +604,7 @@ export default function GiftPreferenceForm() {
           >
             <CloseIcon />
           </IconButton>
-          <UpsertItemForm includeItemList={false} />
+          <AdminItemsForm includeItemList={false} />
         </Container>
       </Modal>
     </>

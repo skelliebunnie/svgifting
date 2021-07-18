@@ -27,11 +27,11 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
-export default function VillagerIcon(props) {
+export default function NpcIcon(props) {
   const classes = useStyles();
   const { getURL } = useContext(DatabaseContext);
 
-  const icon_url = require(`../../assets/villager_icons/${props.name}_Icon.png`);
+  const icon_url = require(`../../assets/npc_icons/${props.name}_Icon.png`);
 
   const image = <img src={props.swap && props.overlay !== undefined ? props.overlay : icon_url.default} alt={`${props.name} Icon`} width={props.size !== undefined ? props.size : 32} height={props.size !== undefined ? props.size : 32} style={props.style !== undefined ? {...props.style} : {margin: 0}} />;
 

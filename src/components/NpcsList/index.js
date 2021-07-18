@@ -4,8 +4,8 @@ import { makeStyles } from '@material-ui/core/styles'
 import { Container } from '@material-ui/core'
 import { DataGrid, GridToolbar } from '@material-ui/data-grid'
 
-import VillagerCard from '../VillagerCard'
-import VillagerIcon from '../VillagerIcon'
+import NpcCard from '../NpcCard'
+import NpcIcon from '../NpcIcon'
 import ItemIcon from '../ItemIcon'
 
 const useStyles = makeStyles(() => ({
@@ -54,12 +54,12 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
-const villagerIcon = {
+const npcIcon = {
   headerName: " ",
   align: 'center',
   disableColumnMenu: true,
   renderCell: ({ value }) => (
-    <VillagerIcon name={value} tooltip={false} style={{verticalAlign: 'middle', margin: '0 auto'}} />
+    <NpcIcon name={value} tooltip={false} style={{verticalAlign: 'middle', margin: '0 auto'}} />
   )
 }
 
@@ -72,17 +72,18 @@ const giftIcons = {
   ))
 }
 
-export default function VillagersList(props) {
+export default function NpcsList(props) {
   const classes = useStyles();
 
-  const { universalLoves, sortVillagerData } = useContext(DatabaseContext);
+  const { universalLoves, sortNpcData } = useContext(DatabaseContext);
 
-  const [villagers, setVillagers] = useState(props.villagers);
+  const [npcs, setNpcs] = useState(props.npcs);
 
   const dataGridColumns = [
-    { field: "icon", flex: 0, ...villagerIcon, sortable: false, disableColumnMenu: true },
+    { field: "icon", flex: 0, ...npcIcon, sortable: false, disableColumnMenu: true },
     { field: 'name', headerName: "Name", flex: 1 },
-    { field: 'available', headerName: "Marriage Candidate", flex: 1, type: 'boolean' },
+    { field: 'availableIn', headerName: "Available In", flex: 1, type: 'string' },
+    { field: 'marriageable', headerName: "Marriage Candidate", flex: 1, type: 'boolean' },
     { field: 'birthdaySeasonId', hide: true, type: 'number', flex: 1 },
     { field: 'birthdaySeason', hide: true, flex: 1 },
     { field: 'birthdayDate', hide: true, type: 'number', flex: 1 },
@@ -98,19 +99,19 @@ export default function VillagersList(props) {
     { field: 'gifts', headerName: 'Loved Gifts', flex: 1, ...giftIcons, sortable: false }
   ]
   
-  const [dataGridRows, setDataGridRows] = useState(villagers)
+  const [dataGridRows, setDataGridRows] = useState(npcs)
 
   const [sortBy, setSortBy] = useState(props.sortBy)
 
   useEffect(() => {
-    setVillagers(props.villagers);
-    const rows = createTableRows(props.villagers);
+    setNpcs(props.npcs);
+    const rows = createTableRows(props.npcs);
     setDataGridRows(rows);
 
-  }, [props.villagers]);
+  }, [props.npcs]);
 
   useEffect(() => {
-    // sortData(villagers, sortBy);
+    // sortData(npcs, sortBy);
     
     let newRows = [];
     for(var i = 0; i < dataGridRows.length; i++) {
@@ -125,10 +126,10 @@ export default function VillagersList(props) {
   }, [props.includeULoves, universalLoves])
 
   useEffect(() => {
-    const villagerData = sortVillagerData(villagers, props.sortBy);
-    setVillagers(villagerData);
+    const npcData = sortNpcData(npcs, props.sortBy);
+    setNpcs(npcData);
     
-    createTableRows(villagerData);
+    createTableRows(npcData);
 
     setSortBy(props.sortBy);
     //eslint-disable-next-line
@@ -144,13 +145,14 @@ export default function VillagersList(props) {
         id: data[i].id,
         icon: data[i].name,
         name: data[i].name,
-        available: data[i].available && data[i].name !== 'Krobus' ? true : false,
+        marriageable: data[i].marriageable && data[i].name !== 'Krobus' ? true : false,
         birthdaySeasonId: data[i].Seasons.length > 0 ? data[i].Seasons[0].id : 0,
         birthdaySeason: data[i].Seasons.length > 0 ? data[i].Seasons[0].name : '',
         birthdayDate: data[i].Seasons.length > 0 ? data[i].Seasons[0].Event.day : 0,
         birthday: data[i].Seasons.length > 0 ? `${data[i].Seasons[0].name} ${data[i].Seasons[0].Event.day}`: 'unavailable',
         allGifts: data[i].Items,
-        gifts: data[i].Items
+        gifts: data[i].Items,
+        availableIn: data[i].availableIn
       };
 
       rows.push(row)
@@ -168,47 +170,48 @@ export default function VillagersList(props) {
     >
       {/* GRID DISPLAY */}
       {props.format === "Grid" &&
-        villagers.map((villager) => (
-          <VillagerCard
-            key={villager.name}
-            name={villager.name}
-            status={villager.available}
-            gifts={villager.Items}
+        npcs.map((npc) => (
+          <NpcCard
+            key={npc.name}
+            name={npc.name}
+            status={npc.marriageable}
+            gifts={npc.Items}
             includeULoves={props.includeULoves}
-            data={villager}
+            data={npc}
             includeLink={true}
+            availableIn={npc.availableIn}
           />
         ))}
       {/* LIST DISPLAY */}
       {props.format === "List" && (
         <div className={classes.displayList}>
-          {villagers.map((villager) => (
-            <article key={villager.name}>
+          {npcs.map((npc) => (
+            <article key={npc.name}>
               <section style={{ display: "flex", flexFlow: "row wrap" }}>
                 <div
                   style={{ flex: 0, margin: 0, padding: 0, lineHeight: "1rem" }}
                 >
-                  <VillagerIcon
-                    name={villager.name}
+                  <NpcIcon
+                    name={npc.name}
                     style={{ verticalAlign: "middle", margin: 0 }}
                   />
                 </div>
                 <div style={{ flex: 1 }}>
                   <p style={{ margin: "0.25rem 0" }}>
-                    <strong>{villager.name}</strong>{" "}
-                    {villager.available && villager.name !== "Krobus" && (
+                    <strong>{npc.name}</strong>{" "}
+                    {npc.available && npc.name !== "Krobus" && (
                       <span style={{ color: "green" }}>
                         [Marriage Candidate]
                       </span>
                     )}
                   </p>
                   <p style={{ margin: "0.25rem 0" }}>
-                    <strong>Birthday:</strong> {villager.birthday}
+                    <strong>Birthday:</strong> {npc.birthday}
                   </p>
                 </div>
               </section>
               <ul className={classes.giftList}>
-                {villager.Items.map(
+                {npc.Items.map(
                   (item) =>
                     (props.includeULoves ||
                       (!props.includeULoves &&

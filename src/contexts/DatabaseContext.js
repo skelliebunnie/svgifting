@@ -30,8 +30,8 @@ const DatabaseContextProvider = (props) => {
   const [addItemModalOpen, setAddItemModalOpen] = useState(false)
   const [addEventModalOpen, setAddEventModalOpen] = useState(false)
 
-  const [selected, setSelected] = useState(null)
-  const [searchTerm, setSearchTerm] = useState("")
+  const [selectedItem, setSelectedItem] = useState(null)
+  const [itemSearchTerm, setItemSearchTerm] = useState("")
 
   const defaultItemAvailability = {
     weather: 'any',
@@ -106,7 +106,7 @@ const DatabaseContextProvider = (props) => {
   const defaultNewEvent = {
     name: "",
     day: selectedDate,
-    VillagerId: '',
+    NpcId: '',
     SeasonId: selectedSeason.id,
     type: 'other',
     startTime: '2021-01-01T09:00:00',
@@ -122,7 +122,7 @@ const DatabaseContextProvider = (props) => {
   }, [addEventModalOpen])
 
   useEffect(() => {
-    API.getVillagers().then(list => {
+    API.getNpcs().then(list => {
       // set the form options list of NPCs and add a new key/value pair for isChecked, defaulting to false
       let npcList = list.data.map(npc => ({ ...npc, isChecked: false }));
       npcList.push({ id: 'all', name: 'All', isChecked: false })
@@ -255,7 +255,7 @@ const DatabaseContextProvider = (props) => {
         setAlert({ open: true, message: addItemFormOptions.id !== undefined ? `${addItemFormOptions.name} updated successfully` : `${addItemFormOptions.name} saved successfully`, severity: 'success' });
 
         setAddItemFormOptions({...defaultAddItemFormOptions, ...defaultItemAvailability})
-        setSelected(null)
+        setSelectedItem(null)
         setAddItemModalOpen(false);
         setItems([...dbItems, {...results.data, icon: getIcon(results.data.name, 'item_icons', 'png', true)}])
 
@@ -318,7 +318,7 @@ const DatabaseContextProvider = (props) => {
    */
    const addEvent = () => {
     const eventData = newEvent;
-    if(eventData.VillagerId === '') eventData.VillagerId = null
+    if(eventData.NpcId === '') eventData.NpcId = null
     eventData.SeasonId = eventData.SeasonId !== selectedSeason.id ? eventData.SeasonId = selectedSeason.id : eventData.SeasonId
     eventData.startTime = typeof eventData.startTime === 'string' ? eventData.startTime.substring(11) : formatTime(eventData.startTime)
     eventData.endTime = typeof eventData.endTime === 'string' ? eventData.endTime.substring(11) : formatTime(eventData.endTime)
@@ -372,7 +372,7 @@ const DatabaseContextProvider = (props) => {
     getEvents(id)
   }
 
-  const sortVillagerData = (data, sortBy = "Villager Name") => {
+  const sortNpcData = (data, sortBy = "Npc Name") => {
     if (sortBy === "Number of Loved Gifts") {
       // console.log("sorting by number of loved gifts", data);
       data.sort((a, b) => {
@@ -416,7 +416,7 @@ const DatabaseContextProvider = (props) => {
       // console.log("sorting by number of loved gifts", data);
       data.sort((a, b) => {
         // here, we're sorting largest to smallest (descending)
-        return a.Villagers.length > b.Villagers.length ? -1 : 1;
+        return a.Npcs.length > b.Npcs.length ? -1 : 1;
       });
     } else if (sortBy === "Seasonal") {
       if(data[0].Seasons !== undefined) {
@@ -459,7 +459,7 @@ const DatabaseContextProvider = (props) => {
   };
 
   return (
-    <DatabaseContext.Provider value={{ dbNpcs, dbItems, setItems, getItems, allItems, setAllItems, dbItemTypes, addItemModalOpen, setAddItemModalOpen, addItemFormSubmit, alert, setAlert, handleAlertClose, addItemFormOptions, setAddItemFormOptions, defaultAddItemFormOptions, defaultItemAvailability, selected, setSelected, searchTerm, setSearchTerm, universalLoves, getIcon, dates, seasons, events, selectedDate, setSelectedDate, selectedSeason, setSelectedSeason, handleSeasonChange, defaultNewEvent, newEvent, setNewEvent, addEvent, deleteEvent, addEventModalOpen, setAddEventModalOpen, sortVillagerData, sortItemData, getURL}}>
+    <DatabaseContext.Provider value={{ dbNpcs, dbItems, setItems, getItems, allItems, setAllItems, dbItemTypes, addItemModalOpen, setAddItemModalOpen, addItemFormSubmit, alert, setAlert, handleAlertClose, addItemFormOptions, setAddItemFormOptions, defaultAddItemFormOptions, defaultItemAvailability, selectedItem, setSelectedItem, itemSearchTerm, setItemSearchTerm, universalLoves, getIcon, dates, seasons, events, selectedDate, setSelectedDate, selectedSeason, setSelectedSeason, handleSeasonChange, defaultNewEvent, newEvent, setNewEvent, addEvent, deleteEvent, addEventModalOpen, setAddEventModalOpen, sortNpcData, sortItemData, getURL}}>
       {props.children}
     </DatabaseContext.Provider>
   )

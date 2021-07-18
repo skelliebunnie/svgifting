@@ -5,7 +5,7 @@ import { makeStyles } from '@material-ui/core/styles'
 import { Container, Grid, Card, CardContent, Button, IconButton, Typography, CardActions, Modal } from '@material-ui/core'
 import { Add as AddIcon, Close as CloseIcon } from '@material-ui/icons';
 
-import VillagerIcon from '../VillagerIcon'
+import NpcIcon from '../NpcIcon'
 import ItemIcon from '../ItemIcon'
 
 import AddEventForm from '../AddEventForm'
@@ -406,29 +406,29 @@ export default function Calendar({ modalState, openModal, closeModal }) {
                               }
                             >
                               {event.type === "birthday" &&
-                              event.VillagerId !== null ? (
-                                <VillagerIcon
+                              event.NpcId !== null ? (
+                                <NpcIcon
                                   tooltip={event.name}
-                                  name={event.Villager.name}
+                                  name={event.Npc.name}
                                   overlay={cakeIcon}
                                   swap={true}
                                   size={38}
                                   overlaySize={32}
                                 />
                               ) : event.type === "checkup" ? (
-                                <VillagerIcon
+                                <NpcIcon
                                   tooltip={event.name}
-                                  name={event.Villager.name}
+                                  name={event.Npc.name}
                                   overlay={checkupIcon}
                                   swap={true}
                                   size={38}
                                   overlaySize={32}
                                 />
                               ) : event.type === "other" &&
-                                event.VillagerId !== null ? (
-                                <VillagerIcon
+                                event.NpcId !== null ? (
+                                <NpcIcon
                                   tooltip={event.name}
-                                  name={event.Villager.name}
+                                  name={event.Npc.name}
                                   overlay={otherEventTypeIcon}
                                   swap={true}
                                   size={38}

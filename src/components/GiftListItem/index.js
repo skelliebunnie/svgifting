@@ -3,7 +3,7 @@ import { DatabaseContext } from "../../contexts/DatabaseContext";
 import { makeStyles } from '@material-ui/core/styles'
 import { Card, CardContent, CardMedia, Typography } from '@material-ui/core'
 
-import VillagerIcon from '../VillagerIcon'
+import NpcIcon from '../NpcIcon'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -54,7 +54,7 @@ export default function GiftListItem(props) {
           <Typography component="h5" variant="h5" className={classes.gift}>
             {props.gift}
           </Typography>
-          {props.villagers.map(villager => <VillagerIcon key={villager.name} name={villager.name} />)}
+          {props.npcs.map(npc => <NpcIcon key={npc.name} name={npc.name} />)}
         </CardContent>
       </div>
       

@@ -4,7 +4,7 @@ import { makeStyles } from '@material-ui/core/styles'
 import { Container } from '@material-ui/core'
 import { NavigateNext, NavigateBefore } from '@material-ui/icons'
 import GiftListItem from "../GiftListItem";
-import VillagerIcon from '../VillagerIcon'
+import NpcIcon from '../NpcIcon'
 import ItemIcon from '../ItemIcon'
 import API from '../../utils/API'
 
@@ -103,12 +103,12 @@ export default function GiftList(props) {
   const tableContainerRef = useRef(null)
 
   const gifts = props.list || [];
-  const [villagers, setVillagers] = useState([])
+  const [npcs, setNpcs] = useState([])
   const [tablePos, setTablePos] = useState(0)
 
   useEffect(() => {
-    API.getVillagers()
-      .then(res => setVillagers(res.data))
+    API.getNpcs()
+      .then(res => setNpcs(res.data))
       .catch(err => console.error(err))
   }, []);
 
@@ -133,7 +133,7 @@ export default function GiftList(props) {
     setTablePos(newPos);
   }
  
-  if(props.display === 'grid') {
+  if(props.display === 'cards') {
     return (
       <Container className={classes.giftsGrid}>
         {gifts.map((gift) => (
@@ -141,7 +141,7 @@ export default function GiftList(props) {
             key={gift.name}
             gift={gift.name}
             icon={gift.icon}
-            villagers={gift.Villagers}
+            npcs={gift.Npcs}
           />
         ))}
       </Container>
@@ -165,17 +165,17 @@ export default function GiftList(props) {
                 <thead>
                   <tr>
                     <th style={{ position: "relative" }}></th>
-                    {villagers.map((villager) => (
-                      <th key={villager.name}>
-                        <VillagerIcon name={villager.name} />
+                    {npcs.map((npc) => (
+                      <th key={npc.name}>
+                        <NpcIcon name={npc.name} />
                       </th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {gifts.map((gift) => {
-                    const giftVillagers = gift.Villagers.map(
-                      (villager) => villager.name
+                    const giftNpcs = gift.Npcs.map(
+                      (npc) => npc.name
                     );
 
                     return (
@@ -183,19 +183,19 @@ export default function GiftList(props) {
                         <th>
                           <ItemIcon name={gift.name} />
                         </th>
-                        {villagers.map((villager) => {
-                          let status = giftVillagers.includes(villager.name)
+                        {npcs.map((npc) => {
+                          let status = giftNpcs.includes(npc.name)
                             ? "Y"
                             : "N";
                           return (
                             <td
-                              key={`${villager.name}-${status}`}
+                              key={`${npc.name}-${status}`}
                               className={`status-${status}`}
                             >
                               {status === "Y" ? (
-                                <VillagerIcon
-                                  tooltip={`Gift: ${gift.name}, NPC: ${villager.name}`}
-                                  name={villager.name}
+                                <NpcIcon
+                                  tooltip={`Gift: ${gift.name}, NPC: ${npc.name}`}
+                                  name={npc.name}
                                   overlay={getIcon(gift.name).default}
                                   swap={true}
                                   size={38}
@@ -229,17 +229,17 @@ export default function GiftList(props) {
               <thead>
                 <tr>
                   <th style={{ position: "relative" }}></th>
-                  {villagers.map((villager) => (
-                    <th key={villager.name}>
-                      <VillagerIcon name={villager.name} />
+                  {npcs.map((npc) => (
+                    <th key={npc.name}>
+                      <NpcIcon name={npc.name} />
                     </th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {gifts.map((gift) => {
-                  const giftVillagers = gift.Villagers.map(
-                    (villager) => villager.name
+                  const giftNpcs = gift.Npcs.map(
+                    (npc) => npc.name
                   );
 
                   return (
@@ -247,19 +247,19 @@ export default function GiftList(props) {
                       <th>
                         <ItemIcon name={gift.name} />
                       </th>
-                      {villagers.map((villager) => {
-                        let status = giftVillagers.includes(villager.name)
+                      {npcs.map((npc) => {
+                        let status = giftNpcs.includes(npc.name)
                           ? "Y"
                           : "N";
                         return (
                           <td
-                            key={`${villager.name}-${status}`}
+                            key={`${npc.name}-${status}`}
                             className={`status-${status}`}
                           >
                             {status === "Y" ? (
-                              <VillagerIcon
-                                tooltip={`Gift: ${gift.name}, NPC: ${villager.name}`}
-                                name={villager.name}
+                              <NpcIcon
+                                tooltip={`Gift: ${gift.name}, NPC: ${npc.name}`}
+                                name={npc.name}
                                 overlay={getIcon(gift.name).default}
                                 swap={true}
                                 size={38}

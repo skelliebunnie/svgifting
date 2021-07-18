@@ -74,10 +74,10 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-export default function UpsertItemForm(props) {
+export default function AdminItemsForm(props) {
   const classes = useStyles();
 
-  const { dbItems, dbItemTypes, addItemFormSubmit, addItemFormOptions, setAddItemFormOptions, defaultAddItemFormOptions, defaultItemAvailability, selected, setSelected } = useContext(DatabaseContext)
+  const { dbItems, dbItemTypes, addItemFormSubmit, addItemFormOptions, setAddItemFormOptions, defaultAddItemFormOptions, defaultItemAvailability, selectedItem, setSelectedItem } = useContext(DatabaseContext)
 
   const [itemList, setItemList] = useState([])
   const [itemTypes, setItemTypes] = useState([])
@@ -108,19 +108,19 @@ export default function UpsertItemForm(props) {
   }, []);
 
   useEffect(() => {
-    if(selected !== null) {
-      let newFormOptions = { ...selected }
-      newFormOptions.AnimalId = selected.AnimalId !== null ? [selected.AnimalId] : []
-      newFormOptions.EquipmentId = selected.EquipmentId !== null ? selected.EquipmentId : 0
-      newFormOptions.LocationId = selected.LocationId !== null ? selected.LocationId : 0
-      newFormOptions.TypeId = selected.TypeId !== null ? selected.TypeId : 0
-      newFormOptions.behavior = selected.behavior !== null ? selected.behavior : ''
-      newFormOptions.difficulty = selected.difficulty !== null ? selected.difficulty : 0
-      newFormOptions.size = selected.size !== null ? selected.size : ''
-      newFormOptions.initialGrowthTime = selected.initialGrowthTime !== null ? selected.initialGrowthTime : 0
-      newFormOptions.reproductionTime = selected.reproductionTime !== null ? selected.reproductionTime : 0
-      newFormOptions.processingTime = selected.processingTime !== null ? selected.processingTime : 0
-      newFormOptions.sellPrice = selected.sellPrice !== null ? selected.sellPrice : 0
+    if(selectedItem !== null) {
+      let newFormOptions = { ...selectedItem }
+      newFormOptions.AnimalId = selectedItem.AnimalId !== null ? [selectedItem.AnimalId] : []
+      newFormOptions.EquipmentId = selectedItem.EquipmentId !== null ? selectedItem.EquipmentId : 0
+      newFormOptions.LocationId = selectedItem.LocationId !== null ? selectedItem.LocationId : 0
+      newFormOptions.TypeId = selectedItem.TypeId !== null ? selectedItem.TypeId : 0
+      newFormOptions.behavior = selectedItem.behavior !== null ? selectedItem.behavior : ''
+      newFormOptions.difficulty = selectedItem.difficulty !== null ? selectedItem.difficulty : 0
+      newFormOptions.size = selectedItem.size !== null ? selectedItem.size : ''
+      newFormOptions.initialGrowthTime = selectedItem.initialGrowthTime !== null ? selectedItem.initialGrowthTime : 0
+      newFormOptions.reproductionTime = selectedItem.reproductionTime !== null ? selectedItem.reproductionTime : 0
+      newFormOptions.processingTime = selectedItem.processingTime !== null ? selectedItem.processingTime : 0
+      newFormOptions.sellPrice = selectedItem.sellPrice !== null ? selectedItem.sellPrice : 0
 
       setAddItemFormOptions({...newFormOptions, ...defaultItemAvailability});
 
@@ -129,7 +129,7 @@ export default function UpsertItemForm(props) {
 
     }
   // eslint-disable-next-line
-  }, [selected])
+  }, [selectedItem])
 
   const handleTextChange = e => {
     setAddItemFormOptions({
@@ -188,15 +188,15 @@ export default function UpsertItemForm(props) {
       ...defaultItemAvailability
     });
 
-    setSelected(null)
+    setSelectedItem(null)
   }
 
   const handleItemClick = item => {
-    if(selected === null || selected.id !== item.id) {
-      setSelected(item);
+    if(selectedItem === null || selectedItem.id !== item.id) {
+      setSelectedItem(item);
 
     } else {
-      setSelected("");
+      setSelectedItem("");
 
     }
   }
@@ -272,13 +272,13 @@ export default function UpsertItemForm(props) {
         {props.includeItemList &&
         <Grid item lg={4}>
           <Typography variant="h3" style={{marginLeft: '1rem', textAlign: 'center'}}>Items</Typography>
-          <ItemList onItemClick={handleItemClick} selected={selected} list={itemList} />
+          <ItemList onItemClick={handleItemClick} selected={selectedItem} list={itemList} />
         </Grid>
         }
         <Grid item lg={props.includeItemList ? 8 : 12}>
           <Container className={classes.form}>
             <Typography variant="h2" gutterBottom style={{textAlign: 'center'}}>
-              {selected === null ? 'New' : 'Update'} Item
+              {selectedItem === null ? 'New' : 'Update'} Item
             </Typography>
             {/* NAME */}
             <FormControl className={classes.formControl}>

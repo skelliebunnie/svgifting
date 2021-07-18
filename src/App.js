@@ -10,11 +10,12 @@ import DatabaseContextProvider from './contexts/DatabaseContext';
 
 import Navbar from './components/Navbar'
 
-import Villagers from './pages/Villagers'
+import Npcs from './pages/Npcs'
 import Gifts from './pages/Gifts'
 import Events from './pages/Events'
-import GiftForm from './pages/GiftForm'
-import UpsertItem from './pages/UpsertItem'
+import AdminNpcs from './pages/AdminNpcs'
+import AdminGifts from './pages/AdminGifts'
+import AdminItems from './pages/AdminItems'
 
 const palette = require('./utils/palette')
 
@@ -66,11 +67,14 @@ function App() {
         <DatabaseContextProvider>
           <Box className={classes.root} style={location.pathname !== '/gifts' ? {paddingTop: '2rem'} : {}}>
             <Switch location={location} key={location.pathname}>
-              <Route exact path="/" component={Villagers} />
+              <Route exact path="/" component={Npcs} />
               <Route exact path="/gifts" component={Gifts} />
+              {/* admin options included on Events page, component looks at URL params */}
               <Route path="/events" component={Events} />
-              <Route exact path="/admin/gifts/assign" component={GiftForm} />
-              <Route exact path="/admin/gifts" component={UpsertItem} />
+              {/* ADMIN ROUTES */}
+              <Route exact path="/npcs/admin" components={AdminNpcs} />
+              <Route exact path="/items/admin" component={AdminItems} />
+              <Route exact path="/gifts/admin" component={AdminGifts} />
             </Switch>
           </Box>
         </DatabaseContextProvider>

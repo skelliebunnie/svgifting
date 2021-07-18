@@ -6,7 +6,7 @@ import { Container, Box, Grid, Button, TextField, FormControl, FormControlLabel,
 import DateFnsUtils from '@date-io/date-fns'
 import { MuiPickersUtilsProvider, KeyboardTimePicker } from '@material-ui/pickers'
 
-import VillagerIcon from '../VillagerIcon'
+import NpcIcon from '../NpcIcon'
 
 import API from '../../utils/API'
 
@@ -14,14 +14,14 @@ const useStyles = makeStyles((theme) => ({
   form: {
     paddingTop: '1rem'
   },
-  villagerList: {
+  npcList: {
     display: 'flex',
     flexFlow: 'row wrap'
   },
-  villagerSelect: {
+  npcSelect: {
     width: '90%',
     margin: '0 auto',
-    '& #villager-birthday-select': {
+    '& #npc-birthday-select': {
       paddingLeft: '0.25rem',
     },
     '& img': {
@@ -81,12 +81,12 @@ export default function AddEventForm() {
 
   const eventTypes = ['Festival', 'Birthday', 'Checkup', 'Other']
 
-  const [villagers, setVillagers] = useState([])
+  const [npcs, setNpcs] = useState([])
 
   useEffect(() => {
-    API.getVillagers()
-      .then(villagers => {
-        setVillagers(villagers.data)
+    API.getNpcs()
+      .then(npcs => {
+        setNpcs(npcs.data)
       })
       .catch(err => {
         console.error(err)
@@ -143,17 +143,17 @@ export default function AddEventForm() {
         <Grid item xs={12} lg={6}>
           {(newEvent.type !== 'festival') &&
             <FormControl className={classes.formControl}>
-              <InputLabel id="villager-select-label">Associated Villager</InputLabel>
+              <InputLabel id="npc-select-label">Associated Npc</InputLabel>
               <Select
-                labelId="villager-select-label"
-                id="villager-select"
-                value={newEvent.VillagerId}
+                labelId="npc-select-label"
+                id="npc-select"
+                value={newEvent.NpcId}
                 onChange={(e) => handleInputChange(e)}
-                name="VillagerId"
-                className={classes.villagerSelect}
+                name="NpcId"
+                className={classes.npcSelect}
                 style={{fontSize: '1.4rem', marginLeft: 0}}
               >
-                {villagers.map(villager => <MenuItem key={villager.id} value={villager.id}><VillagerIcon name={villager.name} style={{marginRight: '0.5rem'}} /> {villager.name}</MenuItem>)}
+                {npcs.map(npc => <MenuItem key={npc.id} value={npc.id}><NpcIcon name={npc.name} style={{marginRight: '0.5rem'}} /> {npc.name}</MenuItem>)}
               </Select>
             </FormControl>
           }

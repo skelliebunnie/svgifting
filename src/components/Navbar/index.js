@@ -77,14 +77,14 @@ export default function Navbar({ active }) {
             open={Boolean(anchorEl)}
             onClose={closeMenu}
           >
-          <MenuItem className={active === '/' ? `${classes.button} ${classes.active}` : classes.button} ><Link to='/'>Villagers / NPCs</Link></MenuItem>
+          <MenuItem className={active === '/' ? `${classes.button} ${classes.active}` : classes.button} ><Link to='/'>NPCs</Link></MenuItem>
           <MenuItem className={active === '/gifts' ? `${classes.button} ${classes.active}` : classes.button} ><Link to='/gifts'>Gifts</Link></MenuItem>
           <MenuItem className={active === '/events' ? `${classes.button} ${classes.active}` : classes.button} ><Link to='/events'>Events</Link></MenuItem>
           </Menu>
           </>
           :
           <>
-          <Button className={active === '/' ? `${classes.button} ${classes.active}` : classes.button} ><Link to='/'>Villagers / NPCs</Link></Button>
+          <Button className={active === '/' ? `${classes.button} ${classes.active}` : classes.button} ><Link to='/'>NPCs</Link></Button>
           <Button className={active === '/gifts' ? `${classes.button} ${classes.active}` : classes.button} ><Link to='/gifts'>Gifts</Link></Button>
           <Button className={active === '/events' ? `${classes.button} ${classes.active}` : classes.button} ><Link to='/events'>Events</Link></Button>
           </>

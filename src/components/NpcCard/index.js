@@ -4,7 +4,7 @@ import { makeStyles } from '@material-ui/core/styles'
 import { Box, Card, CardContent, CardMedia, Typography } from '@material-ui/core'
 
 
-import VillagerIcon from '../VillagerIcon'
+import NpcIcon from '../NpcIcon'
 import ItemIcon from '../ItemIcon'
 
 const useStyles = makeStyles((theme) => ({
@@ -89,14 +89,14 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function VillagerCard(props) {
+export default function NpcCard(props) {
   const classes = useStyles();
   const { universalLoves, getURL } = useContext(DatabaseContext);
 
-  const portrait_url = require(`../../assets/villager_portraits/${props.name}.png`);
+  const portrait_url = require(`../../assets/npc_portraits/${props.name}.png`);
   const love_emote = require(`../../assets/emotes/42px-Emote_Heart.png`);
 
-  const villager_url = props.includeLink ? getURL(props.name) : '';
+  const npc_url = props.includeLink ? getURL(props.name) : '';
 
   const [gifts, setGifts] = useState([])
 
@@ -121,7 +121,7 @@ export default function VillagerCard(props) {
     >
       <div className={classes.details}>
         <CardContent className={classes.content}>
-          <VillagerIcon name={props.name} />
+          <NpcIcon name={props.name} />
           <Typography component="h5" variant="h5" className={classes.name}>
             {props.name}
           </Typography>
@@ -165,7 +165,7 @@ export default function VillagerCard(props) {
                     )
                 )}
               </section>
-              {props.includeLink ? <a href={villager_url} target="_blank" rel="noreferrer">View Wiki</a> : ''}
+              {props.includeLink ? <a href={npc_url} target="_blank" rel="noreferrer">View Wiki</a> : ''}
             </Box>
           )}
         </CardContent>

@@ -4,8 +4,14 @@ const URL_PREFIX = "http://192.168.0.11:3030"
 
 const API = {
   // get
-  getVillagers: () => {
-    return axios.get(`${URL_PREFIX}/api/villagers`)
+  getNpcs: () => {
+    return axios.get(`${URL_PREFIX}/api/npcs`)
+  },
+  getNpcById: (id) => {
+    return axios.get(`${URL_PREFIX}/api/npcs/${id}`)
+  },
+  getNpcByName: (name) => {
+    return axios.get(`${URL_PREFIX}/api/npcs/${name}`)
   },
   getItems: () => {
     return axios.get(`${URL_PREFIX}/api/items`)
@@ -38,6 +44,9 @@ const API = {
     return axios.get(`${URL_PREFIX}/api/events/${season}`)
   },
   // post / put / upsert
+  upsertNpc: (data) => {
+    return axios.post(`${URL_PREFIX}/api/npc/upsert`, data);
+  },
   upsertItem: (data) => {
     return axios.post(`${URL_PREFIX}/api/item/upsert`, data);
   },

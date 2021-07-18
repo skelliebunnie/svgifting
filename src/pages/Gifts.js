@@ -205,28 +205,28 @@ export default function Gifts() {
   }
 
   const filterGiftItems = (list) => {
-    const allVillagers = dbNpcs;
+    const allNpcs = dbNpcs;
 
     // const list = tabValue === 0 ? lovedGifts : tabValue === 1 ? likedGifts : tabValue === 2 ? neutralGifts : tabValue === 3 ? dislikedGifts : hatedGifts;
 
     let gifts = sortItemData(list, 'Number of NPCs');
-    let foundVillagers = [];
+    let foundNpcs = [];
     let minGifts = [];
 
     for (var i = 0; i < gifts.length; i++) {
-      if (foundVillagers.length < allVillagers.length) {
+      if (foundNpcs.length < allNpcs.length) {
         let gift = gifts[i];
 
-        let villagers = gift.Villagers.map(villager => villager.name);
-        villagers = villagers.filter(name => !foundVillagers.includes(name));
+        let npcs = gift.Npcs.map(npc => npc.name);
+        npcs = npcs.filter(name => !foundNpcs.includes(name));
 
-        // if there are villagers not yet "found", add them to the found list
-        // filter out any previously found villagers from the gift's list
+        // if there are npcs not yet "found", add them to the found list
+        // filter out any previously found npcs from the gift's list
         // and push the gift into the minimum list
-        if (villagers.length > 0) {
-          foundVillagers = [...foundVillagers, ...villagers];
-          // console.log(gift.name, villagers)
-          gift.Villagers = gift.Villagers.filter(villager => villagers.includes(villager.name));
+        if (npcs.length > 0) {
+          foundNpcs = [...foundNpcs, ...npcs];
+          // console.log(gift.name, npcs)
+          gift.Npcs = gift.Npcs.filter(npc => npcs.includes(npc.name));
 
           gifts[i] = gift;
 
@@ -284,7 +284,7 @@ export default function Gifts() {
         <Tabs
           value={tabValue}
           onChange={handleTabChange}
-          aria-label="villagers grouped by gifts, grouped by preference"
+          aria-label="npcs grouped by gifts, grouped by preference"
           indicatorColor="secondary"
         >
           <Tab
