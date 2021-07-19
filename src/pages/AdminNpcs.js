@@ -2,7 +2,7 @@ import { useContext } from 'react'
 import { DatabaseContext } from "../contexts/DatabaseContext";
 import { Box } from '@material-ui/core'
 
-import AdminGiftsForm from '../components/AdminGiftsForm'
+import AdminNpcsForm from '../components/AdminNpcsForm'
 import AlertSnack from '../components/AlertSnack'
 
 export default function AdminNpcs() {
@@ -10,7 +10,7 @@ export default function AdminNpcs() {
 
   return (
     <Box>
-      <AdminGiftsForm />
+      <AdminNpcsForm />
       <AlertSnack open={alert.open} severity={alert.severity} message={alert.message} handleClose={handleAlertClose} />
     </Box>
   );

@@ -28,6 +28,9 @@ const API = {
   getLocations: () => {
     return axios.get(`${URL_PREFIX}/api/locations`)
   },
+  getResidences: () => {
+    return axios.get(`${URL_PREFIX}/api/residences`)
+  },
   getAllGifts: () => {
     return axios.get(`${URL_PREFIX}/api/gifts`)
   },

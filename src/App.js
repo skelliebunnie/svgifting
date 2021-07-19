@@ -68,11 +68,11 @@ function App() {
           <Box className={classes.root} style={location.pathname !== '/gifts' ? {paddingTop: '2rem'} : {}}>
             <Switch location={location} key={location.pathname}>
               <Route exact path="/" component={Npcs} />
+              <Route exact path="/npcs" component={Npcs} />
               <Route exact path="/gifts" component={Gifts} />
-              {/* admin options included on Events page, component looks at URL params */}
               <Route path="/events" component={Events} />
               {/* ADMIN ROUTES */}
-              <Route exact path="/npcs/admin" components={AdminNpcs} />
+              <Route exact path="/npcs/admin" component={AdminNpcs} />
               <Route exact path="/items/admin" component={AdminItems} />
               <Route exact path="/gifts/admin" component={AdminGifts} />
             </Switch>

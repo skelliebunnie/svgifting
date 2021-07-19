@@ -196,7 +196,7 @@ export default function AdminItemsForm(props) {
       setSelectedItem(item);
 
     } else {
-      setSelectedItem("");
+      setSelectedItem(null);
 
     }
   }
@@ -268,7 +268,7 @@ export default function AdminItemsForm(props) {
   }
 
   return (
-    <Grid container spacing={0} style={{marginTop: '1rem'}} md>
+    <Grid container spacing={0} style={{marginTop: '1rem'}}>
         {props.includeItemList &&
         <Grid item lg={4}>
           <Typography variant="h3" style={{marginLeft: '1rem', textAlign: 'center'}}>Items</Typography>
@@ -505,6 +505,23 @@ export default function AdminItemsForm(props) {
                 style={{display: 'inline-block', marginTop: '0.75rem'}}
               />
             </Box>
+
+          	{/* Available in standard game, or a mod? */}
+          	<FormControl className={classes.formControl}>
+	            <InputLabel id="availableIn-label">Available in standard game, or a mod?</InputLabel>
+	            <Select
+	              labelId="availableIn-label"
+	              id="availableIn"
+	              name="availableIn"
+	              value={addItemFormOptions.availableIn}
+	              onChange={handleTextChange}
+	              style={{fontSize: '1.4rem'}}
+	            >
+	              {['Vanilla', 'SVE', 'Ridgeside Village', 'Downtown Zuzu', 'Garden Village', 'Walk to the Desert', 'Mermaid Island', 'Deep Woods', 'Other'].map(mod => <MenuItem key={`checkupSeason-${mod}`} value={mod}>{mod}</MenuItem>)}
+	            </Select>
+	          </FormControl>
+
+          	{/* Save & Clear Buttons */}
             <Grid container spacing={2}>
               <Grid item lg={6}>
                 <Button variant="contained" className={`${classes.btn} ${classes.saveBtn}`} onClick={() => addItemFormSubmit(addItemFormOptions)}>

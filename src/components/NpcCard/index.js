@@ -134,7 +134,7 @@ export default function NpcCard(props) {
           </Typography>
           <Typography className={classes.birthday}>
             <strong>Birthday:</strong>{" "}
-            {`${props.data.Seasons[0].name} ${props.data.Seasons[0].Event.day}`}
+            {props.data.Seasons[0] !== undefined ? `${props.data.Seasons[0].name} ${props.data.Seasons[0].Event.day}` : ''}
           </Typography>
           {gifts.length > 0 && (
             <Box>

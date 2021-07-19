@@ -86,6 +86,7 @@ const DatabaseContextProvider = (props) => {
     EquipmentId: '',
     AnimalId: [],
     TypeId: '',
+    availableIn: 'standard',
     ...defaultItemAvailability
   }
 
@@ -113,6 +114,26 @@ const DatabaseContextProvider = (props) => {
     endTime: '2021-01-01T14:00:00'
   }
   const [newEvent, setNewEvent] = useState(defaultNewEvent)
+
+  /**
+   * ADDING NPCs
+   */
+  const [selectedNpc, setSelectedNpc] = useState(null);
+
+  const defaultAddNpcFormOptions = {
+    name: '',
+    birthdayDate: 1,
+    birthdaySeasonId: 1,
+    checkupDate: 0,
+    checkupSeasonId: 1,
+    marriageable: false,
+    LocationId: '',
+    availableIn: 'standard'
+  }
+
+  const [addNpcFormOptions, setAddNpcFormOptions] = useState({
+    ...defaultAddNpcFormOptions
+  });
 
   useEffect(() => {
     if(!addEventModalOpen) {
@@ -266,6 +287,55 @@ const DatabaseContextProvider = (props) => {
       });
   }
 
+  const addNpcFormSubmit = (npcFormData) => {
+  	// add handling for friends / family
+
+  	API.upsertNpc(npcFormData)
+  		.then(results => {
+  			API.upsertEvent({
+  				name: `${npcFormData.name}'s Birthday`,
+			    day: npcFormData.birthdayDate,
+			    NpcId: results.data.id,
+			    SeasonId: npcFormData.birthdaySeasonId,
+			    type: 'birthday',
+			    startTime: formatTime(new Date('2021-01-01T02:00:00')),
+			    endTime: formatTime(new Date('2021-01-01T23:59:59'))
+  			}).then(birthdayEventResults => {
+  				
+  				if(npcFormData.checkupDate !== 0) {
+  					API.upsertEvent({
+  						name: `${npcFormData.name} Checkup`,
+  						day: npcFormData.checkupDate,
+  						NpcId: results.data.id,
+  						SeasonId: npcFormData.checkupSeasonId,
+  						type: 'checkup',
+  						startTime: formatTime(new Date('2021-01-01T10:00:00')),
+  						endTime: formatTime(new Date('2021-01-01T:16:00:00'))
+  					}).then(checkupEventResults => {
+  						setAlert({ open: true, message: addNpcFormOptions.id !== undefined ? `${addNpcFormOptions.name} updated successfully` : `${addNpcFormOptions.name} saved successfully`, severity: 'success' });
+
+			        setAddNpcFormOptions({...defaultAddNpcFormOptions});
+			        setSelectedNpc(null);
+			        setNpcs([...dbNpcs, {...results.data, icon: getIcon(results.data.name, 'npc_icons', 'png', true)}])
+  					}).catch(err => console.error(err));
+
+  				} else {
+  					setAlert({ open: true, message: addNpcFormOptions.id !== undefined ? `${addNpcFormOptions.name} updated successfully` : `${addNpcFormOptions.name} saved successfully`, severity: 'success' });
+
+		        setAddNpcFormOptions({...defaultAddNpcFormOptions});
+		        setSelectedNpc(null);
+		        setNpcs([...dbNpcs, {...results.data, icon: getIcon(results.data.name, 'npc_icons', 'png', true)}])
+  				}
+
+  			}).catch(err => console.error(err));
+
+  			
+  		}).catch(err => {
+        setAlert({ open: true, message: addNpcFormOptions.id !== undefined ? `Error: ${addNpcFormOptions.name} was not updated. Message: ${err.message}` : `Error: ${addNpcFormOptions.name} was not saved. Message: ${err.message}`, severity: 'error' })
+        console.error(err.message);
+      });
+  }
+
   const handleAlertClose = (event, reason) => {
     if(reason === 'clickaway') return;
     
@@ -288,11 +358,23 @@ const DatabaseContextProvider = (props) => {
 
   const getIcon = (str, dir=null, ext='png', returnAsString) => {
     let icon_file = null;
-    let filename =  dir === 'item_icons' || dir === null || dir === true ? '24px-' : '';
+    let filename = '';
     filename += toTitleCase(str)
     
     filename = filename.replace("'", "").replace(",", "");
-    filename = filename.includes(" ") ? filename.split(" ").join("_") : filename
+
+    if(filename.includes(" ") && dir === 'npc_icons') {
+    	let fn = filename.split(" ");
+    	filename = fn[0];
+    	
+    } else {
+    	filename = filename.includes(" ") ? filename.split(" ").join("_") : filename
+
+    }
+
+    if(dir === 'npc_icons') filename += '_Icon';
+
+    
     filename += ext === null ? '.png' : `.${ext}`
 
     if(dir === null || dir === true) { dir = 'item_icons' }
@@ -318,7 +400,9 @@ const DatabaseContextProvider = (props) => {
    */
    const addEvent = () => {
     const eventData = newEvent;
+
     if(eventData.NpcId === '') eventData.NpcId = null
+
     eventData.SeasonId = eventData.SeasonId !== selectedSeason.id ? eventData.SeasonId = selectedSeason.id : eventData.SeasonId
     eventData.startTime = typeof eventData.startTime === 'string' ? eventData.startTime.substring(11) : formatTime(eventData.startTime)
     eventData.endTime = typeof eventData.endTime === 'string' ? eventData.endTime.substring(11) : formatTime(eventData.endTime)
@@ -459,7 +543,7 @@ const DatabaseContextProvider = (props) => {
   };
 
   return (
-    <DatabaseContext.Provider value={{ dbNpcs, dbItems, setItems, getItems, allItems, setAllItems, dbItemTypes, addItemModalOpen, setAddItemModalOpen, addItemFormSubmit, alert, setAlert, handleAlertClose, addItemFormOptions, setAddItemFormOptions, defaultAddItemFormOptions, defaultItemAvailability, selectedItem, setSelectedItem, itemSearchTerm, setItemSearchTerm, universalLoves, getIcon, dates, seasons, events, selectedDate, setSelectedDate, selectedSeason, setSelectedSeason, handleSeasonChange, defaultNewEvent, newEvent, setNewEvent, addEvent, deleteEvent, addEventModalOpen, setAddEventModalOpen, sortNpcData, sortItemData, getURL}}>
+    <DatabaseContext.Provider value={{ dbNpcs, dbItems, setItems, getItems, allItems, setAllItems, dbItemTypes, addItemModalOpen, setAddItemModalOpen, addItemFormSubmit, alert, setAlert, handleAlertClose, addItemFormOptions, setAddItemFormOptions, defaultAddItemFormOptions, defaultItemAvailability, selectedItem, setSelectedItem, itemSearchTerm, setItemSearchTerm, universalLoves, getIcon, dates, seasons, events, selectedDate, setSelectedDate, selectedSeason, setSelectedSeason, handleSeasonChange, defaultNewEvent, newEvent, setNewEvent, addEvent, deleteEvent, addEventModalOpen, setAddEventModalOpen, sortNpcData, sortItemData, getURL, selectedNpc, setSelectedNpc, addNpcFormOptions, setAddNpcFormOptions, addNpcFormSubmit }}>
       {props.children}
     </DatabaseContext.Provider>
   )
