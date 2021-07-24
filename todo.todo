@@ -1,0 +1,11 @@
+TO DO
+ ☐ DB: add "availableIn" to gifts table and set field to "Vanilla" for all current rows
+ ☐ add context menu (right click) to NPCs on GIFTS page
+   > menu should simply show other <preference'd> gifts, in a list (with icons? hopefully)
+ ☐ add left click to NPC *icons* on GIFTS page and *cards* on NPCs page that opens a modal with details about the NPC
+ ☐ add left click on icon(s) on calendar that opens a modal with more information about the event such as times
+ ☐ add context menu (right click) to events on calendar
+   ☐ OPTION 1: view event details - opens same modal as left click
+   ☐ OPTION 2: view <NPC1> schedule - opens modal with a daily schedule for the NPC*
+     * the schedule should show for the date of the event (e.g. right-clicking the event "Evelyn's checkup" on Spring 2, a Tuesday, and selecting "View Evelyn's Schedule" should open the modal with her schedule for Spring 2); there should be "prev" and "next" buttons to cycle through the schedule, as well as season / date selects
+ ☐ add "Raining" as a checkbox on the events page, since rain affects NPC schedules

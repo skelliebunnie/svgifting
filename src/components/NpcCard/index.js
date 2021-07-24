@@ -93,7 +93,9 @@ export default function NpcCard(props) {
   const classes = useStyles();
   const { universalLoves, getURL } = useContext(DatabaseContext);
 
-  const portrait_url = require(`../../assets/npc_portraits/${props.name}.png`);
+  let npc_name = props.name;
+  if(npc_name.includes(" ")) npc_name = npc_name.split(" ")[0];
+  const portrait_url = require(`../../assets/npc_portraits/${npc_name}.png`);
   const love_emote = require(`../../assets/emotes/42px-Emote_Heart.png`);
 
   const npc_url = props.includeLink ? getURL(props.name) : '';
