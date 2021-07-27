@@ -9,7 +9,7 @@ import NpcIcon from '../NpcIcon'
 import ItemIcon from '../ItemIcon'
 
 import AddEventForm from '../AddEventForm'
-import ContextMenu from '../ContextMenu'
+import EventsAdminContextMenu from '../EventsAdminContextMenu'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -240,6 +240,7 @@ export default function Calendar({ modalState, openModal, closeModal }) {
   const otherEventTypeIcon = getIcon('Stardew Checkup Icon', 'other_icons').default;
 
   const token = JSON.parse(localStorage.getItem('token')) || false;
+  
   const [allSeasons, setAllSeasons] = useState([])
   const [allEvents, setAllEvents] = useState([])
 
@@ -254,7 +255,6 @@ export default function Calendar({ modalState, openModal, closeModal }) {
   }, [seasons, events])
 
   const openNewEventUpdate = (event) => {
-    console.log("Editing Event:", event)
     let updateEvent = event;
     updateEvent.startTime = `2021-01-01T${event.startTime}`
     updateEvent.endTime = `2021-01-01T${event.endTime}`
@@ -265,21 +265,23 @@ export default function Calendar({ modalState, openModal, closeModal }) {
   const handleContextMenu = (e, eventData) => {
     e.preventDefault();
 
-    if(eventData !== null && eventData !== undefined) {
-      setShowContextMenu(true);
-      setContextMenuPos({
-        x: e.pageX + 8,
-        y: e.pageY + 15
-      });
+    if(token) {
+    	if(eventData !== null && eventData !== undefined) {
+	      setShowContextMenu(true);
+	      setContextMenuPos({
+	        x: e.pageX + 8,
+	        y: e.pageY + 15
+	      });
 
-      setSelectedEvent(eventData);
-    } else {
-      setShowContextMenu(false);
-      setContextMenuPos({
-        x: null,
-        y: null
-      })
-      setSelectedEvent(null)
+	      setSelectedEvent(eventData);
+	    } else {
+	      setShowContextMenu(false);
+	      setContextMenuPos({
+	        x: null,
+	        y: null
+	      })
+	      setSelectedEvent(null)
+	    }
     }
   }
 
@@ -401,9 +403,7 @@ export default function Calendar({ modalState, openModal, closeModal }) {
                             className={classes.eventBlock}
                           >
                             <span
-                              onContextMenu={
-                                token ? (e) => handleContextMenu(e, event) : ""
-                              }
+                              onContextMenu={(e) => handleContextMenu(e, event)}
                             >
                               {event.type === "birthday" &&
                               event.NpcId !== null ? (
@@ -488,7 +488,7 @@ export default function Calendar({ modalState, openModal, closeModal }) {
           <AddEventForm />
         </Container>
       </Modal>
-      <ContextMenu
+      <EventsAdminContextMenu
         showMenu={showContextMenu}
         menuPos={contextMenuPos}
         handleClose={handleContextMenuClose}

@@ -386,19 +386,19 @@ export default function Gifts() {
         onChangeIndex={handleIndexChange}
       >
         <TabPanel value={tabValue} index={0} className={classes.tabPanel}>
-          <GiftList list={lovedGifts} display={displayStyle} />
+          <GiftList list={lovedGifts} display={displayStyle} preference="love" />
         </TabPanel>
         <TabPanel value={tabValue} index={1} className={classes.tabPanel}>
-          <GiftList list={likedGifts} display={displayStyle} />
+          <GiftList list={likedGifts} display={displayStyle} preference="like" />
         </TabPanel>
         <TabPanel value={tabValue} index={2} className={classes.tabPanel}>
-          <GiftList list={neutralGifts} display={displayStyle} />
+          <GiftList list={neutralGifts} display={displayStyle} preference="neutral" />
         </TabPanel>
         <TabPanel value={tabValue} index={3} className={classes.tabPanel}>
-          <GiftList list={dislikedGifts} display={displayStyle} />
+          <GiftList list={dislikedGifts} display={displayStyle} preference="dislike" />
         </TabPanel>
         <TabPanel value={tabValue} index={4} className={classes.tabPanel}>
-          <GiftList list={hatedGifts} display={displayStyle} />
+          <GiftList list={hatedGifts} display={displayStyle} preference="hate" />
         </TabPanel>
       </SwipeableViews>
     </Box>

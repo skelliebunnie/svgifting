@@ -3,13 +3,17 @@ import { DatabaseContext } from "../../contexts/DatabaseContext";
 import { makeStyles } from '@material-ui/core/styles'
 import { Container } from '@material-ui/core'
 import { NavigateNext, NavigateBefore } from '@material-ui/icons'
+
 import GiftListItem from "../GiftListItem";
+import NpcGiftContextMenu from "../NpcGiftContextMenu";
+import API from '../../utils/API';
+
 import NpcIcon from '../NpcIcon'
 import ItemIcon from '../ItemIcon'
-import API from '../../utils/API'
 
 const useStyles = makeStyles((theme) => ({
   giftsGrid: {
+  	position: 'relative',
     display: "grid",
     gridTemplateColumns: "repeat(1, 1fr)",
     maxWidth: "90%",
@@ -106,11 +110,53 @@ export default function GiftList(props) {
   const [npcs, setNpcs] = useState([])
   const [tablePos, setTablePos] = useState(0)
 
+  const [selectedNpc, setSelectedNpc] = useState(null);
+  const [showContextMenu, setShowContextMenu] = useState(false);
+  const [contextMenuPos, setContextMenuPos] = useState({x: null, y: null, height: 0})
+
   useEffect(() => {
     API.getNpcs()
       .then(res => setNpcs(res.data))
       .catch(err => console.error(err))
   }, []);
+
+  const handleRightClick = (e, npc) => {
+  	e.preventDefault();
+
+  	const targetParent = e.target.offsetParent.offsetParent;
+  	const initHeight = (window.innerHeight - e.clientY) - 20;
+  	let maxHeight = initHeight;
+  	let yPos = targetParent.offsetTop + 50;
+
+  	if(initHeight <= 110) maxHeight = window.innerHeight - e.clientY + 100;
+
+  	if(initHeight <= 110 && initHeight > 60) {
+  		yPos = targetParent.offsetTop - 220
+
+  	} else if(initHeight <= 60 && initHeight > 10) {
+  		yPos = targetParent.offsetTop - 160
+
+  	} else if(initHeight <= 10) {
+  		yPos = targetParent.offsetTop - 120
+  	}
+
+  	setSelectedNpc(npc);
+		setContextMenuPos({
+			x: targetParent.offsetLeft - 65,
+			y: yPos,
+			height: maxHeight
+		})
+		setShowContextMenu(true);
+  }
+
+  const closeContextMenu = (e) => {
+    setContextMenuPos({
+      x: null,
+      y: null,
+      height: 0
+    });
+    setShowContextMenu(false);
+  }
 
   const scrollTable = (direction) => {
     const tableWidth = tableRef.current.clientWidth;
@@ -132,22 +178,38 @@ export default function GiftList(props) {
 
     setTablePos(newPos);
   }
- 
+ 	
+ 	// DISPLAY STYLE: CARDS
   if(props.display === 'cards') {
     return (
-      <Container className={classes.giftsGrid}>
+      <Container 
+      	className={classes.giftsGrid}
+      >
         {gifts.map((gift) => (
           <GiftListItem
             key={gift.name}
             gift={gift.name}
             icon={gift.icon}
             npcs={gift.Npcs}
+            contextMenu={handleRightClick}
+            showContextMenu={showContextMenu}
+            npc={selectedNpc}
           />
         ))}
+        <NpcGiftContextMenu
+	      	showMenu={showContextMenu}
+	      	menuPos={contextMenuPos}
+	      	handleClose={closeContextMenu}
+	      	preference={props.preference}
+	      	npc={selectedNpc}
+	      />
       </Container>
     );
-  } else {
+  } 
+  // DISPLAY STYLE: TABLE
+  else {
     return (
+    	<>
       <Container className={classes.giftsTable} maxWidth="xl">
         {window.innerWidth < 768 ? (
           <div className={classes.scrollNav}>
@@ -174,9 +236,7 @@ export default function GiftList(props) {
                 </thead>
                 <tbody>
                   {gifts.map((gift) => {
-                    const giftNpcs = gift.Npcs.map(
-                      (npc) => npc.name
-                    );
+                    const giftNpcs = gift.Npcs.map(npc => npc.name);
 
                     return (
                       <tr key={gift.name}>
@@ -278,7 +338,9 @@ export default function GiftList(props) {
             </table>
           </div>
         )}
+
       </Container>
+	    </>	
     );
   }
 }

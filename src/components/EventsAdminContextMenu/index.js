@@ -17,7 +17,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function ContextMenu(props) {
+export default function EventsAdminContextMenu(props) {
   const classes = useStyles();
 
   if(props.showMenu)

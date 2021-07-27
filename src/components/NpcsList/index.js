@@ -125,6 +125,8 @@ export default function NpcsList(props) {
   // eslint-disable-next-line
   }, [props.includeULoves, universalLoves])
 
+  useEffect(() => { setSortBy(props.sortBy) }, [props.sortBy])
+
   useEffect(() => {
     const npcData = sortNpcData(npcs, props.sortBy);
     setNpcs(npcData);
@@ -133,7 +135,7 @@ export default function NpcsList(props) {
 
     setSortBy(props.sortBy);
     //eslint-disable-next-line
-  }, [props.sortBy])
+  }, [sortBy])
 
   const createTableRows = (data) => {
     let rows = [];

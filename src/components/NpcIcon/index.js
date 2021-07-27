@@ -34,7 +34,7 @@ export default function NpcIcon(props) {
   // const icon_url = require(`../../assets/npc_icons/${props.name}_Icon.png`);
   const icon_url = getIcon(props.name, 'npc_icons', 'png', false);
 
-  const image = <img src={props.swap && props.overlay !== undefined ? props.overlay : icon_url.default} alt={`${props.name} Icon`} width={props.size !== undefined ? props.size : 32} height={props.size !== undefined ? props.size : 32} style={props.style !== undefined ? {...props.style} : {margin: 0}} />;
+  const image = <img src={props.swap && props.overlay !== undefined ? props.overlay : icon_url.default} alt={`${props.name} Icon`} width={props.size !== undefined ? props.size : 32} height={props.size !== undefined ? props.size : 32} style={props.style !== undefined ? {...props.style} : {margin: 0}} {...props} />;
 
   const overlay = props.overlay !== undefined ? <img src={props.swap ? icon_url.default : props.overlay} alt={props.overlayAlt !== undefined ? props.overlayAlt : 'Overlay Icon'} width={props.overlaySize !== undefined ? props.overlaySize : props.size !== undefined ? props.size / 2 : 24} height={props.overlaySize !== undefined ? props.overlaySize : props.size !== undefined ? props.size / 2 : 24} className={`${classes.overlayIcon} ${props.position !== undefined ? props.position : 'bottomLeft'}`} /> : '';
 
@@ -46,18 +46,18 @@ export default function NpcIcon(props) {
         <Tooltip
           title={props.tooltip !== undefined ? props.tooltip : props.name}
           aria-label={props.name}
-          placement="bottom"
+          placement={props.tooltipLocation || "bottom"}
           arrow
         >
           {props.includeLink ? (
-            <a href={url} target="_blank" rel="noreferrer">
+            <a href={url} target="_blank" rel="noreferrer" style={{...props.style}}>
               <p className={classes.iconContainer}>
                 {image}
                 {props.overlay !== undefined && overlay}
               </p>
             </a>
           ) : (
-            <p className={classes.iconContainer}>
+            <p className={classes.iconContainer} style={{...props.style}}>
               {image}
               {props.overlay !== undefined && overlay}
             </p>
@@ -66,14 +66,14 @@ export default function NpcIcon(props) {
       ) : (
         <>
           {props.includeLink ? (
-              <a href={url} target="_blank" rel="noreferrer">
+              <a href={url} target="_blank" rel="noreferrer" style={{...props.style}}>
               <p className={classes.iconContainer}>
                 {image}
                 {props.overlay !== undefined && overlay}
               </p>
             </a>
           ) : (
-            <p className={classes.iconContainer}>
+            <p className={classes.iconContainer} style={{...props.style}}>
               {image}
               {props.overlay !== undefined && overlay}
             </p>

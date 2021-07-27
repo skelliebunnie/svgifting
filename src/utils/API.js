@@ -13,6 +13,12 @@ const API = {
   getNpcByName: (name) => {
     return axios.get(`${URL_PREFIX}/api/npcs/${name}`)
   },
+  getGiftsByNpcId: (npcId) => {
+  	return axios.get(`${URL_PREFIX}/api/npc/${npcId}/gifts`)
+  },
+  getGiftsByNpcIdAndPreference: (npcId, preference) => {
+  	return axios.get(`${URL_PREFIX}/api/npc/${npcId}/gifts/${preference}`)
+  },
   getItems: () => {
     return axios.get(`${URL_PREFIX}/api/items`)
   },

@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from 'react'
 import { DatabaseContext } from "../../contexts/DatabaseContext";
 import { withStyles, makeStyles } from '@material-ui/core/styles'
-import { Box, Container, Grid, TextField, FormControl, FormControlLabel, FormHelperText, Select, MenuItem, InputLabel, Typography, Button, Checkbox } from '@material-ui/core'
+import { Container, Grid, TextField, FormControl, FormControlLabel, FormHelperText, Select, MenuItem, InputLabel, Typography, Button, Checkbox } from '@material-ui/core'
 
 import AdminNpcsList from '../AdminNpcsList'
 
