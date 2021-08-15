@@ -26,5 +26,10 @@ yarn-error.log*
 
 package-lock.json
 yarn.lock
+
 /book_photos
 /.vscode
+*.sublime*
+*.todo
+
+*.sublime*

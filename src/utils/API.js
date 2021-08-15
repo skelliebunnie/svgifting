@@ -22,8 +22,11 @@ const API = {
   getItems: () => {
     return axios.get(`${URL_PREFIX}/api/items`)
   },
-  getItemTypes: () => {
+  getItemCategories: () => {
     return axios.get(`${URL_PREFIX}/api/categories`)
+  },
+  getItemAvailability: (itemId) => {
+  	return axios.get(`${URL_PREFIX}/api/itemavailability/${itemId}`)
   },
   getEquipment: () => {
     return axios.get(`${URL_PREFIX}/api/equipment`)

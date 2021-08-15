@@ -74,36 +74,95 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
+function LocationWeatherSeason(props) {
+	console.log("Location Weather Season AvailData", props.availData)
+	return (
+		<Box style={{display: 'flex', flexFlow: 'row wrap'}}>
+    	<Box style={{flex: '1 0 auto', marginRight: '4rem'}}>
+    		<Typography variant="h5" style={{margin: 0, padding: 0}}>
+          Location
+        </Typography>
+    		<FormControl className={props.classes.formControl} style={{display: 'inline-block', width: '100%', marginTop: 0, paddingTop: 0}}>
+          <InputLabel id="location-label" style={{width: '100%'}}>Location</InputLabel>
+          <Select
+              labelId="location-label"
+              id="LocationId"
+              name={`LocationId-${props.availData.id}`}
+              value={props.availData.LocationId}
+              onChange={props.handleNumberChange}
+              style={{fontSize: '1.4rem', width: '100%'}}
+            >
+              {props.locations.map(location => <MenuItem key={`locationid-${location.id}`} value={location.id}>{location.name}</MenuItem>)}
+            </Select>
+        </FormControl>
+    	</Box>
+      <Box style={{flex: '1 0 15%'}}>
+        <Typography variant="h5" style={{marginBottom: 0, paddingBottom: 0}}>
+          Weather
+        </Typography>
+        <RadioGroup aria-label="weather" name="weather" value={props.availData.weather} onChange={props.handleRadioChange} data-availid={props.availId} style={{display: 'flex', flexFlow: 'row wrap'}}>
+          <FormControlLabel value="any" control={<Radio />} label="any" />
+          <FormControlLabel value="sun" control={<Radio />} label={<p style={{position: 'relative'}}><img src={weatherIcon_sun} alt="Sunny Weather" height={30} /><br/><span style={{position: 'absolute', fontSize: '0.75rem', textAlign: 'center', display: 'block', width: '100%', bottom: '-0.75rem'}}>Sun</span></p>} />
+          <FormControlLabel value="rain" control={<Radio />} label={<p style={{position: 'relative'}}><img src={weatherIcon_rain} alt="Rainy Weather" height={30} /><br/><span style={{position: 'absolute', fontSize: '0.75rem', textAlign: 'center', display: 'block', width: '100%', bottom: '-0.75rem'}}>Rain</span></p>} />
+        </RadioGroup>
+      </Box>
+      <Box style={{flex: '1 0 25%'}}>
+        <Typography variant="h5" style={{marginBottom: 0, paddingBottom: 0}}>
+          Season
+        </Typography>
+        {props.availData.SeasonId.map(season => {
+          	// const seasonImage = require(`../../assets/season_icons/${season.name}.png`).default;
+          	return (
+          		<FormControlLabel
+		            key={`season-${season.id}`}
+		            label={<p style={{position: 'relative', display: 'inline-block'}}><img src={season.image} alt={`Season: ${season.name}`} height={30} /><br/><span style={{position: 'absolute', fontSize: '0.75rem', textAlign: 'center', display: 'block', minWidth: '100%', bottom: '-0.75rem'}}>{season.name}</span></p>}
+		            control={
+		              <CustomCheckbox
+		                name="SeasonId"
+		                value={season.id}
+		                onChange={props.handleCheckboxGroupChange} 
+		                checked={season.isChecked}
+		                data-availid={props.availId}
+		                style={{ display: 'inline-block' }}
+		              />
+		            }
+		          />
+          	)}
+          )
+     		}
+      </Box>
+    </Box>
+	);
+}
+
 export default function AdminItemsForm(props) {
   const classes = useStyles();
 
-  const { dbItems, dbItemTypes, addItemFormSubmit, addItemFormOptions, setAddItemFormOptions, defaultAddItemFormOptions, defaultItemAvailability, selectedItem, setSelectedItem } = useContext(DatabaseContext)
+  const { dbItems, dbItemCategories, dbSeasons, addItemFormSubmit, addItemFormOptions, setAddItemFormOptions, defaultAddItemFormOptions, defaultItemAvailability, selectedItem, setSelectedItem, gameVersions } = useContext(DatabaseContext)
 
   const [itemList, setItemList] = useState([])
-  const [itemTypes, setItemTypes] = useState([])
+  const [itemCategories, setItemCategories] = useState([])
   const [equipment, setEquipment] = useState([])
   const [animals, setAnimals] = useState([])
   const [locations, setLocations] = useState([])
+  const [seasons, setSeasons] = useState([])
 
   useEffect(() => {
     setItemList(dbItems)
-    setItemTypes(dbItemTypes)
-  }, [dbItems, dbItemTypes])
+    setItemCategories(dbItemCategories)
+  }, [dbItems, dbItemCategories])
 
   useEffect(() => {
-    API.getEquipment().then(list => {
-      setEquipment(list.data)
-    }).catch(err => console.error(err));
-
-    API.getAnimals().then(list => {
-      setAnimals(list.data)
-    }).catch(err => console.error(err));
+    API.getEquipment().then(list => setEquipment(list.data)).catch(err => console.error(err));
+    API.getAnimals().then(list => setAnimals(list.data)).catch(err => console.error(err));
+    API.getSeasons().then(list => setSeasons(list.data)).catch(err => console.error(err));
 
     API.getLocations().then(list => {
-      const locations = list.data.filter(location => (location.name.includes('River') && !location.name.includes("Road")) || location.name.includes("Forest") || (location.name.includes("Mountain") && !location.name.includes("Road")) || location.name.includes("Mines") || location.name.includes("Cave") || location.name.includes("Ocean") || location.name.includes("Forest") || (location.name.includes("Desert") && !location.name.includes("Trader")) || location.name.includes("Beach") || location.name.includes("Tide") )
+      const locations = list.data.filter(location => location.hasForage)
       locations.sort((a, b) => a.name > b.name ? 1 : -1)
       setLocations( locations )
     }).catch(err => console.error(err));
+
   // eslint-disable-next-line
   }, []);
 
@@ -111,9 +170,9 @@ export default function AdminItemsForm(props) {
     if(selectedItem !== null) {
       let newFormOptions = { ...selectedItem }
       newFormOptions.AnimalId = selectedItem.AnimalId !== null ? [selectedItem.AnimalId] : []
-      newFormOptions.EquipmentId = selectedItem.EquipmentId !== null ? selectedItem.EquipmentId : 0
-      newFormOptions.LocationId = selectedItem.LocationId !== null ? selectedItem.LocationId : 0
-      newFormOptions.TypeId = selectedItem.TypeId !== null ? selectedItem.TypeId : 0
+      newFormOptions.EquipmentId = selectedItem.EquipmentId !== null ? selectedItem.EquipmentId : ''
+      newFormOptions.LocationId = selectedItem.LocationId !== null ? selectedItem.LocationId : ''
+      newFormOptions.CategoryId = selectedItem.CategoryId !== null ? selectedItem.CategoryId : ''
       newFormOptions.behavior = selectedItem.behavior !== null ? selectedItem.behavior : ''
       newFormOptions.difficulty = selectedItem.difficulty !== null ? selectedItem.difficulty : 0
       newFormOptions.size = selectedItem.size !== null ? selectedItem.size : ''
@@ -122,10 +181,28 @@ export default function AdminItemsForm(props) {
       newFormOptions.processingTime = selectedItem.processingTime !== null ? selectedItem.processingTime : 0
       newFormOptions.sellPrice = selectedItem.sellPrice !== null ? selectedItem.sellPrice : 0
 
-      setAddItemFormOptions({...newFormOptions, ...defaultItemAvailability});
+      API.getItemAvailability(selectedItem.id)
+      	.then(res => {
+      		let availData = res.data;
+
+      		if(availData.length > 0) {
+      			for(var i = 0; i < availData.length; i++) {
+      				const availSeasonId = availData[i].SeasonId;
+      				availData[i].SeasonId = dbSeasons.map(season => ({...season, isChecked: season.id === availSeasonId}));
+      				availData[i].availId = i;
+      			}
+
+      			setAddItemFormOptions({...newFormOptions, availability: availData});
+      		} else {
+      			setAddItemFormOptions({...newFormOptions, availability: [defaultItemAvailability]});
+
+      		}
+      	})
+      	.catch(err => console.error(err));
+
 
     } else {
-      setAddItemFormOptions({...defaultAddItemFormOptions, ...defaultItemAvailability});
+      setAddItemFormOptions({...defaultAddItemFormOptions});
 
     }
   // eslint-disable-next-line
@@ -140,11 +217,15 @@ export default function AdminItemsForm(props) {
   }
 
   const handleNumberChange = e => {
-    // AnimalId must be an array so that multiple animals can be selected (e.g. for Wool, which can come from Rabbits *or* Sheep)
-    setAddItemFormOptions({
-      ...addItemFormOptions,
-      [e.target.name]: e.target.name !== "AnimalId" && e.target.name !== "LocationId" ? parseInt(e.target.value) : e.target.value
-    })
+    // AnimalId must be an array so that multiple animals can be selected (e.g. for Wool, which can come from Rabbits *or* Sheep); LocationId is handled separately
+    if(!e.target.name.includes("LocationId")) {
+    	setAddItemFormOptions({
+	      ...addItemFormOptions,
+	      [e.target.name]: e.target.name !== "AnimalId" ? parseInt(e.target.value) : e.target.value
+	    })
+    } else {
+    	console.log("selected a location", e.target)
+    }
   }
 
   const handleBoolChange = e => {
@@ -155,7 +236,10 @@ export default function AdminItemsForm(props) {
   }
 
   const handleCheckboxGroupChange = e => {
-      let list = addItemFormOptions[e.target.name];
+  	const targetName = e.target.name;
+
+    if(targetName !== "SeasonId") {
+    	let list = addItemFormOptions[e.target.name];
       list.forEach(item => {
         if(item.id === parseInt(e.target.value)) {
           item.isChecked = e.target.checked
@@ -166,13 +250,16 @@ export default function AdminItemsForm(props) {
         ...addItemFormOptions,
         [e.target.name]: list
       })
+    }
   }
 
   const handleRadioChange = e => {
-    setAddItemFormOptions({
-      ...addItemFormOptions,
-      [e.target.name]: e.target.value
-    })
+    if(e.target.name !== "weather") {
+    	setAddItemFormOptions({
+	      ...addItemFormOptions,
+	      [e.target.name]: e.target.value
+	    })
+    }
   }
 
   const processingTimeSliderChange = (e, newVal) => {
@@ -192,6 +279,7 @@ export default function AdminItemsForm(props) {
   }
 
   const handleItemClick = item => {
+  	console.log("selected Item", item)
     if(selectedItem === null || selectedItem.id !== item.id) {
       setSelectedItem(item);
 
@@ -201,6 +289,8 @@ export default function AdminItemsForm(props) {
     }
   }
 
+  const isCrop = [5, 6, 7, 15]
+  const hasProcessingTime = [3]
   const processingTimeMarks = [
     {
       value: 0
@@ -263,9 +353,7 @@ export default function AdminItemsForm(props) {
     },
   ]
 
-  const valuetext = (value) => {
-    return `${value} min.`
-  }
+  const valuetext = (value) => { return `${value} min.` }
 
   return (
     <Grid container spacing={0} style={{marginTop: '1rem'}}>
@@ -286,21 +374,21 @@ export default function AdminItemsForm(props) {
             </FormControl>
             {/* TYPE ID */}
             <FormControl className={classes.formControl}>
-              <InputLabel id="itemtype-label">Item Type</InputLabel>
+              <InputLabel id="itemcategory-label">Item Type</InputLabel>
               <Select
-                labelId="itemtype-label"
-                id="TypeId"
-                name="TypeId"
-                value={addItemFormOptions.TypeId}
+                labelId="itemcategory-label"
+                id="CategoryId"
+                name="CategoryId"
+                value={addItemFormOptions.CategoryId}
                 onChange={handleNumberChange}
                 style={{fontSize: '1.4rem'}}
               >
-                {itemTypes.map(type => <MenuItem key={`typeid-${type.id}`} value={type.id}>{type.name}</MenuItem>)}
+                {itemCategories.map(type => <MenuItem key={`typeid-${type.id}`} value={type.id}>{type.name}</MenuItem>)}
               </Select>
             </FormControl>
             {/* IF TYPE IS "CROP, <xyz>" */}
             {
-              (addItemFormOptions.TypeId === 5 || addItemFormOptions.TypeId === 6 || addItemFormOptions.TypeId === 7) &&
+              (isCrop.includes(addItemFormOptions.CategoryId)) &&
               <>
               <FormControl className={classes.formControl}>
                 <InputLabel>Initial Growth Time</InputLabel>
@@ -316,7 +404,7 @@ export default function AdminItemsForm(props) {
             }
             {/* IF TYPE IS ARTISAN GOODS */}
             {
-              (addItemFormOptions.TypeId === 3) &&
+              (addItemFormOptions.CategoryId === 3) &&
               <>
               <FormControl className={classes.formControl}>
                 <InputLabel id="equipment-label">Equipment</InputLabel>
@@ -359,7 +447,7 @@ export default function AdminItemsForm(props) {
             }
             {/* IF TYPE IS ANIMAL PRODUCTS */}
             {
-              (addItemFormOptions.TypeId === 4) &&
+              (addItemFormOptions.CategoryId === 4) &&
               <FormControl className={classes.formControl}>
                 <InputLabel id="animals-label">Animal</InputLabel>
                 <Select
@@ -378,13 +466,13 @@ export default function AdminItemsForm(props) {
 
             {/* IF TYPE IS FISH */}
             {
-              (addItemFormOptions.TypeId === 14) &&
+              (addItemFormOptions.CategoryId === 14) &&
               <>
               {/* Difficulty, Behavior, Size */}
               <Box style={{display: 'flex', flexFlow: 'row wrap'}}>
                 <FormControl className={classes.formControl} style={{flex: 1}}>
                   <InputLabel>Difficulty</InputLabel>
-                  <Input name="difficulty" value={addItemFormOptions.difficulty} onBlur={handleNumberChange} onChange={handleNumberChange} min={0} max={100} />
+                  <Input name="difficulty" type="number" value={addItemFormOptions.difficulty} onBlur={handleNumberChange} onChange={handleNumberChange} min={0} max={100} />
                 </FormControl>
                 <FormControl className={classes.formControl} style={{flex: 1}}>
                   <InputLabel id="fish-behavior-label">Behavior</InputLabel>
@@ -403,93 +491,36 @@ export default function AdminItemsForm(props) {
                   </Select>
                 </FormControl>
               </Box>
-              {/* Weather & Season */}
-              <Box style={{display: 'flex', flexFlow: 'row wrap'}}>
-                <Box style={{flex: 1}}>
-                  <Typography variant="h4" gutterBottom>
-                    Weather
-                  </Typography>
-                  <RadioGroup aria-label="weather" name="weather" value={addItemFormOptions.weather} onChange={handleRadioChange} style={{display: 'flex', flexFlow: 'row wrap'}}>
-                    <FormControlLabel value="any" control={<Radio />} label="any" />
-                    <FormControlLabel value="sun" control={<Radio />} label={<p style={{position: 'relative'}}><img src={weatherIcon_sun} alt="Sunny Weather" height={30} /><br/><span style={{position: 'absolute', fontSize: '0.75rem', textAlign: 'center', display: 'block', width: '100%', bottom: '-0.75rem'}}>Sun</span></p>} />
-                    <FormControlLabel value="rain" control={<Radio />} label={<p style={{position: 'relative'}}><img src={weatherIcon_rain} alt="Rainy Weather" height={30} /><br/><span style={{position: 'absolute', fontSize: '0.75rem', textAlign: 'center', display: 'block', width: '100%', bottom: '-0.75rem'}}>Rain</span></p>} />
-                  </RadioGroup>
-                </Box>
-                <Box style={{flex: 1}}>
-                  <Typography variant="h4" gutterBottom>
-                    Season
-                  </Typography>
-                  {addItemFormOptions.SeasonId.map(season => (
-                    <FormControlLabel
-                      key={`season-${season.id}`}
-                      label={<p style={{position: 'relative', display: 'inline-block'}}><img src={season.icon} alt={`Season: ${season.name}`} height={30} /><br/><span style={{position: 'absolute', fontSize: '0.75rem', textAlign: 'center', display: 'block', minWidth: '100%', bottom: '-0.75rem'}}>{season.name}</span></p>}
-                      control={
-                        <CustomCheckbox
-                          name="SeasonId"
-                          value={season.id}
-                          onChange={handleCheckboxGroupChange} 
-                          checked={season.isChecked}
-                          style={{ display: 'inline-block' }}
-                        />
-                      }
-                    />
-                  ))}
-                </Box>
-              </Box>
+              {/* Location, Weather & Season */}
+              {addItemFormOptions.availability.map(availData => <LocationWeatherSeason classes={classes} handleNumberChange={handleNumberChange} handleRadioChange={handleRadioChange} handleCheckboxGroupChange={handleCheckboxGroupChange} locations={locations} availData={availData} />)}
               </>
             }
 
             {/* SELL PRICE (base) */}
             <FormControl className={classes.formControl}>
-              <InputLabel>Sell Price</InputLabel>
+              <InputLabel><strong>Base</strong> Sell Price</InputLabel>
               <Input type="number" name="sellPrice" value={addItemFormOptions.sellPrice} onChange={handleNumberChange} />
             </FormControl>
 
             {/* SOURCE & EDIBILITY */}
             <Box style={{width: '100%'}}>
-              {addItemFormOptions.TypeId !== 2 && addItemFormOptions.TypeId !== 14 ?
+              {addItemFormOptions.CategoryId !== 2 && addItemFormOptions.CategoryId !== 14 ?
                 <FormControl className={classes.formControl} style={{display: 'inline-block', width: '88%'}}>
                   <TextField id="source" label="Source" name="source" value={addItemFormOptions.source} onChange={handleTextChange} style={{width: '100%'}} />
                   <FormHelperText>If the source is a recipe recieved in the mail, please use the format <span className={classes.code}>Name (mail, X+ :heart:)</span> where 'Name' is the name of the NPC and 'X' is the number of hearts required with that NPC</FormHelperText>
                 </FormControl>
                 :
                 <Box style={{flex: 1}}>
-                  {addItemFormOptions.TypeId === 2 &&
+                  {addItemFormOptions.CategoryId === 2 && addItemFormOptions.CategoryId !== 14 ?
                   <>
                   <Typography variant="h4" gutterBottom>
                     Season
                   </Typography>
-                  {addItemFormOptions.SeasonId.map(season => (
-                    <FormControlLabel
-                      key={`season-${season.id}`}
-                      label={<p style={{position: 'relative', display: 'inline-block'}}><img src={season.icon} alt={`Season: ${season.name}`} height={30} /><br/><span style={{position: 'absolute', fontSize: '0.75rem', textAlign: 'center', display: 'block', minWidth: '100%', bottom: '-0.75rem'}}>{season.name}</span></p>}
-                      control={
-                        <CustomCheckbox
-                          name="SeasonId"
-                          value={season.id}
-                          onChange={handleCheckboxGroupChange} 
-                          checked={season.isChecked}
-                          style={{ display: 'inline-block' }}
-                        />
-                      }
-                    />
-                  ))}
+                  {addItemFormOptions.availability.map(availData => <LocationWeatherSeason classes={classes} handleNumberChange={handleNumberChange} handleRadioChange={handleRadioChange} handleCheckboxGroupChange={handleCheckboxGroupChange} locations={locations} availData={availData} />)}
                   </>
+                  :
+                  ''
                   }
-                  <FormControl className={classes.formControl} style={{display: 'inline-block', width: '100%'}}>
-                    <InputLabel id="location-label" style={{width: '100%'}}>Location</InputLabel>
-                    <Select
-                        labelId="location-label"
-                        id="LocationId"
-                        name="LocationId"
-                        value={addItemFormOptions.LocationId}
-                        onChange={handleNumberChange}
-                        style={{fontSize: '1.4rem', width: '100%'}}
-                        multiple
-                      >
-                        {locations.map(location => <MenuItem key={`locationid-${location.id}`} value={location.id}>{location.name}</MenuItem>)}
-                      </Select>
-                  </FormControl>
                 </Box>
               }
               <FormControlLabel
@@ -517,7 +548,7 @@ export default function AdminItemsForm(props) {
 	              onChange={handleTextChange}
 	              style={{fontSize: '1.4rem'}}
 	            >
-	              {['Vanilla', 'SVE', 'Ridgeside Village', 'Downtown Zuzu', 'Garden Village', 'Walk to the Desert', 'Mermaid Island', 'Deep Woods', 'Other'].map(mod => <MenuItem key={`checkupSeason-${mod}`} value={mod}>{mod}</MenuItem>)}
+	              {gameVersions.map(mod => <MenuItem key={`checkupSeason-${mod}`} value={mod}>{mod}</MenuItem>)}
 	            </Select>
 	          </FormControl>
 

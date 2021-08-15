@@ -1,20 +1,23 @@
 import { createContext, useState, useEffect } from 'react'
 import API from '../utils/API'
 
-import seasonIcon_spring from '../assets/season_icons/24px-Spring.png'
-import seasonIcon_summer from '../assets/season_icons/24px-Summer.png'
-import seasonIcon_fall from '../assets/season_icons/24px-Fall.png'
-import seasonIcon_winter from '../assets/season_icons/24px-Winter.png'
-import seasonIcon_all from '../assets/season_icons/24px-All_Seasons_Icon.png'
+import seasonIcon_Spring from '../assets/season_icons/Spring.png'
+import seasonIcon_Summer from '../assets/season_icons/Summer.png'
+import seasonIcon_Fall from '../assets/season_icons/Fall.png'
+import seasonIcon_Winter from '../assets/season_icons/Winter.png'
+import seasonIcon_All from '../assets/season_icons/All.png'
 
 export const DatabaseContext = createContext();
 
 const DatabaseContextProvider = (props) => {
 
+	const gameVersions = ['Vanilla', 'SVE', 'Ridgeside Village', 'Downtown Zuzu', 'Garden Village', 'Walk to the Desert', 'Mermaid Island', 'Deep Woods', 'Other'];
+
   const [dbNpcs, setNpcs] = useState([]);
   const [dbItems, setItems] = useState([]);
+  const [dbSeasons, setDbSeasons] = useState([]);
   const [allItems, setAllItems] = useState([])
-  const [dbItemTypes, setItemTypes] = useState([]);
+  const [dbItemCategories, setItemCategories] = useState([]);
 
   const universalLoves = ['Golden Pumpkin', 'Magic Rock Candy', 'Pearl', 'Prismatic Shard', "Rabbit's Foot"]
 
@@ -33,44 +36,47 @@ const DatabaseContextProvider = (props) => {
   const [selectedItem, setSelectedItem] = useState(null)
   const [itemSearchTerm, setItemSearchTerm] = useState("")
 
-  const defaultItemAvailability = {
+  // const defaultSeasonSelection = [
+  //   {
+  //     id: 1,
+  //     name: 'Spring',
+  //     icon: seasonIcon_spring,
+  //     isChecked: false
+  //   },
+  //   {
+  //     id: 2,
+  //     name: 'Summer',
+  //     icon: seasonIcon_summer,
+  //     isChecked: false
+  //   },
+  //   {
+  //     id: 3,
+  //     name: 'Fall',
+  //     icon: seasonIcon_fall,
+  //     isChecked: false
+  //   },
+  //   {
+  //     id: 4,
+  //     name: 'Winter',
+  //     icon: seasonIcon_winter,
+  //     isChecked: false
+  //   },
+  //   {
+  //     id: 5,
+  //     name: 'All',
+  //     icon: seasonIcon_all,
+  //     isChecked: true
+  //   }
+  // ];
+
+  const [defaultItemAvailability, setDefaultItemAvailability] = useState({
+  	id: 0,
     weather: 'any',
-    SeasonId: [
-      {
-        id: 1,
-        name: 'Spring',
-        icon: seasonIcon_spring,
-        isChecked: false
-      },
-      {
-        id: 2,
-        name: 'Summer',
-        icon: seasonIcon_summer,
-        isChecked: false
-      },
-      {
-        id: 3,
-        name: 'Fall',
-        icon: seasonIcon_fall,
-        isChecked: false
-      },
-      {
-        id: 4,
-        name: 'Winter',
-        icon: seasonIcon_winter,
-        isChecked: false
-      },
-      {
-        id: 5,
-        name: 'All',
-        icon: seasonIcon_all,
-        isChecked: true
-      }
-    ],
+    SeasonId: [],
     LocationId: [],
     chance: 0,
     time: [600, 200]
-  };
+  });
 
   const defaultAddItemFormOptions = {
     name: '',
@@ -85,14 +91,12 @@ const DatabaseContextProvider = (props) => {
     processingTime: 0,
     EquipmentId: '',
     AnimalId: [],
-    TypeId: '',
-    availableIn: 'standard',
-    ...defaultItemAvailability
+    CategoryId: '',
+    availableIn: gameVersions[0],
+    availability: [defaultItemAvailability]
   }
 
-  const [addItemFormOptions, setAddItemFormOptions] = useState({
-    ...defaultAddItemFormOptions
-  });
+  const [addItemFormOptions, setAddItemFormOptions] = useState(defaultAddItemFormOptions);
 
   /**
    * ADDING EVENTS (form, which is displayed in a modal)
@@ -136,6 +140,24 @@ const DatabaseContextProvider = (props) => {
   });
 
   useEffect(() => {
+  	API.getNpcs().then(res => setNpcs(res.data)).catch(err => console.error(err));
+  	API.getItems().then(res => {setItems(res.data); setAllItems(res.data)}).catch(err => console.error(err));
+  	API.getSeasons()
+  		.then(res => {
+  			// (str, dir=null, ext='png', returnAsString)
+  			console.log("season name", res.data[0].name)
+  			const seasons = res.data.map(season => ({ ...season, image: season.name === "Spring" ? seasonIcon_Spring : season.name === "Summer" ? seasonIcon_Summer : season.name === "Fall" ? seasonIcon_Fall : season.name === "Winter" ? seasonIcon_Winter : seasonIcon_All, isChecked: false }));
+
+	  		setDbSeasons(seasons);
+	  		setDefaultItemAvailability({
+	  			...defaultItemAvailability,
+	  			SeasonId: seasons
+	  		})
+	  	}).catch(err => console.error(err));
+
+  }, [])
+
+  useEffect(() => {
     if(!addEventModalOpen) {
       setNewEvent(defaultNewEvent)
     }
@@ -151,11 +173,10 @@ const DatabaseContextProvider = (props) => {
 
     }).catch(err => console.error(err));
 
-    API.getItemTypes().then(types => {
-      let itemTypesList = types.data.map(type => ({ ...type, isChecked: true }))
-      itemTypesList.push({ id: 'otherTypes', name: 'Other', isChecked: true })
-      itemTypesList.push({ id: 'allTypes', name: 'All', isChecked: true })
-      setItemTypes(itemTypesList);
+    API.getItemCategories().then(types => {
+      let itemCategoriesList = types.data.map(type => ({ ...type, isChecked: true }))
+      itemCategoriesList.push({ id: 'allTypes', name: 'All', isChecked: true })
+      setItemCategories(itemCategoriesList);
 
     }).catch(err => console.error(err));
 
@@ -242,11 +263,16 @@ const DatabaseContextProvider = (props) => {
 
     // if the item is *not* an animal product OR the AnimalId.length === 0
     // just 'null' the AnimalId and insert/update
-    if(addItemFormOptions.TypeId !== 4 || addItemFormOptions.AnimalId.length === 0) {
+    if(addItemFormOptions.CategoryId !== 4 || addItemFormOptions.AnimalId.length === 0) {
       data.AnimalId = null;
       // if it's not a *fish* either, go ahead and 'null' the weather as well
       // since forage items will have item availability but won't be weather dependent
-      if(data.TypeId !== 14) data.weather = null;
+      if(data.CategoryId !== 14) data.weather = null;
+
+      // TODO: check for locations
+      // if(data.LocationId.length > 1)
+
+      // TODO: check for seasons
 
       itemToDatabase(data)
 
@@ -275,7 +301,7 @@ const DatabaseContextProvider = (props) => {
       .then(results => {
         setAlert({ open: true, message: addItemFormOptions.id !== undefined ? `${addItemFormOptions.name} updated successfully` : `${addItemFormOptions.name} saved successfully`, severity: 'success' });
 
-        setAddItemFormOptions({...defaultAddItemFormOptions, ...defaultItemAvailability})
+        setAddItemFormOptions({ ...defaultAddItemFormOptions })
         setSelectedItem(null)
         setAddItemModalOpen(false);
         setItems([...dbItems, {...results.data, icon: getIcon(results.data.name, 'item_icons', 'png', true)}])
@@ -358,8 +384,7 @@ const DatabaseContextProvider = (props) => {
 
   const getIcon = (str, dir=null, ext='png', returnAsString) => {
     let icon_file = null;
-    let filename = '';
-    filename += toTitleCase(str)
+    let filename = toTitleCase(str);
     
     filename = filename.replace("'", "").replace(",", "");
 
@@ -374,11 +399,15 @@ const DatabaseContextProvider = (props) => {
 
     if(dir === 'npc_icons') filename += '_Icon';
 
-    
     filename += ext === null ? '.png' : `.${ext}`
 
-    if(dir === null || dir === true) { dir = 'item_icons' }
+    if(dir === null || dir === true || dir === '') { dir = 'item_icons' }
     if(returnAsString === null) { returnAsString = false }
+
+    if(dir === "season_icons") {
+  		console.log("get icons from:", dir);
+  		console.log(`Trying to get ../../assets/${dir}/${filename}`)
+  	}
 
     try {
       icon_file = require(`../assets/${dir}/${filename}`);
@@ -543,7 +572,7 @@ const DatabaseContextProvider = (props) => {
   };
 
   return (
-    <DatabaseContext.Provider value={{ dbNpcs, dbItems, setItems, getItems, allItems, setAllItems, dbItemTypes, addItemModalOpen, setAddItemModalOpen, addItemFormSubmit, alert, setAlert, handleAlertClose, addItemFormOptions, setAddItemFormOptions, defaultAddItemFormOptions, defaultItemAvailability, selectedItem, setSelectedItem, itemSearchTerm, setItemSearchTerm, universalLoves, getIcon, dates, seasons, events, selectedDate, setSelectedDate, selectedSeason, setSelectedSeason, handleSeasonChange, defaultNewEvent, newEvent, setNewEvent, addEvent, deleteEvent, addEventModalOpen, setAddEventModalOpen, sortNpcData, sortItemData, getURL, selectedNpc, setSelectedNpc, addNpcFormOptions, setAddNpcFormOptions, addNpcFormSubmit }}>
+    <DatabaseContext.Provider value={{ gameVersions, dbSeasons, dbNpcs, dbItems, setItems, getItems, allItems, setAllItems, dbItemCategories, addItemModalOpen, setAddItemModalOpen, addItemFormSubmit, alert, setAlert, handleAlertClose, addItemFormOptions, setAddItemFormOptions, defaultAddItemFormOptions, defaultItemAvailability, selectedItem, setSelectedItem, itemSearchTerm, setItemSearchTerm, universalLoves, getIcon, dates, seasons, events, selectedDate, setSelectedDate, selectedSeason, setSelectedSeason, handleSeasonChange, defaultNewEvent, newEvent, setNewEvent, addEvent, deleteEvent, addEventModalOpen, setAddEventModalOpen, sortNpcData, sortItemData, getURL, selectedNpc, setSelectedNpc, addNpcFormOptions, setAddNpcFormOptions, addNpcFormSubmit }}>
       {props.children}
     </DatabaseContext.Provider>
   )

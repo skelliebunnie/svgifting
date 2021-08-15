@@ -1,6 +1,6 @@
 TO DO
  ✔ DB: add "availableIn" to gifts table and set field to "Vanilla" for all current rows @done (21-07-26 09:51)
- ☐ add context menu (right click) to NPCs on GIFTS page
+ ✔ add context menu (right click) to NPCs on GIFTS page @done (21-07-27 11:32)
    > menu should simply show other <preference'd> gifts, in a list (with icons? hopefully)
  ☐ add context menu (right click) to events on calendar (for *non* admins!)
    ☐ OPTION 1: view event details - opens same modal as left click
