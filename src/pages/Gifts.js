@@ -217,7 +217,10 @@ export default function Gifts() {
       if (foundNpcs.length < allNpcs.length) {
         let gift = gifts[i];
 
-        let npcs = gift.Npcs.map(npc => npc.name).filter(name => !foundNpcs.includes(name));
+        let npcs = gift.Npcs.map(npc => npc.name);
+        if(foundNpcs.length > 0) {
+          npcs = npcs.filter((name) => !foundNpcs.includes(name));
+        }
 
         // if there are npcs not yet "found", add them to the found list
         // filter out any previously found npcs from the gift's list
