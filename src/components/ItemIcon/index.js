@@ -30,7 +30,7 @@ const useStyles = makeStyles(() => ({
 export default function ItemIcon(props) {
   const classes = useStyles();
 
-  const { getIcon, getURL } = useContext(DatabaseContext)
+  const { getIcon, getURL } = useContext(DatabaseContext);
 
   let overlay_image, icon_image;
 
