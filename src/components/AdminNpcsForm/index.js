@@ -118,7 +118,7 @@ export default function AdminNpcsForm() {
       <Grid item lg={8}>
         <Container className={classes.form}>
           <Typography variant="h2" gutterBottom style={{ textAlign: 'center' }}>
-          	{selectedNpc === null ? 'New' : 'Update'} NPC
+          	{selectedNpc === null ? 'Add NPC' : `Update NPC: ${selectedNpc.name}`}
           </Typography>
           {/* Name & Location */}
           <Grid container spacing={2}>

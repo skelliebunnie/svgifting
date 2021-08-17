@@ -7,7 +7,7 @@ import Calendar from '../components/Calendar'
 
 import AlertSnack from '../components/AlertSnack'
 
-export default function Events() {
+export default function Events({ userIsAdmin }) {
   const { alert, handleAlertClose, setSelectedDate, addEventModalOpen, setAddEventModalOpen } = useContext(DatabaseContext)
 
   const openModal = (date) => {
@@ -21,7 +21,7 @@ export default function Events() {
   
   return (
     <Container maxWidth="lg">
-      <Calendar openModal={openModal} closeModal={closeModal} modalState={addEventModalOpen} />
+      <Calendar openModal={openModal} closeModal={closeModal} modalState={addEventModalOpen} userIsAdmin={userIsAdmin} />
       <p><em>The week begins on Monday for everything <strong>EXCEPT</strong> gift-giving! The "gift-giving week" begins on SUNDAY.</em></p>
       <AlertSnack open={alert.open} severity={alert.severity} message={alert.message} handleClose={handleAlertClose} />
     </Container>

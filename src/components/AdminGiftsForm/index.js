@@ -5,12 +5,11 @@ import { Grid, Container, FormGroup, FormControlLabel, Checkbox, Typography, For
 import { Close as CloseIcon } from '@material-ui/icons'
 
 import AdminItemsForm from '../AdminItemsForm'
-import ItemIcon from '../ItemIcon'
-import NpcIcon from '../NpcIcon'
 
 import { useSnackbar } from 'notistack'
 
 import API from '../../utils/API'
+import CustomIcon from '../CustomIcon';
 
 const CustomCheckbox = withStyles((theme) => ({
   root: {
@@ -133,9 +132,9 @@ const useStyles = makeStyles((theme) => ({
 export default function AdminGiftsForm() {
   const classes = useStyles();
 
-  const { dbNpcs, dbItems, allItems, setAllItems, dbItemTypes, addItemModalOpen, setAddItemModalOpen, itemSearchTerm, setItemSearchTerm, getIcon } = useContext(DatabaseContext)
-  
-  const [itemTypes, setItemTypes] = useState(dbItemTypes || [])
+  const { dbNpcs, dbItems, allItems, setAllItems, dbItemCategories, addItemModalOpen, setAddItemModalOpen, itemSearchTerm, setItemSearchTerm, getIcon } = useContext(DatabaseContext)
+
+  const [itemCategories, setItemCategories] = useState(dbItemCategories || []);
   const [formOptions, setFormOptions] = useState({
     npcs: [],
     items: [],
@@ -150,17 +149,20 @@ export default function AdminGiftsForm() {
 
   useEffect(() => {
     if(containerRef) {
-      setFormOptions({
+      const opts = {
         ...formOptions,
         npcs: dbNpcs,
-        items: dbItems
-      })
-      setItemTypes(dbItemTypes)
+        items: dbItems,
+      };
+
+      setFormOptions(opts)
+      setItemCategories(dbItemCategories)
 
       filterItemsOnLoad(dbItems);
     }
+
   //eslint-disable-next-line
-  }, [dbNpcs, dbItems, dbItemTypes])
+  }, [dbNpcs, dbItems, dbItemCategories])
 
   useEffect(() => {
     if(!addItemModalOpen) {
@@ -185,6 +187,7 @@ export default function AdminGiftsForm() {
 
         setFormOptions({
           ...formOptions,
+          npcs: dbNpcs,
           items: itemList
         })
         
@@ -194,10 +197,10 @@ export default function AdminGiftsForm() {
   }, [addItemModalOpen])
 
   const filterItemsOnLoad = (items) => {
-    if((itemTypes.length > 0 && !itemTypes[itemTypes.length - 1].isChecked)) {
+    if((itemCategories.length > 0 && !itemCategories[itemCategories.length - 1].isChecked)) {
       let selectedTypes = []
 
-      itemTypes.forEach(type => {
+      itemCategories.forEach(type => {
         if(type.isChecked) selectedTypes.push(type.id)
       })
 
@@ -253,6 +256,7 @@ export default function AdminGiftsForm() {
     // otherwise, filter the items
     setFormOptions({
       ...formOptions,
+      npcs: dbNpcs,
       items: searchFor === "" ? allItems : allItems.filter(item => item.name.toLowerCase().includes(searchFor))
     })
   }
@@ -260,7 +264,7 @@ export default function AdminGiftsForm() {
   const handleItemTypeFilter = e => {
     const TypeId = e.target.value !== 'allTypes' && e.target.value !== 'otherTypes' ? parseInt(e.target.value) : e.target.value
 
-    let selectedTypes = itemTypes;
+    let selectedTypes = itemCategories;
     let selectedTypeIds = [];
     let visible = allItems;
 
@@ -314,6 +318,7 @@ export default function AdminGiftsForm() {
 
     setFormOptions({
       ...formOptions,
+      npcs: dbNpcs,
       items: visible
     })
     
@@ -393,6 +398,7 @@ export default function AdminGiftsForm() {
       setAllItems(itemList)
       setFormOptions({
         ...formOptions,
+        npcs: dbNpcs,
         items: itemList
       })
     } else if(target === "npcs") {
@@ -445,7 +451,8 @@ export default function AdminGiftsForm() {
                     label={
                       npc.id !== "all" ? (
                         <>
-                          <NpcIcon name={npc.name} size={20} /> {npc.name}
+                          <CustomIcon name={npc.name} mainDir="npc_icons" size={20} /> {npc.name}
+                          {/* <NpcIcon name={npc.name} size={20} /> {npc.name} */}
                         </>
                       ) : (
                         "All"
@@ -523,7 +530,7 @@ export default function AdminGiftsForm() {
                 </Button>
               </Typography>
               <FormGroup className={classes.list}>
-                {itemTypes.map((type) => (
+                {itemCategories.map((type) => (
                   <FormControlLabel
                     key={`${type.id}-label`}
                     label={type.name}
@@ -548,7 +555,11 @@ export default function AdminGiftsForm() {
                         key={`${item.id}-label`}
                         label={
                           <>
-                            <ItemIcon
+                            <CustomIcon
+                              name={item.name}
+                              size={20}
+                            />{" "}
+                            {/* <ItemIcon
                               name={item.name}
                               size={20}
                               icon={
@@ -556,7 +567,7 @@ export default function AdminGiftsForm() {
                                   ? item.icon.default
                                   : item.icon
                               }
-                            />{" "}
+                            />{" "} */}
                             {item.name}
                           </>
                         }

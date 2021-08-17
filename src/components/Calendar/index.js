@@ -5,8 +5,7 @@ import { makeStyles } from '@material-ui/core/styles'
 import { Container, Grid, Card, CardContent, Button, IconButton, Typography, CardActions, Modal } from '@material-ui/core'
 import { Add as AddIcon, Close as CloseIcon } from '@material-ui/icons';
 
-import NpcIcon from '../NpcIcon'
-import ItemIcon from '../ItemIcon'
+import CustomIcon from '../CustomIcon'
 
 import AddEventForm from '../AddEventForm'
 import EventsAdminContextMenu from '../EventsAdminContextMenu'
@@ -228,18 +227,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Calendar({ modalState, openModal, closeModal }) {
+export default function Calendar({ userIsAdmin, modalState, openModal, closeModal }) {
   const classes = useStyles();
 
-  const { getIcon, dates, seasons, events, selectedSeason, handleSeasonChange, deleteEvent, setNewEvent } = useContext(DatabaseContext)
-
-  const festivalIcon = getIcon('Calendar Flag Static', 'other_icons').default;
-  const nightMarketIcon = getIcon('Iridium Quality', 'other_icons').default;
-  const checkupIcon = getIcon('Health', 'other_icons').default;
-  const cakeIcon = getIcon('Birthday Cake', 'other_icons').default;
-  const otherEventTypeIcon = getIcon('Stardew Checkup Icon', 'other_icons').default;
-
-  const token = JSON.parse(localStorage.getItem('token')) || false;
+  const { dates, seasons, events, selectedSeason, handleSeasonChange, deleteEvent, setNewEvent } = useContext(DatabaseContext)
   
   const [allSeasons, setAllSeasons] = useState([])
   const [allEvents, setAllEvents] = useState([])
@@ -265,23 +256,23 @@ export default function Calendar({ modalState, openModal, closeModal }) {
   const handleContextMenu = (e, eventData) => {
     e.preventDefault();
 
-    if(token) {
-    	if(eventData !== null && eventData !== undefined) {
-	      setShowContextMenu(true);
-	      setContextMenuPos({
-	        x: e.pageX + 8,
-	        y: e.pageY + 15
-	      });
+    if (userIsAdmin) {
+      if (eventData !== null && eventData !== undefined) {
+        setShowContextMenu(true);
+        setContextMenuPos({
+          x: e.pageX + 8,
+          y: e.pageY + 15,
+        });
 
-	      setSelectedEvent(eventData);
-	    } else {
-	      setShowContextMenu(false);
-	      setContextMenuPos({
-	        x: null,
-	        y: null
-	      })
-	      setSelectedEvent(null)
-	    }
+        setSelectedEvent(eventData);
+      } else {
+        setShowContextMenu(false);
+        setContextMenuPos({
+          x: null,
+          y: null,
+        });
+        setSelectedEvent(null);
+      }
     }
   }
 
@@ -407,44 +398,52 @@ export default function Calendar({ modalState, openModal, closeModal }) {
                             >
                               {event.type === "birthday" &&
                               event.NpcId !== null ? (
-                                <NpcIcon
-                                  tooltip={event.name}
-                                  name={event.Npc.name}
-                                  overlay={cakeIcon}
-                                  swap={true}
+                                <CustomIcon
+                                  includeTooltip={true}
+                                  tooltipText={event.name}
+                                  name="Birthday_Cake"
+                                  mainDir="other_icons"
+                                  overlay={event.Npc.name}
+                                  overlayDir="npc_icons"
                                   size={38}
                                   overlaySize={32}
                                 />
                               ) : event.type === "checkup" ? (
-                                <NpcIcon
-                                  tooltip={event.name}
-                                  name={event.Npc.name}
-                                  overlay={checkupIcon}
-                                  swap={true}
+                                <CustomIcon
+                                  includeTooltip={true}
+                                  tooltipText={event.name}
+                                  name="Health"
+                                  mainDir="other_icons"
+                                  overlay={event.Npc.name}
+                                  overlayDir="npc_icons"
                                   size={38}
                                   overlaySize={32}
                                 />
                               ) : event.type === "other" &&
                                 event.NpcId !== null ? (
-                                <NpcIcon
-                                  tooltip={event.name}
-                                  name={event.Npc.name}
-                                  overlay={otherEventTypeIcon}
-                                  swap={true}
+                                <CustomIcon
+                                  includeTooltip={true}
+                                  tooltipText={event.name}
+                                  name="Stardew_Checkup_Icon"
+                                  mainDir="other_icons"
+                                  overlay={event.Npc.name}
+                                  overlayDir="npc_icons"
                                   size={38}
                                   overlaySize={32}
                                 />
                               ) : (
-                                <ItemIcon
-                                  tooltip={true}
+                                <CustomIcon
+                                  includeTooltip={true}
+                                  tooltipText={event.name}
+                                  name={event.name}
                                   icon={
                                     event.name === "Night Market"
-                                      ? nightMarketIcon
+                                      ? "Iridium_Quality"
                                       : event.type === "other"
-                                      ? otherEventTypeIcon
-                                      : festivalIcon
+                                      ? "Stardew_Checkup"
+                                      : "Calendar_Flag_Static"
                                   }
-                                  name={event.name}
+                                  mainDir="other_icons"
                                 />
                               )}
                             </span>
@@ -453,7 +452,7 @@ export default function Calendar({ modalState, openModal, closeModal }) {
                     )}
                   </Grid>
                 </CardContent>
-                {token && (
+                {userIsAdmin && (
                   <CardActions className={classes.eventCardActions}>
                     <IconButton
                       className={classes.addBtn}

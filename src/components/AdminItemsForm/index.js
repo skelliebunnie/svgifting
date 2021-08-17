@@ -75,7 +75,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function LocationWeatherSeason(props) {
-	console.log("Location Weather Season AvailData", props.availData)
+	// console.log("Location Weather Season AvailData", props.availData)
 	return (
 		<Box style={{display: 'flex', flexFlow: 'row wrap'}}>
     	<Box style={{flex: '1 0 auto', marginRight: '4rem'}}>
@@ -150,12 +150,12 @@ export default function AdminItemsForm(props) {
   useEffect(() => {
     setItemList(dbItems)
     setItemCategories(dbItemCategories)
-  }, [dbItems, dbItemCategories])
+    setSeasons(dbSeasons)
+  }, [dbItems, dbItemCategories, dbSeasons])
 
   useEffect(() => {
     API.getEquipment().then(list => setEquipment(list.data)).catch(err => console.error(err));
     API.getAnimals().then(list => setAnimals(list.data)).catch(err => console.error(err));
-    API.getSeasons().then(list => setSeasons(list.data)).catch(err => console.error(err));
 
     API.getLocations().then(list => {
       const locations = list.data.filter(location => location.hasForage)
@@ -188,7 +188,7 @@ export default function AdminItemsForm(props) {
       		if(availData.length > 0) {
       			for(var i = 0; i < availData.length; i++) {
       				const availSeasonId = availData[i].SeasonId;
-      				availData[i].SeasonId = dbSeasons.map(season => ({...season, isChecked: season.id === availSeasonId}));
+      				availData[i].SeasonId = seasons.map(season => ({...season, isChecked: season.id === availSeasonId}));
       				availData[i].availId = i;
       			}
 
@@ -224,7 +224,7 @@ export default function AdminItemsForm(props) {
 	      [e.target.name]: e.target.name !== "AnimalId" ? parseInt(e.target.value) : e.target.value
 	    })
     } else {
-    	console.log("selected a location", e.target)
+    	// console.log("selected a location", e.target)
     }
   }
 
@@ -279,7 +279,7 @@ export default function AdminItemsForm(props) {
   }
 
   const handleItemClick = item => {
-  	console.log("selected Item", item)
+  	// console.log("selected Item", item)
     if(selectedItem === null || selectedItem.id !== item.id) {
       setSelectedItem(item);
 
@@ -290,7 +290,7 @@ export default function AdminItemsForm(props) {
   }
 
   const isCrop = [5, 6, 7, 15]
-  const hasProcessingTime = [3]
+  // const hasProcessingTime = [3]
   const processingTimeMarks = [
     {
       value: 0

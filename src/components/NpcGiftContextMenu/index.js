@@ -3,7 +3,7 @@ import { DatabaseContext } from "../../contexts/DatabaseContext";
 import { ClickAwayListener } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
-import ItemIcon from "../ItemIcon"
+import CustomIcon from "../CustomIcon"
 
 import API from "../../utils/API"
 import GeneralFunctions from "../../utils/GeneralFunctions"
@@ -84,7 +84,7 @@ export default function NpcGiftContextMenu(props) {
 		} else {
 			container.style.overflow = 'auto';
 		}
-
+	// eslint-disable-next-line
 	}, [props.showMenu, props.npc, props.preference])
 
   return(
@@ -103,7 +103,7 @@ export default function NpcGiftContextMenu(props) {
 	        }}
 	  		>
 	  			<li className={classes.menuTitle} onContextMenu={props.handleClose}>{selectedNpc.name}'s {preference} Gifts</li>
-	  			{giftsList.map(gift => <li key={gift.id} onClick={props.handleClose} onContextMenu={props.handleClose}><ItemIcon name={gift.name} size={24} /> {gift.name}</li>)}
+	  			{giftsList.map(gift => <li key={gift.id} onClick={props.handleClose} onContextMenu={props.handleClose}><CustomIcon name={gift.name} size={24} /> {gift.name}</li>)}
 	  		</ul>
   		</ClickAwayListener>
       :

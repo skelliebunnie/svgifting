@@ -1,5 +1,4 @@
-import { useState, useEffect, useRef, useContext } from 'react'
-import { DatabaseContext } from "../../contexts/DatabaseContext";
+import { useState, useEffect, useRef } from 'react'
 import { makeStyles } from '@material-ui/core/styles'
 import { Container } from '@material-ui/core'
 import { NavigateNext, NavigateBefore } from '@material-ui/icons'
@@ -8,8 +7,7 @@ import GiftListItem from "../GiftListItem";
 import NpcGiftContextMenu from "../NpcGiftContextMenu";
 import API from '../../utils/API';
 
-import NpcIcon from '../NpcIcon'
-import ItemIcon from '../ItemIcon'
+import CustomIcon from '../CustomIcon'
 
 const useStyles = makeStyles((theme) => ({
   giftsGrid: {
@@ -100,8 +98,6 @@ const useStyles = makeStyles((theme) => ({
 
 export default function GiftList(props) {
   const classes = useStyles();
-
-  const { getIcon } = useContext(DatabaseContext);
 
   const tableRef = useRef(null)
   const tableContainerRef = useRef(null)
@@ -229,7 +225,7 @@ export default function GiftList(props) {
                     <th style={{ position: "relative" }}></th>
                     {npcs.map((npc) => (
                       <th key={npc.name}>
-                        <NpcIcon name={npc.name} />
+                        <CustomIcon name={npc.name} mainDir="npc_icons" />
                       </th>
                     ))}
                   </tr>
@@ -241,7 +237,7 @@ export default function GiftList(props) {
                     return (
                       <tr key={gift.name}>
                         <th>
-                          <ItemIcon name={gift.name} />
+                          <CustomIcon name={gift.name} mainDir="item_icons" />
                         </th>
                         {npcs.map((npc) => {
                           let status = giftNpcs.includes(npc.name)
@@ -253,11 +249,13 @@ export default function GiftList(props) {
                               className={`status-${status}`}
                             >
                               {status === "Y" ? (
-                                <NpcIcon
-                                  tooltip={`Gift: ${gift.name}, NPC: ${npc.name}`}
-                                  name={npc.name}
-                                  overlay={getIcon(gift.name).default}
-                                  swap={true}
+                                <CustomIcon
+                                  includeTooltip={true}
+                                  tooltipText={`Gift: ${gift.name}, NPC: ${npc.name}`}
+                                  name={gift.name}
+                                  mainDir="item_icons"
+                                  overlay={npc.name}
+                                  overlayDir="npc_icons"
                                   size={38}
                                   overlaySize={32}
                                 />
@@ -291,7 +289,7 @@ export default function GiftList(props) {
                   <th style={{ position: "relative" }}></th>
                   {npcs.map((npc) => (
                     <th key={npc.name}>
-                      <NpcIcon name={npc.name} />
+                      <CustomIcon name={npc.name} mainDir="npc_icons" />
                     </th>
                   ))}
                 </tr>
@@ -305,7 +303,7 @@ export default function GiftList(props) {
                   return (
                     <tr key={gift.name}>
                       <th>
-                        <ItemIcon name={gift.name} />
+                        <CustomIcon name={gift.name} />
                       </th>
                       {npcs.map((npc) => {
                         let status = giftNpcs.includes(npc.name)
@@ -317,11 +315,12 @@ export default function GiftList(props) {
                             className={`status-${status}`}
                           >
                             {status === "Y" ? (
-                              <NpcIcon
+                              <CustomIcon
                                 tooltip={`Gift: ${gift.name}, NPC: ${npc.name}`}
-                                name={npc.name}
-                                overlay={getIcon(gift.name).default}
-                                swap={true}
+                                name={gift.name}
+                                mainDir="item_icons"
+                                overlay={npc.name}
+                                overlayDir="npc_icons"
                                 size={38}
                                 overlaySize={32}
                               />

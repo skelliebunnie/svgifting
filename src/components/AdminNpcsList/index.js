@@ -3,7 +3,7 @@ import { makeStyles } from '@material-ui/core/styles'
 import { Container, Grid } from '@material-ui/core'
 
 import API from '../../utils/API'
-import NpcIcon from '../NpcIcon'
+import CustomIcon from '../CustomIcon'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -32,7 +32,6 @@ export default function AdminNpcsList({ onNpcClick, selected }) {
   useEffect(() => {
     API.getNpcs().then(res => {
       setNpcs(res.data);
-      console.log(res.data);
     }).catch(err => console.error(err));
 
   }, [])
@@ -42,7 +41,7 @@ export default function AdminNpcsList({ onNpcClick, selected }) {
       <Grid container spacing={1} className={classes.gridContainer}>
         {npcs.map(npc =>
           <Grid item key={npc.id} className={(selected !== null && selected.id === npc.id) ? `${classes.activeNpc} ${classes.npcIcon}` : classes.npcIcon} onClick={() => onNpcClick(npc)}>
-            <NpcIcon name={npc.name} size={24} style={{ position: 'relative', margin: '8px', verticalAlign: 'middle' }} />
+            <CustomIcon name={npc.name} mainDir="npc_icons" size={38} style={{ position: 'relative', margin: '8px', verticalAlign: 'middle' }} />
           </Grid>
         )}
       </Grid>

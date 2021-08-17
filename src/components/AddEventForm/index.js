@@ -3,12 +3,12 @@ import { DatabaseContext } from "../../contexts/DatabaseContext";
 import { makeStyles } from '@material-ui/core/styles'
 import { Container, Box, Grid, Button, TextField, FormControl, FormControlLabel, InputLabel, RadioGroup, Radio, Select, MenuItem, Typography } from '@material-ui/core'
 
+import API from '../../utils/API'
+
 import DateFnsUtils from '@date-io/date-fns'
 import { MuiPickersUtilsProvider, KeyboardTimePicker } from '@material-ui/pickers'
 
-import NpcIcon from '../NpcIcon'
-
-import API from '../../utils/API'
+import CustomIcon from '../CustomIcon'
 
 const useStyles = makeStyles((theme) => ({
   form: {
@@ -153,7 +153,12 @@ export default function AddEventForm() {
                 className={classes.npcSelect}
                 style={{fontSize: '1.4rem', marginLeft: 0}}
               >
-                {npcs.map(npc => <MenuItem key={npc.id} value={npc.id}><NpcIcon name={npc.name} style={{marginRight: '0.5rem'}} /> {npc.name}</MenuItem>)}
+                {npcs.map(npc => 
+                  <MenuItem key={npc.id} value={npc.id}>
+                    <CustomIcon name={npc.name} style={{marginRight: '0.5rem'}} />
+                    {npc.name}
+                  </MenuItem>
+                )}
               </Select>
             </FormControl>
           }

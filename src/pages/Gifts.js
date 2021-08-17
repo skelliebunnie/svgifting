@@ -143,7 +143,7 @@ export default function Gifts() {
 
     setLovedGifts(loved || []);
     setHatedGifts(hated || []);
-
+  // eslint-disable-next-line
   }, [includeUniversalLoves, universalLoves, allGifts])
 
   useEffect(() => {
@@ -155,7 +155,7 @@ export default function Gifts() {
     } else {
       getAllGiftItems();
     }
-
+  // eslint-disable-next-line
   }, [minGiftList])
 
   const getAllGiftItems = () => {
@@ -207,21 +207,22 @@ export default function Gifts() {
   const filterGiftItems = (list) => {
     const allNpcs = dbNpcs;
 
-    // const list = tabValue === 0 ? lovedGifts : tabValue === 1 ? likedGifts : tabValue === 2 ? neutralGifts : tabValue === 3 ? dislikedGifts : hatedGifts;
-
     let gifts = sortItemData(list, 'Number of NPCs');
     let foundNpcs = [];
     let minGifts = [];
 
-    for (var i = 0; i < gifts.length; i++) {
-      if (foundNpcs.length < allNpcs.length) {
-        let gift = gifts[i];
+    for (let i = 0; i < gifts.length; i++) {
+      let gift = gifts[i];
 
-        let npcs = gift.Npcs.map(npc => npc.name);
-        if(foundNpcs.length > 0) {
-          npcs = npcs.filter((name) => !foundNpcs.includes(name));
+      const giftNpcs = gift.Npcs;
+      let npcs = [];
+      for(let x = 0; x < giftNpcs.length; x++) {
+        if(!foundNpcs.includes(giftNpcs[x].name)) {
+          npcs.push(giftNpcs[x].name)
         }
+      }
 
+      if (foundNpcs.length < allNpcs.length) {
         // if there are npcs not yet "found", add them to the found list
         // filter out any previously found npcs from the gift's list
         // and push the gift into the minimum list
@@ -330,25 +331,27 @@ export default function Gifts() {
                 handleInputChange={handleDisplayChange}
               />
             </Grid>
-            <Grid item xs={12}>
-              <FormControlLabel
-                label="Minimum Gifts List"
-                style={{
-                  display: "inline-block",
-                  flex: 1,
-                  paddingTop: 0
-                }}
-                control={
-                  <Checkbox
-                    name="minGiftList"
-                    value="minGiftList"
-                    onChange={toggleMinGiftList}
-                    checked={minGiftList}
-                    style={{ display: "inline-block" }}
-                  />
-                }
-              />
-            </Grid>
+            {tabValue === 0 && (
+              <Grid item xs={12}>
+                <FormControlLabel
+                  label="Minimum Gifts List"
+                  style={{
+                    display: "inline-block",
+                    flex: 1,
+                    paddingTop: 0,
+                  }}
+                  control={
+                    <Checkbox
+                      name="minGiftList"
+                      value="minGiftList"
+                      onChange={toggleMinGiftList}
+                      checked={minGiftList}
+                      style={{ display: "inline-block" }}
+                    />
+                  }
+                />
+              </Grid>
+            )}
           </Grid>
           <Grid item xs={12} lg={6}>
             <SortOptions
@@ -358,26 +361,26 @@ export default function Gifts() {
             />
           </Grid>
         </Grid>
-        
+
         {tabValue === 0 || tabValue === 4 ? (
-        <FormControlLabel
-          label="Include Universally Loved Items"
-          style={{
-            display: "inline-block",
-            flex: 1,
-            paddingTop: "0.25rem",
-            borderTop: '1px solid gainsboro'
-          }}
-          control={
-            <Checkbox
-              name="includeUniversalLoves"
-              value="includeUniversalLoves"
-              onChange={toggleUniversalLoves}
-              checked={includeUniversalLoves}
-              style={{ display: "inline-block" }}
-            />
-          }
-        />
+          <FormControlLabel
+            label="Include Universally Loved Items"
+            style={{
+              display: "inline-block",
+              flex: 1,
+              paddingTop: "0.25rem",
+              borderTop: "1px solid gainsboro",
+            }}
+            control={
+              <Checkbox
+                name="includeUniversalLoves"
+                value="includeUniversalLoves"
+                onChange={toggleUniversalLoves}
+                checked={includeUniversalLoves}
+                style={{ display: "inline-block" }}
+              />
+            }
+          />
         ) : (
           ""
         )}
@@ -388,19 +391,39 @@ export default function Gifts() {
         onChangeIndex={handleIndexChange}
       >
         <TabPanel value={tabValue} index={0} className={classes.tabPanel}>
-          <GiftList list={lovedGifts} display={displayStyle} preference="love" />
+          <GiftList
+            list={lovedGifts}
+            display={displayStyle}
+            preference="love"
+          />
         </TabPanel>
         <TabPanel value={tabValue} index={1} className={classes.tabPanel}>
-          <GiftList list={likedGifts} display={displayStyle} preference="like" />
+          <GiftList
+            list={likedGifts}
+            display={displayStyle}
+            preference="like"
+          />
         </TabPanel>
         <TabPanel value={tabValue} index={2} className={classes.tabPanel}>
-          <GiftList list={neutralGifts} display={displayStyle} preference="neutral" />
+          <GiftList
+            list={neutralGifts}
+            display={displayStyle}
+            preference="neutral"
+          />
         </TabPanel>
         <TabPanel value={tabValue} index={3} className={classes.tabPanel}>
-          <GiftList list={dislikedGifts} display={displayStyle} preference="dislike" />
+          <GiftList
+            list={dislikedGifts}
+            display={displayStyle}
+            preference="dislike"
+          />
         </TabPanel>
         <TabPanel value={tabValue} index={4} className={classes.tabPanel}>
-          <GiftList list={hatedGifts} display={displayStyle} preference="hate" />
+          <GiftList
+            list={hatedGifts}
+            display={displayStyle}
+            preference="hate"
+          />
         </TabPanel>
       </SwipeableViews>
     </Box>

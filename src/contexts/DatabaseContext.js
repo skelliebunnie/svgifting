@@ -145,7 +145,7 @@ const DatabaseContextProvider = (props) => {
   	API.getSeasons()
   		.then(res => {
   			// (str, dir=null, ext='png', returnAsString)
-  			console.log("season name", res.data[0].name)
+  			// console.log("season name", res.data[0].name)
   			const seasons = res.data.map(season => ({ ...season, image: season.name === "Spring" ? seasonIcon_Spring : season.name === "Summer" ? seasonIcon_Summer : season.name === "Fall" ? seasonIcon_Fall : season.name === "Winter" ? seasonIcon_Winter : seasonIcon_All, isChecked: false }));
 
 	  		setDbSeasons(seasons);
@@ -154,7 +154,7 @@ const DatabaseContextProvider = (props) => {
 	  			SeasonId: seasons
 	  		})
 	  	}).catch(err => console.error(err));
-
+  //eslint-disable-next-line
   }, [])
 
   useEffect(() => {
@@ -224,8 +224,8 @@ const DatabaseContextProvider = (props) => {
     API.getItems()
       .then(list => {
         const data = list.data.map(item => ({...item, isChecked: false, icon: getIcon(item.name)}) )
-        setItems(data)
-        setAllItems(data)
+        setItems([...data])
+        setAllItems([...data])
       })
       .catch(err => console.error(err));
   }
@@ -233,7 +233,7 @@ const DatabaseContextProvider = (props) => {
   const getEvents = (SeasonId) => {
     API.getEventsBySeason(SeasonId)
       .then(results => {
-        setEvents(results.data)
+        setEvents([...results.data])
       })
       .catch(err => console.error(err))
   }

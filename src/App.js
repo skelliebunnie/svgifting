@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { Switch, Route, useLocation } from 'react-router-dom'
 import { ThemeProvider } from '@material-ui/core/styles'
 import mainTheme from './themes/mainTheme'
@@ -7,12 +8,16 @@ import { Box } from '@material-ui/core'
 
 import { SnackbarProvider } from 'notistack'
 import DatabaseContextProvider from './contexts/DatabaseContext';
+import GeneralFunctions from "./utils/GeneralFunctions";
 
 import Navbar from './components/Navbar'
 
 import Npcs from './pages/Npcs'
 import Gifts from './pages/Gifts'
 import Events from './pages/Events'
+
+import Login from './pages/Login'
+
 import AdminNpcs from './pages/AdminNpcs'
 import AdminGifts from './pages/AdminGifts'
 import AdminItems from './pages/AdminItems'
@@ -48,12 +53,26 @@ function App() {
   const location = useLocation();
   const classes = useStyles();
 
-  const eventToken = location.pathname.includes("admin") ? true : false;
-  localStorage.setItem('token', eventToken)
+  const [user, setUser] = useState({
+    name: "",
+    username: "",
+    email: "",
+    admin: false,
+    isLoggedIn: false
+  });
+
+  useEffect(() => {
+    const authToken = localStorage.getItem("svgifting-token") || null;
+
+    if (authToken !== null) {
+      GeneralFunctions.userAuth(authToken).then(res => setUser(res));
+    }
+
+  }, []);
 
   return (
     <ThemeProvider theme={mainTheme}>
-      <Navbar active={location.pathname} />
+      <Navbar active={location.pathname} user={user} />
       <SnackbarProvider
         maxSnack={5} 
         classes={{
@@ -70,7 +89,10 @@ function App() {
               <Route exact path="/" component={Npcs} />
               <Route exact path="/npcs" component={Npcs} />
               <Route exact path="/gifts" component={Gifts} />
-              <Route path="/events" component={Events} />
+              <Route exact path="/login" component={Login} />
+              <Route path="/events">
+                <Events userIsAdmin={user.admin} />
+              </Route>
               {/* ADMIN ROUTES */}
               <Route exact path="/npcs/admin" component={AdminNpcs} />
               <Route exact path="/items/admin" component={AdminItems} />

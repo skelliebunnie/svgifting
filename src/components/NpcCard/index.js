@@ -3,9 +3,7 @@ import { DatabaseContext } from '../../contexts/DatabaseContext'
 import { makeStyles } from '@material-ui/core/styles'
 import { Box, Card, CardContent, CardMedia, Typography } from '@material-ui/core'
 
-
-import NpcIcon from '../NpcIcon'
-import ItemIcon from '../ItemIcon'
+import CustomIcon from '../CustomIcon'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -93,21 +91,23 @@ export default function NpcCard(props) {
   const classes = useStyles();
   const { universalLoves, getURL } = useContext(DatabaseContext);
 
-  let npc_name = props.name;
+  let npc_name = props.data.name;
   if(npc_name.includes(" ")) npc_name = npc_name.split(" ")[0];
   const portrait_url = require(`../../assets/npc_portraits/${npc_name}.png`);
   const love_emote = require(`../../assets/emotes/42px-Emote_Heart.png`);
 
-  const npc_url = props.includeLink ? getURL(props.name) : '';
+  const npc_url = props.includeLink ? getURL(props.data.name) : '';
 
   const [gifts, setGifts] = useState([])
 
   useEffect(() => {
     if(props.includeULoves) {
-      setGifts(props.gifts)
+      setGifts(props.data.Items)
 
     } else {
-      setGifts( props.gifts.filter(gift => !universalLoves.includes(gift.name)) )
+      setGifts(
+        props.data.Items.filter((gift) => !universalLoves.includes(gift.name))
+      );
 
     }
   // eslint-disable-next-line
@@ -116,27 +116,39 @@ export default function NpcCard(props) {
   return (
     <Card
       className={
-        props.status && props.name !== "Krobus"
+        props.data.status && props.data.name !== "Krobus"
           ? `${classes.root} ${classes.marriageable}`
           : classes.root
       }
     >
       <div className={classes.details}>
         <CardContent className={classes.content}>
-          <NpcIcon name={props.name} />
+          <CustomIcon
+            data={props.data}
+            mainDir="npc_icons"
+            includeTooltip={false}
+            style={{verticalAlign: 'baseline'}}
+          />
           <Typography component="h5" variant="h5" className={classes.name}>
-            {props.name}
+            {props.data.name}
+            <span style={{fontSize: 'small'}}>
+              {props.data.availableIn !== "Vanilla"
+                ? ` ( ${props.data.availableIn} )`
+                : ""}
+            </span>
           </Typography>
           <Typography variant="subtitle1" className={classes.status}>
             <strong>
-              {props.status && props.name !== "Krobus"
+              {props.data.status && props.data.name !== "Krobus"
                 ? "Marriage Candidate"
                 : ""}
             </strong>
           </Typography>
           <Typography className={classes.birthday}>
             <strong>Birthday:</strong>{" "}
-            {props.data.Seasons[0] !== undefined ? `${props.data.Seasons[0].name} ${props.data.Seasons[0].Event.day}` : ''}
+            {props.data.Seasons[0] !== undefined
+              ? `${props.data.Seasons[0].name} ${props.data.Seasons[0].Event.day}`
+              : ""}
           </Typography>
           {gifts.length > 0 && (
             <Box>
@@ -157,17 +169,22 @@ export default function NpcCard(props) {
                 {gifts.map(
                   (gift) =>
                     gift.Gift.preference === "love" && (
-                      <ItemIcon
+                      <CustomIcon
                         key={gift.name}
                         name={gift.name}
-                        icon={gift.icon}
                         size={24}
                         includeLink={true}
                       />
                     )
                 )}
               </section>
-              {props.includeLink ? <a href={npc_url} target="_blank" rel="noreferrer">View Wiki</a> : ''}
+              {props.includeLink ? (
+                <a href={npc_url} target="_blank" rel="noreferrer">
+                  View Wiki
+                </a>
+              ) : (
+                ""
+              )}
             </Box>
           )}
         </CardContent>
@@ -175,7 +192,7 @@ export default function NpcCard(props) {
       <CardMedia
         className={classes.portrait}
         image={portrait_url.default}
-        title={props.name}
+        title={props.data.name}
       />
     </Card>
   );

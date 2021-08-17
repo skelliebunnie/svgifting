@@ -3,7 +3,7 @@ import { DatabaseContext } from "../../contexts/DatabaseContext";
 import { makeStyles } from '@material-ui/core/styles'
 import { Card, CardContent, CardMedia, Typography } from '@material-ui/core'
 
-import NpcIcon from '../NpcIcon'
+import CustomIcon from '../CustomIcon'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -75,7 +75,7 @@ export default function GiftListItem(props) {
             {props.gift}
           </Typography>
           <div>
-          	{props.npcs.map(npc => <span key={npc.name} onContextMenu={(e) => props.contextMenu(e, npc)} className={props.showContextMenu && props.npc.id === npc.id ? `${classes.npcIcon} ${classes.activeNpc}` : classes.npcIcon}><NpcIcon name={npc.name} npcid={npc.id} tooltipLocation="top" /></span>)}
+          	{props.npcs.map(npc => <span key={npc.name} onContextMenu={(e) => props.contextMenu(e, npc)} className={props.showContextMenu && props.npc.id === npc.id ? `${classes.npcIcon} ${classes.activeNpc}` : classes.npcIcon}><CustomIcon name={npc.name} mainDir="npc_icons" npcid={npc.id} tooltipPlacement="top" /></span>)}
           </div>
         </CardContent>
       </div>

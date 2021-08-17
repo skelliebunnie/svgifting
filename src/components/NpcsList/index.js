@@ -5,8 +5,8 @@ import { Container } from '@material-ui/core'
 import { DataGrid, GridToolbar } from '@material-ui/data-grid'
 
 import NpcCard from '../NpcCard'
-import NpcIcon from '../NpcIcon'
-import ItemIcon from '../ItemIcon'
+
+import CustomIcon from '../CustomIcon'
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -56,18 +56,34 @@ const useStyles = makeStyles(() => ({
 
 const npcIcon = {
   headerName: " ",
-  align: 'center',
+  align: "center",
   disableColumnMenu: true,
   renderCell: ({ value }) => (
-    <NpcIcon name={value} tooltip={false} style={{verticalAlign: 'middle', margin: '0 auto'}} />
-  )
-}
+    <CustomIcon
+      name={value}
+      mainDir="npc_icons"
+      includeTooltip={false}
+      style={{ verticalAlign: "middle", margin: "0 auto" }}
+    />
+    // <NpcIcon name={value} tooltip={false} style={{verticalAlign: 'middle', margin: '0 auto'}} />
+  ),
+};
 
 const giftIcons = {
   disableColumnMenu: true,
   renderCell: (({value}) => (
     <div>
-    {value.length > 0 ? value.map(item => <ItemIcon key={item.name} name={item.name} size={24} style={{position: 'relative', margin: '8px', verticalAlign: 'middle'}} />) : ""}
+    {value.length > 0 
+      ? value.map(item => 
+          <CustomIcon 
+            key={item.name} 
+            name={item.name} 
+            mainDir="item_icons"
+            size={24} 
+            style={{position: 'relative', margin: '8px', verticalAlign: 'middle'}} 
+          />
+        ) 
+      : ""}
     </div>
   ))
 }
@@ -175,13 +191,12 @@ export default function NpcsList(props) {
         npcs.map((npc) => (
           <NpcCard
             key={npc.name}
-            name={npc.name}
-            status={npc.marriageable}
-            gifts={npc.Items}
-            includeULoves={props.includeULoves}
+            // name={npc.name}
+            // status={npc.marriageable}
+            // gifts={npc.Items}
             data={npc}
+            includeULoves={props.includeULoves}
             includeLink={true}
-            availableIn={npc.availableIn}
           />
         ))}
       {/* LIST DISPLAY */}
@@ -193,10 +208,15 @@ export default function NpcsList(props) {
                 <div
                   style={{ flex: 0, margin: 0, padding: 0, lineHeight: "1rem" }}
                 >
-                  <NpcIcon
+                  <CustomIcon
                     name={npc.name}
+                    mainDir="npc_icons"
                     style={{ verticalAlign: "middle", margin: 0 }}
                   />
+                  {/* <NpcIcon
+                    name={npc.name}
+                    style={{ verticalAlign: "middle", margin: 0 }}
+                  /> */}
                 </div>
                 <div style={{ flex: 1 }}>
                   <p style={{ margin: "0.25rem 0" }}>
@@ -220,12 +240,19 @@ export default function NpcsList(props) {
                         !universalLoves.includes(item.name))) &&
                     item.Gift.preference === "love" && (
                       <li key={item.id}>
-                        <ItemIcon
+                        <CustomIcon 
+                          key={item.name}
+                          name={item.name}
+                          mainDir="item_icons"
+                          size={24}
+                          tooltipPlacement="bottom"
+                        />
+                        {/* <ItemIcon
                           key={item.name}
                           name={item.name}
                           icon={item.icon}
                           size={24}
-                        />
+                        /> */}
                       </li>
                     )
                 )}
