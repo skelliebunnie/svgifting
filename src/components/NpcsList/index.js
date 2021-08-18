@@ -91,7 +91,7 @@ const giftIcons = {
 export default function NpcsList(props) {
   const classes = useStyles();
 
-  const { universalLoves, sortNpcData } = useContext(DatabaseContext);
+  const { universalLoves, sortNpcData, availableIn } = useContext(DatabaseContext);
 
   const [npcs, setNpcs] = useState(props.npcs);
 
@@ -120,11 +120,16 @@ export default function NpcsList(props) {
   const [sortBy, setSortBy] = useState(props.sortBy)
 
   useEffect(() => {
-    setNpcs(props.npcs);
-    const rows = createTableRows(props.npcs);
-    setDataGridRows(rows);
+    const npcList = sortNpcData(props.npcs, props.sortBy)
+    const mods = availableIn.map((mod) => mod.isChecked && mod.name);
+    const filteredNpcsList = npcList.filter(npc => mods.includes(npc.availableIn));
 
-  }, [props.npcs]);
+    setNpcs(filteredNpcsList);
+    const rows = createTableRows(filteredNpcsList);
+    setDataGridRows(rows);
+  // eslint-disable-next-line
+  }, [props.npcs, availableIn, props.sortBy]);
+
 
   useEffect(() => {
     // sortData(npcs, sortBy);
@@ -149,7 +154,7 @@ export default function NpcsList(props) {
     
     createTableRows(npcData);
 
-    setSortBy(props.sortBy);
+    // setSortBy(props.sortBy);
     //eslint-disable-next-line
   }, [sortBy])
 

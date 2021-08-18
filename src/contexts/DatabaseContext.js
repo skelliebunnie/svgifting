@@ -27,6 +27,19 @@ const DatabaseContextProvider = (props) => {
     message: 'A Snackbar Alert'
   });
 
+  const [availableIn, setAvailableIn] = useState([{ name: "Vanilla", isChecked: true }]);
+
+  const handleAvailableInChecks = (e) => {
+    const mods = availableIn.map((mod) => ({
+      ...mod,
+      isChecked: e.target.name === mod.name ? e.target.checked : mod.isChecked,
+    }));
+
+    setAvailableIn(mods);
+
+    localStorage.setItem("sv_available_in", JSON.stringify(mods));
+  };
+
   /**
    * ADDING ITEMS (page & modal)
    */
@@ -35,39 +48,6 @@ const DatabaseContextProvider = (props) => {
 
   const [selectedItem, setSelectedItem] = useState(null)
   const [itemSearchTerm, setItemSearchTerm] = useState("")
-
-  // const defaultSeasonSelection = [
-  //   {
-  //     id: 1,
-  //     name: 'Spring',
-  //     icon: seasonIcon_spring,
-  //     isChecked: false
-  //   },
-  //   {
-  //     id: 2,
-  //     name: 'Summer',
-  //     icon: seasonIcon_summer,
-  //     isChecked: false
-  //   },
-  //   {
-  //     id: 3,
-  //     name: 'Fall',
-  //     icon: seasonIcon_fall,
-  //     isChecked: false
-  //   },
-  //   {
-  //     id: 4,
-  //     name: 'Winter',
-  //     icon: seasonIcon_winter,
-  //     isChecked: false
-  //   },
-  //   {
-  //     id: 5,
-  //     name: 'All',
-  //     icon: seasonIcon_all,
-  //     isChecked: true
-  //   }
-  // ];
 
   const [defaultItemAvailability, setDefaultItemAvailability] = useState({
   	id: 0,
@@ -140,7 +120,38 @@ const DatabaseContextProvider = (props) => {
   });
 
   useEffect(() => {
-  	API.getNpcs().then(res => setNpcs(res.data)).catch(err => console.error(err));
+    const savedAvailableIn = JSON.parse(localStorage.getItem("sv_available_in")) || [{ name: "Vanilla", isChecked: true }]
+
+    let mods = availableIn.map(mod => mod.name);
+
+  	API.getNpcs().then(res => {
+      const npcs = res.data;
+      setNpcs(npcs);
+
+      npcs.forEach(npc => {
+        if (!mods.includes(npc.availableIn)) {
+          mods.push(npc.availableIn);
+        }
+      });
+
+      if(savedAvailableIn.length > 1 && savedAvailableIn.length < mods.length) {
+        const saved = savedAvailableIn.map(mod => mod.name)
+
+        mods.forEach((mod) => {
+          if(!saved.includes(mod)) {
+            mods.push({ name: mod, isChecked: false })
+          }
+        });
+
+      } else if(savedAvailableIn.length <= 1) {
+        setAvailableIn(mods.map((mod) => ({ name: mod, isChecked: mod === "Vanilla" ? true : false })));
+
+      } else {
+        setAvailableIn(savedAvailableIn);
+      }
+
+    }).catch(err => console.error(err));
+    
   	API.getItems().then(res => {setItems(res.data); setAllItems(res.data)}).catch(err => console.error(err));
   	API.getSeasons()
   		.then(res => {
@@ -486,13 +497,13 @@ const DatabaseContextProvider = (props) => {
   }
 
   const sortNpcData = (data, sortBy = "Npc Name") => {
-    if (sortBy === "Number of Loved Gifts") {
+    if (sortBy.includes("Gifts")) {
       // console.log("sorting by number of loved gifts", data);
       data.sort((a, b) => {
         // here, we're sorting largest to smallest (descending)
         return a.Items.length > b.Items.length ? -1 : 1;
       });
-    } else if (sortBy === "Birthday <Season, Day>") {
+    } else if (sortBy.includes("Birthday")) {
       data.sort((a, b) => {
         if (a.birthdaySeasonId === b.birthdaySeasonId) {
           return a.birthdayDate > b.birthdayDate ? 1 : -1;
@@ -572,7 +583,7 @@ const DatabaseContextProvider = (props) => {
   };
 
   return (
-    <DatabaseContext.Provider value={{ gameVersions, dbSeasons, dbNpcs, dbItems, setItems, getItems, allItems, setAllItems, dbItemCategories, addItemModalOpen, setAddItemModalOpen, addItemFormSubmit, alert, setAlert, handleAlertClose, addItemFormOptions, setAddItemFormOptions, defaultAddItemFormOptions, defaultItemAvailability, selectedItem, setSelectedItem, itemSearchTerm, setItemSearchTerm, universalLoves, getIcon, dates, seasons, events, selectedDate, setSelectedDate, selectedSeason, setSelectedSeason, handleSeasonChange, defaultNewEvent, newEvent, setNewEvent, addEvent, deleteEvent, addEventModalOpen, setAddEventModalOpen, sortNpcData, sortItemData, getURL, selectedNpc, setSelectedNpc, addNpcFormOptions, setAddNpcFormOptions, addNpcFormSubmit }}>
+    <DatabaseContext.Provider value={{ gameVersions, dbSeasons, dbNpcs, dbItems, setItems, getItems, allItems, setAllItems, dbItemCategories, addItemModalOpen, setAddItemModalOpen, addItemFormSubmit, alert, setAlert, handleAlertClose, addItemFormOptions, setAddItemFormOptions, defaultAddItemFormOptions, defaultItemAvailability, selectedItem, setSelectedItem, itemSearchTerm, setItemSearchTerm, universalLoves, getIcon, dates, seasons, events, selectedDate, setSelectedDate, selectedSeason, setSelectedSeason, handleSeasonChange, defaultNewEvent, newEvent, setNewEvent, addEvent, deleteEvent, addEventModalOpen, setAddEventModalOpen, sortNpcData, sortItemData, getURL, selectedNpc, setSelectedNpc, addNpcFormOptions, setAddNpcFormOptions, addNpcFormSubmit, availableIn, handleAvailableInChecks }}>
       {props.children}
     </DatabaseContext.Provider>
   )

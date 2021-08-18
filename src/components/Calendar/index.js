@@ -230,7 +230,7 @@ const useStyles = makeStyles((theme) => ({
 export default function Calendar({ userIsAdmin, modalState, openModal, closeModal }) {
   const classes = useStyles();
 
-  const { dates, seasons, events, selectedSeason, handleSeasonChange, deleteEvent, setNewEvent } = useContext(DatabaseContext)
+  const { dates, seasons, events, selectedSeason, handleSeasonChange, deleteEvent, setNewEvent, availableIn } = useContext(DatabaseContext)
   
   const [allSeasons, setAllSeasons] = useState([])
   const [allEvents, setAllEvents] = useState([])
@@ -240,10 +240,15 @@ export default function Calendar({ userIsAdmin, modalState, openModal, closeModa
   const [selectedEvent, setSelectedEvent] = useState(null);
 
   useEffect(() => {
-    setAllSeasons(seasons);
-    setAllEvents(events);
+    const availInArr = availableIn.map((mod) => mod.isChecked && mod.name);
 
-  }, [seasons, events])
+    const npcEvents = events.filter(event => event.Npc !== null).filter(event => availInArr.includes(event.Npc.availableIn));
+    const generalEvents = events.filter(event => event.Npc === null);
+
+    setAllSeasons(seasons.filter(season => season.name !== "All"));
+    setAllEvents([...generalEvents, ...npcEvents]);
+
+  }, [seasons, events, availableIn])
 
   const openNewEventUpdate = (event) => {
     let updateEvent = event;
@@ -436,12 +441,12 @@ export default function Calendar({ userIsAdmin, modalState, openModal, closeModa
                                   includeTooltip={true}
                                   tooltipText={event.name}
                                   name={event.name}
-                                  icon={
+                                  iconName={
                                     event.name === "Night Market"
                                       ? "Iridium_Quality"
-                                      : event.type === "other"
-                                      ? "Stardew_Checkup"
-                                      : "Calendar_Flag_Static"
+                                      : event.type === "festival"
+                                      ? "Calendar_Flag_Static"
+                                      : "Stardew_Checkup_Icon"
                                   }
                                   mainDir="other_icons"
                                 />

@@ -74,7 +74,7 @@ const GeneralFunctions = {
           isLoggedIn: false
         };
       });
-  }
+  },
 };
 
 export default GeneralFunctions;

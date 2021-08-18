@@ -51,7 +51,7 @@ export default function CustomIcon(props) {
     constructIcon();
 
   // eslint-disable-next-line
-  }, [props.name, props.maindir, props.overlay, props.overlaydir, props.overlayPosition, props.tooltipPlacement, props.size, props.style, props.includeLink])
+  }, [props.name, props.icon, props.maindir, props.overlay, props.overlaydir, props.overlayPosition, props.tooltipPlacement, props.size, props.style, props.includeLink])
 
   const constructIcon = () => {
     let name, iconName;
@@ -64,7 +64,7 @@ export default function CustomIcon(props) {
     }
 
     if(props.iconName !== undefined) {
-      iconName = props.icon;
+      iconName = props.iconName;
     } else {
       iconName = name;
     }

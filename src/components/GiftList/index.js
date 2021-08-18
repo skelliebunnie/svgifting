@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useContext } from 'react'
+import { DatabaseContext } from "../../contexts/DatabaseContext";
 import { makeStyles } from '@material-ui/core/styles'
 import { Container } from '@material-ui/core'
 import { NavigateNext, NavigateBefore } from '@material-ui/icons'
@@ -99,6 +100,8 @@ const useStyles = makeStyles((theme) => ({
 export default function GiftList(props) {
   const classes = useStyles();
 
+  const { availableIn } = useContext(DatabaseContext);
+
   const tableRef = useRef(null)
   const tableContainerRef = useRef(null)
 
@@ -112,9 +115,15 @@ export default function GiftList(props) {
 
   useEffect(() => {
     API.getNpcs()
-      .then(res => setNpcs(res.data))
+      .then(res => {
+        const list = res.data;
+        const avail = availableIn.map(mod => mod.name);
+
+        setNpcs(list.filter(npc => avail.includes(npc.availableIn)));
+      })
       .catch(err => console.error(err))
-  }, []);
+
+  }, [availableIn]);
 
   const handleRightClick = (e, npc) => {
   	e.preventDefault();

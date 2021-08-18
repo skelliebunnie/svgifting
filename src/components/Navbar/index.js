@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useContext } from 'react'
+import { DatabaseContext } from "../../contexts/DatabaseContext";
 import { Link } from 'react-router-dom'
-import { makeStyles } from '@material-ui/core/styles'
-import { Grid, AppBar, Toolbar, Typography, IconButton, Button, Menu, MenuItem } from '@material-ui/core'
+import { makeStyles, withStyles } from '@material-ui/core/styles'
+import { Grid, AppBar, Toolbar, Typography, IconButton, Button, Menu, MenuItem, FormControlLabel, Checkbox } from '@material-ui/core'
 import MenuIcon from '@material-ui/icons/Menu';
 
 const useStyles = makeStyles((theme) => ({
@@ -51,8 +52,41 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
+const CustomCheckbox = withStyles((theme) => ({
+  root: {
+    color: theme.palette.green[600],
+    // '&$checked': {
+    //   color: theme.palette.green[600]
+    // }
+  },
+}))((props) => <Checkbox color="default" {...props} />);
+
+function FilterAvailableIn({ includeAvailableIn, handleAvailableInChecks }) {
+  return (
+    <>
+      {includeAvailableIn.map(mod => (
+        <FormControlLabel
+          key={mod.name}
+          label={mod.name}
+          control={
+            <CustomCheckbox
+              name={mod.name}
+              value={mod.name}
+              onChange={handleAvailableInChecks}
+              checked={mod.isChecked}
+              style={{ display: "inline-block" }}
+            />
+          }
+        />
+      ))}
+    </>
+  );
+}
+
 export default function Navbar(props) {
   const classes = useStyles();
+
+  const { availableIn, handleAvailableInChecks } = useContext(DatabaseContext);
 
   const [anchorEl, setAnchorEl] = useState(null);
 
@@ -87,15 +121,23 @@ export default function Navbar(props) {
             <MenuItem className={active === '/gifts' ? `${classes.button} ${classes.active}` : classes.button} ><Link to='/gifts'>Gifts</Link></MenuItem>
             <MenuItem className={active === '/events' ? `${classes.button} ${classes.active}` : classes.button} ><Link to='/events'>Events</Link></MenuItem>
             {/* Login */}
-            <MenuItem className={active === '/login' ? `${classes.button} ${classes.active}` : classes.button}><Link to='/login'>Sign In</Link></MenuItem>
+            {!userData.isLoggedIn &&
+              <MenuItem className={active === '/login' ? `${classes.button} ${classes.active}` : classes.button}><Link to='/login'>Sign In</Link></MenuItem>
+            }
             {/* Admin Only */}
-            {userData !== null && userData.admin &&
+            {(userData.isLoggedIn && userData.Admin) &&
             <>
               <MenuItem className={active === '/npcs/admin' ? `${classes.button} ${classes.active}` : classes.button} ><Link to='/npcs/admin'>Admin NPCs</Link></MenuItem>
               <MenuItem className={active === '/items/admin' ? `${classes.button} ${classes.active}` : classes.button} ><Link to='/items/admin'>Admin Items</Link></MenuItem>
               <MenuItem className={active === '/gifts/admin' ? `${classes.button} ${classes.active}` : classes.button} ><Link to='/gifts/admin'>Admin Gifts</Link></MenuItem>
             </>
             }
+            <hr/>
+            <Typography>Include Data From:</Typography>
+            <FilterAvailableIn
+              includeAvailableIn={availableIn}
+              handleAvailableInChecks={handleAvailableInChecks}
+            />
           </Menu>
           </>
           :
@@ -104,14 +146,21 @@ export default function Navbar(props) {
               <Button className={active === '/' ? `${classes.button} ${classes.active}` : classes.button}><Link to='/'>NPCs</Link></Button>
               <Button className={active === '/gifts' ? `${classes.button} ${classes.active}` : classes.button}><Link to='/gifts'>Gifts</Link></Button>
               <Button className={active === '/events' ? `${classes.button} ${classes.active}` : classes.button}><Link to='/events'>Events</Link></Button>
+              <div style={{display: 'inline-block', color: 'gainsboro'}}>
+                <span style={{ borderLeft: '2px solid gainsboro', paddingLeft: '1rem'}}>Include Data From:&nbsp;&nbsp;&nbsp;</span>
+                <FilterAvailableIn
+                  includeAvailableIn={availableIn}
+                  handleAvailableInChecks={handleAvailableInChecks}
+                />
+              </div>
             </Grid>
             <Grid item>
               {/* Login */}
-              {userData === null &&
+              {!userData.isLoggedIn &&
                 <Button className={active === '/login' ? `${classes.button} ${classes.active} ${classes.login}` : `${classes.button} ${classes.login}`}><Link to='/login'>Sign In</Link></Button>
               }
               {/* Admin Only */}
-              {userData !== null && userData.admin &&
+              {(userData.isLoggedIn && userData.admin) &&
               <>
                 <Button className={active === '/npcs/admin' ? `${classes.button} ${classes.active}` : classes.button} ><Link to='/npcs/admin'>Admin NPCs</Link></Button>
                 <Button className={active === '/items/admin' ? `${classes.button} ${classes.active}` : classes.button} ><Link to='/items/admin'>Admin Items</Link></Button>

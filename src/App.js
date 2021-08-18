@@ -72,18 +72,19 @@ function App() {
 
   return (
     <ThemeProvider theme={mainTheme}>
-      <Navbar active={location.pathname} user={user} />
-      <SnackbarProvider
-        maxSnack={5} 
-        classes={{
-          variantSuccess: classes.success,
-          variantError: classes.error,
-          variantWarning: classes.warning,
-          variantInfo: classes.info
-        }}
-        preventDuplicate
-      >
-        <DatabaseContextProvider>
+      <DatabaseContextProvider>
+        <Navbar active={location.pathname} user={user} />
+        <SnackbarProvider
+          maxSnack={5} 
+          classes={{
+            variantSuccess: classes.success,
+            variantError: classes.error,
+            variantWarning: classes.warning,
+            variantInfo: classes.info
+          }}
+          preventDuplicate
+        >
+          
           <Box className={classes.root} style={location.pathname !== '/gifts' ? {paddingTop: '2rem'} : {}}>
             <Switch location={location} key={location.pathname}>
               <Route exact path="/" component={Npcs} />
@@ -99,8 +100,8 @@ function App() {
               <Route exact path="/gifts/admin" component={AdminGifts} />
             </Switch>
           </Box>
-        </DatabaseContextProvider>
-      </SnackbarProvider>
+        </SnackbarProvider>
+      </DatabaseContextProvider>
     </ThemeProvider>
   );
 }

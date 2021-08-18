@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from 'react'
 import { DatabaseContext } from '../contexts/DatabaseContext'
 import { makeStyles } from '@material-ui/core/styles'
-import { Box, AppBar, Tabs, Tab, Container, FormControlLabel, Checkbox, InputLabel, FormControl, RadioGroup, Grid, Radio } from '@material-ui/core'
+import { Box, AppBar, Tabs, Tab, Container, FormControlLabel, Checkbox, InputLabel, FormControl, FormHelperText, RadioGroup, Grid, Radio } from '@material-ui/core'
 import SwipeableViews from 'react-swipeable-views';
 import API from '../utils/API'
 
@@ -350,40 +350,45 @@ export default function Gifts() {
                     />
                   }
                 />
+                <FormHelperText style={{marginTop: 0, paddingTop: 0}}>
+                  Right-click an NPC icon to view a complete list of loved gifts
+                  for that NPC.
+                </FormHelperText>
               </Grid>
             )}
           </Grid>
-          <Grid item xs={12} lg={6}>
-            <SortOptions
-              options={sortOptions}
-              sortBy={sortBy}
-              handleInputChange={handleInputChange}
-            />
+          <Grid item container xs={12} lg={6} spacing={0}>
+            <Grid item xs={12}>
+              <SortOptions
+                options={sortOptions}
+                sortBy={sortBy}
+                handleInputChange={handleInputChange}
+              />
+            </Grid>
+            {(tabValue === 0 || tabValue === 4) && (
+              <Grid item xs={12}>
+                <FormControlLabel
+                  label="Include Universally Loved Items"
+                  style={{
+                    display: "inline-block",
+                    flex: 1,
+                    paddingTop: "0.25rem",
+                    borderTop: "1px solid gainsboro",
+                  }}
+                  control={
+                    <Checkbox
+                      name="includeUniversalLoves"
+                      value="includeUniversalLoves"
+                      onChange={toggleUniversalLoves}
+                      checked={includeUniversalLoves}
+                      style={{ display: "inline-block" }}
+                    />
+                  }
+                />
+              </Grid>
+            )}
           </Grid>
         </Grid>
-
-        {tabValue === 0 || tabValue === 4 ? (
-          <FormControlLabel
-            label="Include Universally Loved Items"
-            style={{
-              display: "inline-block",
-              flex: 1,
-              paddingTop: "0.25rem",
-              borderTop: "1px solid gainsboro",
-            }}
-            control={
-              <Checkbox
-                name="includeUniversalLoves"
-                value="includeUniversalLoves"
-                onChange={toggleUniversalLoves}
-                checked={includeUniversalLoves}
-                style={{ display: "inline-block" }}
-              />
-            }
-          />
-        ) : (
-          ""
-        )}
       </Container>
       <SwipeableViews
         axis="x"

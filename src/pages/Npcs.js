@@ -81,6 +81,7 @@ export default function Npcs() {
   const displayOptions = ["Grid", "List", "Table"]
 
   const [uLovesChecked, setULovesChecked] = useState(JSON.parse(localStorage.getItem("sv_include_uloves")) || false);
+
   const [sortBy, setSortBy] = useState('Npc Name')
   const [display, setDisplay] = useState('Grid')
 
@@ -92,6 +93,7 @@ export default function Npcs() {
     API.getNpcs()
       .then((list) => {
         let data = sortNpcData(list.data, sortBy);
+
         setNpcs(data);
         setSearchValue(data[0].name);
 
@@ -100,7 +102,6 @@ export default function Npcs() {
           data[i].Items = data[i].Items.filter(
             (item) => item.Gift.preference === "love"
           );
-
           for (var j = 0; j < data[i].Items.length; j++) {
             const item = data[i].Items[j];
             const icon = getIcon(item.name, "item_icons", "png", false).default;
@@ -110,13 +111,13 @@ export default function Npcs() {
                 : "unavailable";
             data[i].Items[j].icon = icon;
           }
-
           data[i].birthdaySeasonId = data[i].Seasons[0].id;
           data[i].birthdaySeason = data[i].Seasons[0].name;
           data[i].birthdayDate = data[i].Seasons[0].Event.day;
         }
       })
       .catch((err) => console.error(err));
+
   // eslint-disable-next-line
   }, [])
 
@@ -140,11 +141,13 @@ export default function Npcs() {
           inputValue={searchInputValue}
           setInputValue={setSearchInputValue}
         />
-        <FilterUniversallyLovedGifts
-          uLovesChecked={uLovesChecked}
-          toggleUniversalLoves={toggleUniversalLoves}
-        />
         <Grid container>
+          <Grid item xs={12} lg={6}>
+            <FilterUniversallyLovedGifts
+              uLovesChecked={uLovesChecked}
+              toggleUniversalLoves={toggleUniversalLoves}
+            />
+          </Grid>
           <Grid item xs={12} lg={6}>
             <DisplayOptions
               options={displayOptions}
