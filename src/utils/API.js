@@ -1,7 +1,7 @@
 const axios = require("axios")
 
-// const URL_PREFIX = "http://192.168.0.11:3030"
-const URL_PREFIX = "https://evening-thicket-11567.herokuapp.com";
+const URL_PREFIX = "http://192.168.0.11:3030"
+// const URL_PREFIX = "https://evening-thicket-11567.herokuapp.com";
 
 const API = {
   // user login & auth
@@ -68,24 +68,48 @@ const API = {
     return axios.get(`${URL_PREFIX}/api/events/${season}`);
   },
   // post / put / upsert
-  upsertNpc: (data) => {
-    return axios.post(`${URL_PREFIX}/api/npc/upsert`, data);
+  upsertNpc: (data, token) => {
+    return axios.post(`${URL_PREFIX}/api/npc/upsert`, data, {
+      headers: {
+        authorization: `Bearer: ${token}`,
+      },
+    });
   },
-  upsertItem: (data) => {
-    return axios.post(`${URL_PREFIX}/api/item/upsert`, data);
+  upsertItem: (data, token) => {
+    return axios.post(`${URL_PREFIX}/api/item/upsert`, data, {
+      headers: {
+        authorization: `Bearer: ${token}`
+      }
+    });
   },
-  upsertGift: (data) => {
-    return axios.post(`${URL_PREFIX}/api/gift/upsert`, data);
+  upsertGift: (data, token) => {
+    return axios.post(`${URL_PREFIX}/api/gift/upsert`, data, {
+      headers: {
+        authorization: `Bearer: ${token}`
+      }
+    });
   },
-  postEvent: (data) => {
-    return axios.post(`${URL_PREFIX}/api/event`, data);
+  postEvent: (data, token) => {
+    return axios.post(`${URL_PREFIX}/api/event`, data, {
+      headers: {
+        authorization: `Bearer: ${token}`
+      }
+    });
   },
-  upsertEvent: (data) => {
-    return axios.post(`${URL_PREFIX}/api/event/upsert`, data);
+  upsertEvent: (data, token) => {
+    return axios.post(`${URL_PREFIX}/api/event/upsert`, data, {
+      headers: {
+        authorization: `Bearer: ${token}`
+      }
+    });
   },
   // delete
-  deleteEvent: (id) => {
-    return axios.delete(`${URL_PREFIX}/api/event/${id}`);
+  deleteEvent: (id, token) => {
+    return axios.delete(`${URL_PREFIX}/api/event/${id}`, {
+      headers: {
+        authorization: `Bearer: ${token}`
+      }
+    });
   },
 };
 

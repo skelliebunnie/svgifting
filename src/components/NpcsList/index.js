@@ -120,6 +120,7 @@ export default function NpcsList(props) {
   const [sortBy, setSortBy] = useState(props.sortBy)
 
   useEffect(() => {
+    console.log(props.npcs)
     const npcList = sortNpcData(props.npcs, props.sortBy)
     const mods = availableIn.map((mod) => mod.isChecked && mod.name);
     const filteredNpcsList = npcList.filter(npc => mods.includes(npc.availableIn));

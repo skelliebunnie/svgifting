@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import { DatabaseContext } from "../../contexts/DatabaseContext";
 import { Link } from 'react-router-dom'
 import { makeStyles, withStyles } from '@material-ui/core/styles'
@@ -90,8 +90,12 @@ export default function Navbar(props) {
 
   const [anchorEl, setAnchorEl] = useState(null);
 
-  const userData = props.user || null;
+  const [userData, setUserData] = useState(props.user || null);
   const active = props.active;
+
+  useEffect(() => {
+    setUserData(props.user)
+  }, [props.user])
 
   const openMenu = (e) => {
     setAnchorEl(e.currentTarget);

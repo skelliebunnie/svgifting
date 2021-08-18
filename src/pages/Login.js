@@ -48,7 +48,7 @@ export default function Login(props) {
 
   const handleLogin = (e) => {
     e.preventDefault();
-
+    
     API.login(loginForm).then(res => {
       localStorage.setItem("svgifting-token", res.data.token);
 
@@ -79,7 +79,7 @@ export default function Login(props) {
       <form autoComplete="off" onSubmit={handleLogin} className={classes.root}>
         <TextField label="Username" name="username" variant="filled" value={loginForm.username} type="text" onChange={handleInputChange} required />
         <TextField label="Password" name="password" variant="filled" value={loginForm.password} type="password" onChange={handleInputChange} required />
-        <Button variant="contained" color="secondary" onClick={handleLogin}>Sign In</Button>
+        <Button variant="contained" color="secondary" onClick={handleLogin} type="submit">Sign In</Button>
       </form>
     </Container>
   );

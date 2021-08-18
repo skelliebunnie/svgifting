@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Switch, Route, useLocation } from 'react-router-dom'
+import { Switch, Route, useLocation, Redirect } from 'react-router-dom'
 import { ThemeProvider } from '@material-ui/core/styles'
 import mainTheme from './themes/mainTheme'
 
@@ -8,7 +8,7 @@ import { Box } from '@material-ui/core'
 
 import { SnackbarProvider } from 'notistack'
 import DatabaseContextProvider from './contexts/DatabaseContext';
-import GeneralFunctions from "./utils/GeneralFunctions";
+import API from "./utils/API";
 
 import Navbar from './components/Navbar'
 
@@ -64,11 +64,32 @@ function App() {
   useEffect(() => {
     const authToken = localStorage.getItem("svgifting-token") || null;
 
-    if (authToken !== null) {
-      GeneralFunctions.userAuth(authToken).then(res => setUser(res));
+    if (authToken !== null && !user.isLoggedIn) {
+      API.getAuthToken(authToken)
+        .then((res) => {
+          setUser({
+            name: res.data.name,
+            username: res.data.username,
+            email: res.data.email,
+            admin: res.data.admin,
+            isLoggedIn: true,
+          });
+        })
+        .catch((err) => {
+          console.log(err);
+          localStorage.removeItem("svgifting-token");
+
+          setUser({
+            name: "",
+            username: "",
+            email: "",
+            admin: false,
+            isLoggedIn: false,
+          });
+        });
     }
 
-  }, []);
+  }, [user.isLoggedIn]);
 
   return (
     <ThemeProvider theme={mainTheme}>
@@ -95,9 +116,15 @@ function App() {
                 <Events userIsAdmin={user.admin} />
               </Route>
               {/* ADMIN ROUTES */}
-              <Route exact path="/npcs/admin" component={AdminNpcs} />
-              <Route exact path="/items/admin" component={AdminItems} />
-              <Route exact path="/gifts/admin" component={AdminGifts} />
+              <Route exact path="/npcs/admin">
+                {user.isLoggedIn && user.admin ? <AdminNpcs /> : <Redirect to="/login" />}
+              </Route>
+              <Route exact path="/items/admin">
+                {user.isLoggedIn && user.admin ? <AdminItems /> : <Redirect to="/login" />}
+              </Route>
+              <Route exact path="/gifts/admin">
+                {user.isLoggedIn && user.admin ? <AdminGifts /> : <Redirect to="/login" />}
+              </Route>
             </Switch>
           </Box>
         </SnackbarProvider>

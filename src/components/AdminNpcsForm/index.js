@@ -149,7 +149,7 @@ export default function AdminNpcsForm() {
           	<Grid item xs={6}>
 	          	{/* Available in standard game, or a mod? */}
 	          	<FormControl className={classes.formControl}>
-		            <InputLabel id="availableIn-label">Available in standard game, or a mod?</InputLabel>
+		            <InputLabel id="availableIn-label">Available in standard game ("Vanilla"), or a mod?</InputLabel>
 		            <Select
 		              labelId="availableIn-label"
 		              id="availableIn"

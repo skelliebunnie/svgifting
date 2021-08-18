@@ -112,7 +112,7 @@ const DatabaseContextProvider = (props) => {
     checkupSeasonId: 1,
     marriageable: false,
     LocationId: '',
-    availableIn: 'standard'
+    availableIn: "Vanilla"
   }
 
   const [addNpcFormOptions, setAddNpcFormOptions] = useState({
@@ -167,6 +167,36 @@ const DatabaseContextProvider = (props) => {
 	  	}).catch(err => console.error(err));
   //eslint-disable-next-line
   }, [])
+
+  useEffect(() => {
+    if(selectedNpc !== null) {
+      let formOptions = {
+        name: selectedNpc.name,
+        marriageable: selectedNpc.marriageable,
+        LocationId: selectedNpc.Location.id,
+        availableIn: selectedNpc.availableIn,
+      };
+
+      for(var i = 0; i < selectedNpc.Seasons.length; i++) {
+        const season = selectedNpc.Seasons[i];
+
+        if(season.Event.type === "birthday") {
+          formOptions.birthdaySeasonId = season.id;
+          formOptions.birthdayDate = season.Event.day;
+        }
+
+        if (season.Event.type === "checkup") {
+          formOptions.checkupSeasonId = season.id;
+          formOptions.checkupDate = season.Event.day;
+        }
+      }
+
+      setAddNpcFormOptions(formOptions);
+      
+    } else {
+      setAddNpcFormOptions(defaultAddNpcFormOptions);
+    }
+  }, [selectedNpc])
 
   useEffect(() => {
     if(!addEventModalOpen) {
@@ -308,67 +338,133 @@ const DatabaseContextProvider = (props) => {
   }
 
   const itemToDatabase = (data) => {
-    API.upsertItem(data)
-      .then(results => {
-        setAlert({ open: true, message: addItemFormOptions.id !== undefined ? `${addItemFormOptions.name} updated successfully` : `${addItemFormOptions.name} saved successfully`, severity: 'success' });
+    const token = localStorage.getItem("svgifting-token") || null;
 
-        setAddItemFormOptions({ ...defaultAddItemFormOptions })
-        setSelectedItem(null)
+    API.upsertItem(data, token)
+      .then((results) => {
+        setAlert({
+          open: true,
+          message:
+            addItemFormOptions.id !== undefined
+              ? `${addItemFormOptions.name} updated successfully`
+              : `${addItemFormOptions.name} saved successfully`,
+          severity: "success",
+        });
+
+        setAddItemFormOptions({ ...defaultAddItemFormOptions });
+        setSelectedItem(null);
         setAddItemModalOpen(false);
-        setItems([...dbItems, {...results.data, icon: getIcon(results.data.name, 'item_icons', 'png', true)}])
-
+        setItems([
+          ...dbItems,
+          {
+            ...results.data,
+            icon: getIcon(results.data.name, "item_icons", "png", true),
+          },
+        ]);
       })
-      .catch(err => {
-        setAlert({ open: true, message: addItemFormOptions.id !== undefined ? `Error: ${addItemFormOptions.name} was not updated. Message: ${err.message}` : `Error: ${addItemFormOptions.name} was not saved. Message: ${err.message}`, severity: 'error' })
+      .catch((err) => {
+        setAlert({
+          open: true,
+          message:
+            addItemFormOptions.id !== undefined
+              ? `Error: ${addItemFormOptions.name} was not updated. Message: ${err.message}`
+              : `Error: ${addItemFormOptions.name} was not saved. Message: ${err.message}`,
+          severity: "error",
+        });
         console.error(err.message);
       });
   }
 
   const addNpcFormSubmit = (npcFormData) => {
+    const token = localStorage.getItem("svgifting-token") || null;
+
   	// add handling for friends / family
+  	API.upsertNpc(npcFormData, token)
+      .then((results) => {
+        API.upsertEvent(
+          {
+            name: `${npcFormData.name}'s Birthday`,
+            day: npcFormData.birthdayDate,
+            NpcId: results.data.id,
+            SeasonId: npcFormData.birthdaySeasonId,
+            type: "birthday",
+            startTime: formatTime(new Date("2021-01-01T02:00:00")),
+            endTime: formatTime(new Date("2021-01-01T23:59:59")),
+          },
+          token
+        )
+          .then((birthdayEventResults) => {
+            if (npcFormData.checkupDate !== 0) {
+              API.upsertEvent(
+                {
+                  name: `${npcFormData.name} Checkup`,
+                  day: npcFormData.checkupDate,
+                  NpcId: results.data.id,
+                  SeasonId: npcFormData.checkupSeasonId,
+                  type: "checkup",
+                  startTime: formatTime(new Date("2021-01-01T10:00:00")),
+                  endTime: formatTime(new Date("2021-01-01T:16:00:00")),
+                },
+                token
+              )
+                .then((checkupEventResults) => {
+                  setAlert({
+                    open: true,
+                    message:
+                      addNpcFormOptions.id !== undefined
+                        ? `${addNpcFormOptions.name} updated successfully`
+                        : `${addNpcFormOptions.name} saved successfully`,
+                    severity: "success",
+                  });
 
-  	API.upsertNpc(npcFormData)
-  		.then(results => {
-  			API.upsertEvent({
-  				name: `${npcFormData.name}'s Birthday`,
-			    day: npcFormData.birthdayDate,
-			    NpcId: results.data.id,
-			    SeasonId: npcFormData.birthdaySeasonId,
-			    type: 'birthday',
-			    startTime: formatTime(new Date('2021-01-01T02:00:00')),
-			    endTime: formatTime(new Date('2021-01-01T23:59:59'))
-  			}).then(birthdayEventResults => {
-  				
-  				if(npcFormData.checkupDate !== 0) {
-  					API.upsertEvent({
-  						name: `${npcFormData.name} Checkup`,
-  						day: npcFormData.checkupDate,
-  						NpcId: results.data.id,
-  						SeasonId: npcFormData.checkupSeasonId,
-  						type: 'checkup',
-  						startTime: formatTime(new Date('2021-01-01T10:00:00')),
-  						endTime: formatTime(new Date('2021-01-01T:16:00:00'))
-  					}).then(checkupEventResults => {
-  						setAlert({ open: true, message: addNpcFormOptions.id !== undefined ? `${addNpcFormOptions.name} updated successfully` : `${addNpcFormOptions.name} saved successfully`, severity: 'success' });
+                  setAddNpcFormOptions({ ...defaultAddNpcFormOptions });
+                  setSelectedNpc(null);
+                  setNpcs([
+                    ...dbNpcs,
+                    {
+                      ...results.data,
+                      icon: getIcon(
+                        results.data.name,
+                        "npc_icons",
+                        "png",
+                        true
+                      ),
+                    },
+                  ]);
+                })
+                .catch((err) => console.error(err));
+            } else {
+              setAlert({
+                open: true,
+                message:
+                  addNpcFormOptions.id !== undefined
+                    ? `${addNpcFormOptions.name} updated successfully`
+                    : `${addNpcFormOptions.name} saved successfully`,
+                severity: "success",
+              });
 
-			        setAddNpcFormOptions({...defaultAddNpcFormOptions});
-			        setSelectedNpc(null);
-			        setNpcs([...dbNpcs, {...results.data, icon: getIcon(results.data.name, 'npc_icons', 'png', true)}])
-  					}).catch(err => console.error(err));
-
-  				} else {
-  					setAlert({ open: true, message: addNpcFormOptions.id !== undefined ? `${addNpcFormOptions.name} updated successfully` : `${addNpcFormOptions.name} saved successfully`, severity: 'success' });
-
-		        setAddNpcFormOptions({...defaultAddNpcFormOptions});
-		        setSelectedNpc(null);
-		        setNpcs([...dbNpcs, {...results.data, icon: getIcon(results.data.name, 'npc_icons', 'png', true)}])
-  				}
-
-  			}).catch(err => console.error(err));
-
-  			
-  		}).catch(err => {
-        setAlert({ open: true, message: addNpcFormOptions.id !== undefined ? `Error: ${addNpcFormOptions.name} was not updated. Message: ${err.message}` : `Error: ${addNpcFormOptions.name} was not saved. Message: ${err.message}`, severity: 'error' })
+              setAddNpcFormOptions({ ...defaultAddNpcFormOptions });
+              setSelectedNpc(null);
+              setNpcs([
+                ...dbNpcs,
+                {
+                  ...results.data,
+                  icon: getIcon(results.data.name, "npc_icons", "png", true),
+                },
+              ]);
+            }
+          })
+          .catch((err) => console.error(err));
+      })
+      .catch((err) => {
+        setAlert({
+          open: true,
+          message:
+            addNpcFormOptions.id !== undefined
+              ? `Error: ${addNpcFormOptions.name} was not updated. Message: ${err.message}`
+              : `Error: ${addNpcFormOptions.name} was not saved. Message: ${err.message}`,
+          severity: "error",
+        });
         console.error(err.message);
       });
   }
@@ -439,28 +535,48 @@ const DatabaseContextProvider = (props) => {
    * CREATE / DELETE EVENTS
    */
    const addEvent = () => {
+    const token = localStorage.getItem("svgifting-token") || null;
+
     const eventData = newEvent;
 
-    if(eventData.NpcId === '') eventData.NpcId = null
+    if (eventData.NpcId === "") eventData.NpcId = null;
 
-    eventData.SeasonId = eventData.SeasonId !== selectedSeason.id ? eventData.SeasonId = selectedSeason.id : eventData.SeasonId
-    eventData.startTime = typeof eventData.startTime === 'string' ? eventData.startTime.substring(11) : formatTime(eventData.startTime)
-    eventData.endTime = typeof eventData.endTime === 'string' ? eventData.endTime.substring(11) : formatTime(eventData.endTime)
+    eventData.SeasonId =
+      eventData.SeasonId !== selectedSeason.id
+        ? (eventData.SeasonId = selectedSeason.id)
+        : eventData.SeasonId;
+    eventData.startTime =
+      typeof eventData.startTime === "string"
+        ? eventData.startTime.substring(11)
+        : formatTime(eventData.startTime);
+    eventData.endTime =
+      typeof eventData.endTime === "string"
+        ? eventData.endTime.substring(11)
+        : formatTime(eventData.endTime);
 
-    // console.log("insert this", eventData)
-    API.upsertEvent(eventData)
+    API.upsertEvent(eventData, token)
       .then((event) => {
-        let season = seasons.filter(season => season.id === parseInt(eventData.SeasonId));
-        setAlert({ open: true, severity: "success", message: `"${eventData.name}" added successfully to ${season[0].name} ${eventData.day}`})
-        
+        let season = seasons.filter(
+          (season) => season.id === parseInt(eventData.SeasonId)
+        );
+        setAlert({
+          open: true,
+          severity: "success",
+          message: `"${eventData.name}" added successfully to ${season[0].name} ${eventData.day}`,
+        });
+
         getEvents(selectedSeason.id);
 
-        setNewEvent(defaultNewEvent)
-        
-        setAddEventModalOpen(false)
+        setNewEvent(defaultNewEvent);
+
+        setAddEventModalOpen(false);
       })
-      .catch(err => {
-        setAlert({open: true, severity: 'error', message: `"${eventData.name}" NOT created.\nERROR: ${err.message}`});
+      .catch((err) => {
+        setAlert({
+          open: true,
+          severity: "error",
+          message: `"${eventData.name}" NOT created.\nERROR: ${err.message}`,
+        });
       });
   }
 

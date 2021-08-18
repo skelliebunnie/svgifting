@@ -52,15 +52,13 @@ const GeneralFunctions = {
   userAuth: (authToken) => {
     return API.getAuthToken(authToken)
       .then((res) => {
-        const user = {
+        return {
           name: res.data.name,
           username: res.data.username,
           email: res.data.email,
           admin: res.data.admin,
-          isLoggedIn: true,
+          isLoggedIn: true
         };
-
-        return user;
       })
       .catch((err) => {
         console.log(err);
