@@ -1,7 +1,7 @@
 import { createMuiTheme } from '@material-ui/core/styles'
 import createBreakpoints from '@material-ui/core/styles/createBreakpoints'
 
-const palette = require('../utils/palette').default
+import palette from '../utils/palette'
 
 const breakpoints = createBreakpoints({})
 

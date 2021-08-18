@@ -22,7 +22,7 @@ import AdminNpcs from './pages/AdminNpcs'
 import AdminGifts from './pages/AdminGifts'
 import AdminItems from './pages/AdminItems'
 
-const palette = require('./utils/palette').default
+import palette from "./utils/palette";
 
 const useStyles = makeStyles(() => ({
   root: {
