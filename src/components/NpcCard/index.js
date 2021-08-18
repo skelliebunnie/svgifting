@@ -163,7 +163,6 @@ export default function NpcCard(props) {
                     alt="Love"
                     style={{ width: 24, marginRight: "0.35rem" }}
                   />
-                  {/* <FontAwesomeIcon icon={faHeart} style={{fontSize: '2rem', color: 'crimson', verticalAlign: 'middle'}} /> */}
                   Loved Gifts:
                 </Typography>
                 {gifts.map(

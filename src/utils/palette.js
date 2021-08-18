@@ -185,5 +185,4 @@ const palette = {
   ...corePalette,
 }
 
-// export default palette // this is for import palette from '...'
 module.exports = palette // this is for const palette = require('...')

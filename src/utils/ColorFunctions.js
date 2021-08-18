@@ -1,4 +1,4 @@
-import palette from './palette'
+const palette = require("../utils/palette");
 
 const ColorFunctions = {
   // https://codepen.io/davidhalford/pen/ywEva?editors=0010
@@ -31,17 +31,17 @@ const ColorFunctions = {
   // https://stackoverflow.com/a/60880664
   adjustColor: (hex, percent, alpha) => {
     if (hex === undefined) return;
-    
+
     // strip the leading # if it's there
     hex = hex.toString().replace("#", "");
-    alpha = alpha !== undefined ? parseInt(alpha, 16) : 'FF';
+    alpha = alpha !== undefined ? parseInt(alpha, 16) : "FF";
 
     // convert 3 char codes --> 6, e.g. `E0F` --> `EE00FF`
     if (hex.length === 3) {
-        hex = hex.replace(/(.)/g, "$1$1");
+      hex = hex.replace(/(.)/g, "$1$1");
     }
 
-    if(hex.length > 6) {
+    if (hex.length > 6) {
       alpha = parseInt(hex.substr(6, 2), 16);
     }
 
@@ -55,11 +55,12 @@ const ColorFunctions = {
     g = Math.round(Math.min(255, Math.max(0, g * calculatedPercent)));
     b = Math.round(Math.min(255, Math.max(0, b * calculatedPercent)));
 
-    const newRGB = (`${r.toString(16).toUpperCase()}${g.toString(16).toUpperCase()}${b.toString(16).toUpperCase()}${alpha}`).padStart(6, '0');
+    const newRGB = `${r.toString(16).toUpperCase()}${g
+      .toString(16)
+      .toUpperCase()}${b.toString(16).toUpperCase()}${alpha}`.padStart(6, "0");
 
-    return '#' + newRGB;
-  }
+    return "#" + newRGB;
+  },
 };
 
-
-export default ColorFunctions
+export default ColorFunctions;
