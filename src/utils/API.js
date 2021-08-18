@@ -1,7 +1,7 @@
 const axios = require("axios")
 
 // const URL_PREFIX = "http://192.168.0.11:3030"
-const URL_PREFIX = "https://evening-thicket-11567.herokuapp.com/";
+const URL_PREFIX = "https://evening-thicket-11567.herokuapp.com";
 
 const API = {
   // user login & auth

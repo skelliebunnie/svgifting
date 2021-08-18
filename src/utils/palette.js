@@ -176,13 +176,14 @@ const generatePalette = (colors, range) => {
 const corePalette = generatePalette(core, base);
 
 const palette = {
-  transparent: 'transparent',
-  current: 'currentColor',
-  white: 'white',
-  black: 'black',
+  transparent: "transparent",
+  current: "currentColor",
+  white: "white",
+  black: "black",
   light: base[50],
   dark: base[900],
   ...corePalette,
-}
+};
 
-module.exports = palette // this is for const palette = require('...')
+//module.exports = palette // this is for const palette = require('...')
+export default palette
